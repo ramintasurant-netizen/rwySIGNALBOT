@@ -59,9 +59,10 @@ Legenda status: ❌ belum · ⚠️ sebagian · ✅ selesai
 
 | Item | Status | Catatan |
 |---|---|---|
-| Batas panjang pesan & perilaku HTML parse mode | ❌ | cek Bot API terbaru saat implementasi formatter |
-| Hak posting bot pada channel dan supergroup forum (`message_thread_id`) | ❌ | verifikasi via `getChatMember` saat runtime |
-| Penanganan pengirim anonim/`sender_chat` untuk otorisasi admin | ❌ | ditolak by design; verifikasi field API |
+| Batas panjang pesan (4096) & tag HTML yang didukung | ⚠️ | dipakai dari konstanta python-telegram-bot 22.8; formatter memvalidasi tag & panjang. Perilaku nyata di grup belum diuji dari sandbox (tanpa token) |
+| Hak posting bot pada channel dan supergroup forum (`message_thread_id`) | ⚠️ | diverifikasi saat runtime via `getChat`/`getChatMember` (`can_post_messages`, `is_forum`); belum diuji dengan akun nyata |
+| Penanganan pengirim anonim/`sender_chat` untuk otorisasi admin | ⚠️ | ditolak by design (sender_chat, GroupAnonymousBot 1087968824, is_bot); belum diuji dengan grup nyata |
+| Uji kirim TEST nyata ke grup | ❌ | membutuhkan token & ID grup pemilik; jalankan `scripts/test_telegram.py --send` |
 
 ## 7. Parameter risiko & kebijakan (Tahap 3)
 

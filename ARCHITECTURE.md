@@ -1,7 +1,8 @@
 # ARCHITECTURE — Bot Sinyal Saham IDX untuk Grup Telegram
 
-> **Status dokumen:** arsitektur disetujui (Tahap 1); **Tahap 2 (fondasi & data layer) dan
-> Tahap 3 (engine & risk) diimplementasikan** — lihat §21–§22 untuk keputusan dan penyesuaian.
+> **Status dokumen:** arsitektur disetujui (Tahap 1); **Tahap 2 (fondasi & data layer), Tahap 3
+> (engine & risk), dan Tahap 4 (storage, Telegram, scheduler) diimplementasikan** — lihat
+> §21–§23 untuk keputusan dan penyesuaian.
 > Semua nilai angka pada dokumen ini (lot, fraksi harga, ARA/ARB, threshold, modal contoh)
 > adalah **CONTOH / BELUM TERVERIFIKASI** sampai dilabeli sebaliknya pada file konfigurasi.
 >
@@ -836,3 +837,57 @@ kebijakan target agar syarat "R:R minimum 2.0 **dengan biaya**" dapat dipenuhi s
 Bukti yang benar-benar dijalankan: `pytest` (215 test offline lulus), `ruff check/format`,
 `python main.py evaluate` dengan jaringan pada 12 saham watchlist (semua data `degraded`
 dapat dipakai; hasil hari itu "data valid tetapi tidak ada setup layak" — bukan dipaksakan).
+
+---
+
+## 23. Catatan implementasi Tahap 4 — storage, Telegram, scheduler (2026-09-24 WIB)
+
+Keputusan: command admin **hanya** diterima di grup admin (`TELEGRAM_ADMIN_CHAT_ID`); tanpa
+grup admin, command admin dinonaktifkan (alasan dicatat di log dan dibalas ke grup).
+
+Modul dan perilaku kunci:
+
+- **Kontrak `ReportSnapshot`** di `core/snapshot.py` (pydantic, angka sebagai string dari
+  `Decimal`); disimpan immutable di `job_runs.snapshot_json`; formatter/WhatsApp/narator hanya
+  membaca dari sini.
+- **Lifecycle** (`engine/lifecycle.py`): entry terisi bila `low ≤ entry_high` pada sesi setelah
+  publikasi, harga isi `min(entry_high, open)`; pada bar entry SL boleh terpicu (konservatif) tetapi
+  TP tidak; `active`: SL diperiksa sebelum TP; gap melewati SL/TP1 ⇒ keluar di open; tanpa partial;
+  pending kedaluwarsa setelah 3 sesi; `active` ditutup di close setelah 20 sesi (`closed_time`).
+  Bar parsial (quote 15:00) hanya mengevaluasi sentuhan high/low, tidak menambah hitungan sesi.
+  Level tersentuh ≠ jaminan terisi di pasar nyata — dinyatakan sebagai asumsi simulasi.
+- **Storage** (`storage/`): UNIQUE `(job_type, trading_date, origin)` sebagai klaim atomik;
+  re-klaim hanya untuk `failed/blocked` atau job `claimed/running` yang basi (> 30 menit);
+  `message_deliveries` UNIQUE `(job_run_id, chat_id, thread_id, part_index)`; transisi
+  `pending→sending` lewat UPDATE bersyarat; saat start, baris `sending` yang tertinggal menjadi
+  `unknown` (bukan `pending`). `UTCDateTime` menjaga tz-aware pada SQLite. Alembic untuk PostgreSQL;
+  `origin` memisahkan dry_run/live/fixture di semua statistik.
+- **Notifier Telegram**: allowlist → `getChat` (hanya group/supergroup/channel) → `getChatMember`
+  (anggota; channel: admin + `can_post_messages`; forum untuk `thread_id`); private ditolak di semua
+  jalur termasuk alert admin dan script TEST. Pemetaan: sukses ⇒ `sent`; `BadRequest/Forbidden/
+  ChatMigrated/InvalidToken` ⇒ `failed`; `RetryAfter` ⇒ `failed` retryable (satu percobaan ulang
+  terbatas, dijamin belum terkirim); `TimedOut/NetworkError` ⇒ `unknown` tanpa resend otomatis.
+- **Gate** (`bot/gates.py`): kalender/pause = blocker keras (job dilewati); di development, aturan
+  belum terverifikasi & gate backtest = peringatan (masuk ke bagian kualitas data pesan); di
+  production = blocker publikasi. Live selalu memerlukan token+tujuan+saklar+verifikasi API tujuan.
+- **ReportService** (`bot/reports.py`): pagi = sesi sebelumnya via kalender, universe = watchlist DB ∪
+  simbol sinyal terbuka, engine + lifecycle dengan bar sesi tersebut; sore = quote intraday
+  (kesegaran ≤ 20 menit) hanya untuk lifecycle & validasi pending — strategi harian tidak dijalankan
+  pada bar belum lengkap. Semua data gagal ⇒ job `failed` + alert (tanpa pesan "sinyal kosong").
+  Origin `live` tanpa gate publikasi ⇒ job `blocked` + alert; dry_run ⇒ ekspor ke `var/exports`.
+- **Command router** (`bot/commands.py`) independen dari PTB agar otorisasi dapat diuji tanpa
+  objek Telegram; adapter tipis di `bot/handlers.py` memakai filter grup/channel PTB.
+- **Scheduler**: cron Senin–Jumat 08:30/15:00 WIB (`misfire_grace_time` 10 menit, `coalesce`,
+  `max_instances=1`); kalender/libur diperiksa di preflight; health check tiap 15 menit + heartbeat
+  `var/heartbeat`; shutdown tertib pada SIGINT/SIGTERM.
+- Tambahan kecil: `scripts/test_telegram.py --discover` mencetak ID grup yang terlihat bot lewat
+  `getUpdates` (chat pribadi tidak ditampilkan) agar pemilik tidak perlu membagikan token.
+
+Bukti yang benar-benar dijalankan: `pytest` (283 test offline lulus: klaim konkuren 8 coroutine
+⇒ 1 pemenang; restart `sending→unknown`; dedup rencana pengiriman; jalur live dengan bot palsu
+termasuk timeout ⇒ `unknown` tanpa resend; penolakan private di notifier/router/script; otorisasi
+admin incl. anonim; formatter escape/split/validasi; migrasi Alembic pada SQLite), `ruff`,
+`python main.py dryrun morning|afternoon` dengan data Yahoo nyata (job `completed`, ekspor
+HTML, tanpa kirim), `python main.py run` tanpa token (scheduler aktif, jadwal WIB benar,
+shutdown tertib). **Belum**: pengiriman nyata ke grup Telegram (membutuhkan token & ID grup
+pemilik), PostgreSQL nyata (test tersedia via `TEST_POSTGRES_URL`).

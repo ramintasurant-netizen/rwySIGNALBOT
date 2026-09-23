@@ -5,7 +5,8 @@ Tahap 2: perintah diagnostik tanpa token —
   python main.py health                 health check provider aktif (JARINGAN)
   python main.py fetch --symbol BBCA    ambil & validasi OHLCV harian lewat aggregator (JARINGAN)
   python main.py evaluate [--symbols ...] jalankan engine pada watchlist, cetak kartu (JARINGAN, tanpa kirim)
-Perintah `run` (bot + scheduler) tersedia pada Tahap 4.
+  python main.py dryrun morning|afternoon  jalankan satu job end-to-end tanpa kirim; ekspor ke var/exports (JARINGAN)
+  python main.py run                    bot Telegram (grup-only) + scheduler; tanpa token = scheduler dry-run saja
 """
 
 from __future__ import annotations
@@ -14,6 +15,7 @@ import argparse
 import asyncio
 import json
 import sys
+from dataclasses import asdict
 from datetime import datetime
 from pathlib import Path
 
@@ -25,6 +27,7 @@ from config.settings import Settings, load_settings
 from config.trading_calendar import CalendarCoverageError, load_trading_calendar
 from config.watchlist import load_watchlist
 from core.logging import configure_logging
+from core.snapshot import ReportType
 from core.timeutil import WIB
 from data.aggregator import AggregatorConfig, MarketDataAggregator
 from data.providers import build_providers
@@ -107,7 +110,7 @@ async def cmd_health(settings: Settings) -> int:
         build_providers(settings, rules), AggregatorConfig.from_settings(settings)
     )
     report = await aggregator.health()
-    print(_json([h.__dict__ for h in report]))
+    print(_json([asdict(h) for h in report]))
     return 0 if all(h.healthy for h in report) else 1
 
 
@@ -189,7 +192,7 @@ async def cmd_evaluate(settings: Settings, symbols: list[str] | None) -> int:
         "calendar_label": calendar.label,
         "universe": list(universe_symbols),
         "data_blocked": data_blocked,
-        "engine_blocked": [b.__dict__ for b in result.blocked],
+        "engine_blocked": [asdict(b) for b in result.blocked],
         "evaluated_without_setup": [
             e.symbol for e in result.evaluations if e.card is None and e.blocked is None
         ],
@@ -210,16 +213,53 @@ async def cmd_evaluate(settings: Settings, symbols: list[str] | None) -> int:
                 "tp": [c.risk.tp1, c.risk.tp2, c.risk.tp3],
                 "rr_tp1": {"gross": c.risk.rr_tp1_gross, "net": c.risk.rr_tp1_net},
                 "ara_arb": [c.risk.ara, c.risk.arb],
-                "sizing": c.risk.sizing.__dict__ if c.risk.sizing else None,
+                "sizing": asdict(c.risk.sizing) if c.risk.sizing else None,
                 "reasons": list(c.reasons),
                 "risk_notes": list(c.risk.notes),
-                "data": c.data.__dict__,
+                "data": asdict(c.data),
             }
             for c in result.cards
         ],
         "disclaimer": "Bukan ajakan jual/beli. Analisis bersifat informasional. Keputusan dan risiko sepenuhnya milik Anda.",
     }
     print(_json(out))
+    return 0
+
+
+async def cmd_dryrun(settings: Settings, which: str) -> int:
+    """Satu job end-to-end dengan origin dry_run: tidak mengirim apa pun, mencetak pesan tersanitasi."""
+    from bot.commands import outcome_text
+    from bot.runtime import build_runtime
+
+    if settings.app_mode != "dry_run":
+        print(
+            "dryrun hanya untuk APP_MODE=dry_run (ubah .env atau pakai --env-file -)",
+            file=sys.stderr,
+        )
+        return 2
+    rt = await build_runtime(settings, with_bot=False)
+    try:
+        outcome = await rt.service.run(ReportType(which), trigger="manual")
+    finally:
+        await rt.db.dispose()
+    print(f"status: {outcome.status}")
+    if outcome.reason:
+        print(f"alasan: {outcome.reason}")
+    for w in outcome.warnings:
+        print(f"peringatan: {w}")
+    if outcome.export_path:
+        print(f"ekspor: {outcome.export_path}")
+    for i, part in enumerate(outcome.parts, 1):
+        print(f"\n----- bagian {i}/{len(outcome.parts)} ({len(part)} karakter) -----\n{part}")
+    logger.info(outcome_text(outcome).replace("<", "[").replace(">", "]"))
+    return 0 if outcome.status == "completed" else 1
+
+
+async def cmd_run(settings: Settings) -> int:
+    from bot.runtime import build_runtime, run_forever
+
+    rt = await build_runtime(settings)
+    await run_forever(rt)
     return 0
 
 
@@ -238,7 +278,9 @@ def build_parser() -> argparse.ArgumentParser:
         "evaluate", help="jalankan engine pada watchlist tanpa mengirim (jaringan)"
     )
     evaluate.add_argument("--symbols", nargs="*", help="override watchlist, mis. BBCA BBRI")
-    sub.add_parser("run", help="jalankan bot + scheduler (Tahap 4)")
+    dry = sub.add_parser("dryrun", help="satu job end-to-end tanpa kirim (jaringan)")
+    dry.add_argument("which", choices=["morning", "afternoon"])
+    sub.add_parser("run", help="jalankan bot Telegram + scheduler")
     return parser
 
 
@@ -250,7 +292,11 @@ def main(argv: list[str] | None = None) -> int:
     except Exception as exc:  # noqa: BLE001 - tampilkan error konfigurasi dengan jelas
         print(f"Konfigurasi tidak valid:\n{exc}", file=sys.stderr)
         return 2
-    configure_logging(level=settings.log_level, diagnose=settings.log_diagnose)
+    configure_logging(
+        level=settings.log_level,
+        diagnose=settings.log_diagnose,
+        log_dir=settings.var_dir / "logs" if args.command == "run" else None,
+    )
     for warning in settings.config_warnings:
         logger.warning(warning)
 
@@ -262,12 +308,10 @@ def main(argv: list[str] | None = None) -> int:
         return asyncio.run(cmd_fetch(settings, args.symbol, args.timeframe))
     if args.command == "evaluate":
         return asyncio.run(cmd_evaluate(settings, args.symbols))
+    if args.command == "dryrun":
+        return asyncio.run(cmd_dryrun(settings, args.which))
     if args.command == "run":
-        print(
-            "Perintah `run` belum tersedia: bot, storage, dan scheduler dibangun pada Tahap 4.",
-            file=sys.stderr,
-        )
-        return 3
+        return asyncio.run(cmd_run(settings))
     return 2
 
 

@@ -19,9 +19,13 @@ def test_config_command_runs_without_token_and_hides_secrets(capsys) -> None:
     assert "TELEGRAM_BOT_TOKEN" not in out
 
 
-def test_run_command_is_not_available_yet(capsys) -> None:
-    assert main.main(["--env-file", "-", "run"]) == 3
-    assert "Tahap 4" in capsys.readouterr().err
+def test_dryrun_refuses_live_mode(monkeypatch, capsys) -> None:
+    monkeypatch.setenv("APP_MODE", "live")
+    monkeypatch.setenv("TELEGRAM_ENABLE_LIVE_SEND", "true")
+    monkeypatch.setenv("TELEGRAM_BOT_TOKEN", "1234567890:AAFakeTokenValueForTests_abcdefghijklmnop")
+    monkeypatch.setenv("TELEGRAM_SIGNAL_CHAT_IDS", "-1001")
+    assert main.main(["--env-file", "-", "dryrun", "morning"]) == 2
+    assert "APP_MODE=dry_run" in capsys.readouterr().err
 
 
 def test_invalid_env_reports_clear_error(monkeypatch, capsys) -> None:
