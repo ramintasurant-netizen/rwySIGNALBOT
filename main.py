@@ -7,6 +7,8 @@ Tahap 2: perintah diagnostik tanpa token —
   python main.py evaluate [--symbols ...] jalankan engine pada watchlist, cetak kartu (JARINGAN, tanpa kirim)
   python main.py dryrun morning|afternoon  jalankan satu job end-to-end tanpa kirim; ekspor ke var/exports (JARINGAN)
   python main.py run                    bot Telegram (grup-only) + scheduler; tanpa token = scheduler dry-run saja
+  python main.py backtest --start ... --end ... [--csv-dir DIR] [--save-gate]
+                                        backtest engine yang sama; laporan + CSV ke var/backtests (JARINGAN bila tanpa CSV)
 """
 
 from __future__ import annotations
@@ -16,7 +18,7 @@ import asyncio
 import json
 import sys
 from dataclasses import asdict
-from datetime import datetime
+from datetime import date, datetime
 from pathlib import Path
 
 from loguru import logger
@@ -267,6 +269,110 @@ async def cmd_run(settings: Settings) -> int:
     return 0
 
 
+async def cmd_backtest(settings: Settings, args: argparse.Namespace) -> int:
+    from decimal import Decimal
+
+    from backtest.data import fetch_frames, load_csv_dir
+    from backtest.gate import GateThresholds, evaluate_gate, gate_record, split_period
+    from backtest.metrics import write_equity_csv, write_trades_csv
+    from backtest.runner import BacktestConfig, BacktestRunner
+    from storage.repository import Database, Repository
+
+    rules = load_market_rules(settings.config_dir / "market_rules.yaml")
+    watchlist = load_watchlist(settings.config_dir / "watchlist.yaml")
+    engine = SignalEngine(
+        rules, risk=RiskConfig.from_settings(settings), scorer=ScorerConfig.from_settings(settings)
+    )
+    start, end = date.fromisoformat(args.start), date.fromisoformat(args.end)
+    symbols = [s.upper() for s in (args.symbols or watchlist.codes)]
+    skipped: dict[str, str] = {}
+    if args.csv_dir:
+        frames = load_csv_dir(Path(args.csv_dir))
+        if args.symbols:
+            frames = {k: v for k, v in frames.items() if k in symbols}
+    else:
+        aggregator = MarketDataAggregator(
+            build_providers(settings, rules), AggregatorConfig.from_settings(settings)
+        )
+        frames, skipped = await fetch_frames(
+            aggregator, symbols, start=start, end=end, min_bars=settings.daily_min_history_bars
+        )
+    if not frames:
+        print(f"Tidak ada data layak untuk backtest: {skipped}", file=sys.stderr)
+        return 1
+
+    thresholds = GateThresholds(
+        min_trades=args.min_trades,
+        min_profit_factor=Decimal(str(args.min_pf)),
+        max_drawdown_pct=Decimal(str(args.max_dd)),
+        oos_fraction=Decimal(str(args.oos_fraction)),
+    )
+    (is_start, is_end), (oos_start, oos_end) = split_period(start, end, thresholds.oos_fraction)
+    cfg_common = dict(
+        initial_capital=settings.sizing_capital_example,
+        slippage_ticks=args.slippage_ticks,
+        fee_buy_pct=settings.risk_fee_buy_pct,
+        fee_sell_pct=settings.risk_fee_sell_pct,
+        warmup_bars=settings.daily_min_history_bars,
+    )
+
+    def progress(session: date, i: int, n: int) -> None:
+        if i == 1 or i == n or i % 50 == 0:
+            logger.info("backtest {} {}/{}", session, i, n)
+
+    def run_segment(seg_start: date, seg_end: date):
+        cfg = BacktestConfig(start=seg_start, end=seg_end, **cfg_common)
+        return BacktestRunner(engine, rules, cfg, progress=progress).run(frames)
+
+    try:
+        in_sample = run_segment(is_start, is_end)
+    except ValueError as exc:
+        logger.warning("in-sample tidak dapat dijalankan: {}", exc)
+        in_sample = None
+    try:
+        oos = run_segment(oos_start, oos_end)
+    except ValueError as exc:
+        print(f"Out-of-sample tidak dapat dijalankan: {exc}", file=sys.stderr)
+        return 1
+    evaluation = evaluate_gate(oos, thresholds, in_sample=in_sample)
+    record = gate_record(oos, evaluation)
+
+    out_dir = (
+        settings.var_dir / "backtests" / f"{start.isoformat()}_{end.isoformat()}_{oos.result_hash}"
+    )
+    out_dir.mkdir(parents=True, exist_ok=True)
+    write_equity_csv(oos.equity, out_dir / "oos_equity.csv")
+    write_trades_csv(oos.trades, out_dir / "oos_trades.csv")
+    if in_sample is not None:
+        write_equity_csv(in_sample.equity, out_dir / "in_sample_equity.csv")
+        write_trades_csv(in_sample.trades, out_dir / "in_sample_trades.csv")
+    report = {
+        "in_sample": in_sample.summary() if in_sample else None,
+        "out_of_sample": oos.summary(),
+        "gate": record,
+        "data_skipped": skipped,
+        "rules_label": rules.label,
+        "output_dir": str(out_dir),
+    }
+    (out_dir / "report.json").write_text(_json(report), encoding="utf-8")
+    print(_json(report))
+
+    if args.save_gate:
+        db = Database(settings.database_url)
+        if db.is_sqlite:
+            await db.init_dev_schema()
+        try:
+            await Repository(db).set_state("backtest_gate", record)
+        finally:
+            await db.dispose()
+        print(
+            f"\nGate {'LULUS' if record['passed'] else 'TIDAK LULUS'} disimpan ke app_state.backtest_gate "
+            f"(config_hash {record['config_hash']}). Hasil backtest tidak menjamin keuntungan masa depan.",
+            file=sys.stderr,
+        )
+    return 0 if evaluation.passed else 4
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="stock_signal_bot")
     parser.add_argument(
@@ -285,6 +391,21 @@ def build_parser() -> argparse.ArgumentParser:
     dry = sub.add_parser("dryrun", help="satu job end-to-end tanpa kirim (jaringan)")
     dry.add_argument("which", choices=["morning", "afternoon"])
     sub.add_parser("run", help="jalankan bot Telegram + scheduler")
+    bt = sub.add_parser("backtest", help="backtest engine yang sama; gate out-of-sample")
+    bt.add_argument("--start", required=True, help="YYYY-MM-DD")
+    bt.add_argument("--end", required=True, help="YYYY-MM-DD")
+    bt.add_argument("--symbols", nargs="*", help="override watchlist")
+    bt.add_argument("--csv-dir", help="folder CSV per simbol (date,open,high,low,close,volume)")
+    bt.add_argument("--slippage-ticks", type=int, default=1)
+    bt.add_argument("--min-trades", type=int, default=30)
+    bt.add_argument("--min-pf", type=float, default=1.3)
+    bt.add_argument("--max-dd", type=float, default=15.0)
+    bt.add_argument("--oos-fraction", type=float, default=0.3)
+    bt.add_argument(
+        "--save-gate",
+        action="store_true",
+        help="simpan hasil gate ke DB (membuka gate produksi bila lulus)",
+    )
     return parser
 
 
@@ -316,6 +437,8 @@ def main(argv: list[str] | None = None) -> int:
         return asyncio.run(cmd_dryrun(settings, args.which))
     if args.command == "run":
         return asyncio.run(cmd_run(settings))
+    if args.command == "backtest":
+        return asyncio.run(cmd_backtest(settings, args))
     return 2
 
 

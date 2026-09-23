@@ -1,8 +1,8 @@
 # ARCHITECTURE — Bot Sinyal Saham IDX untuk Grup Telegram
 
-> **Status dokumen:** arsitektur disetujui (Tahap 1); **Tahap 2–5 diimplementasikan** (fondasi &
-> data layer, engine & risk, storage + Telegram + scheduler, narator LLM + ekspor WhatsApp) —
-> lihat §21–§24 untuk keputusan dan penyesuaian.
+> **Status dokumen:** arsitektur disetujui (Tahap 1); **Tahap 2–6 diimplementasikan** (fondasi &
+> data layer, engine & risk, storage + Telegram + scheduler, narator LLM + ekspor WhatsApp,
+> backtest & gate) — lihat §21–§25 untuk keputusan dan penyesuaian.
 > Semua nilai angka pada dokumen ini (lot, fraksi harga, ARA/ARB, threshold, modal contoh)
 > adalah **CONTOH / BELUM TERVERIFIKASI** sampai dilabeli sebaliknya pada file konfigurasi.
 >
@@ -923,3 +923,45 @@ pada LLM error, bentuk request/response OpenAI & Anthropic dengan transport pals
 pada HTTP 401, kesetaraan angka Telegram↔WhatsApp), `ruff`, `dryrun morning` nyata dengan
 `WHATSAPP_EXPORT_ENABLED=true` (berkas `.whatsapp.txt` dibuat, narasi `template`). **Belum**:
 panggilan LLM nyata (butuh kunci API pemilik).
+
+---
+
+## 25. Catatan implementasi Tahap 6 — backtest & gate produksi (2026-09-24 WIB)
+
+- **Runner** (`backtest/runner.py`) memakai `SignalEngine.run` dan `engine.lifecycle.step` yang sama
+  dengan live. Per sesi t: (1) lifecycle posisi/pending dengan bar t (hanya untuk sinyal yang
+  dipublikasikan < t), (2) engine pada frame yang dipotong ke bar lengkap ≤ t (pertahanan ganda:
+  runner memotong, pipeline memotong lagi), kartu baru menjadi `pending_entry` dan baru bisa
+  terisi mulai t+1, (3) equity mark-to-market di close t. Fill `min(entry_high, open)` + slippage
+  memburuk; SL sebelum TP; gap ⇒ open; biaya persen beli/jual; lot penuh dibatasi kas; satu
+  posisi per simbol; kapasitas `max_open_positions`. Foreign flow `inactive` (tidak ada data EOD).
+- **Definisi R** pada trade: PnL bersih ÷ (`entry_high_rencana − SL` × shares) — identik dengan
+  lifecycle live; fill yang lebih baik memperkecil |R| (dikonfirmasi pada trade nyata UNTR:
+  fill 29.975 vs rencana lebih tinggi ⇒ −0,78R meski keluar di bawah SL).
+- **Metrik** (`backtest/metrics.py`): trade = selesai saja; win rate/expectancy `None` bila 0 trade;
+  PF `None` + catatan bila tanpa kerugian; max drawdown dari equity curve harian (bukan penjumlahan
+  trade); `signals_not_filled`, `open_at_end`, `by_strategy`; CSV equity & trade.
+- **Gate** (`backtest/gate.py`): split berbasis waktu (OOS 30 % akhir); lulus bila OOS trade ≥ 30,
+  expectancy > 0R, PF ≥ 1,3 (PF tak terdefinisi karena tanpa rugi diterima hanya bila trade ≥ minimum),
+  MDD ≤ 15 %. Threshold berlabel CONTOH / BELUM DISEPAKATI. Rekaman gate memuat `engine_version`,
+  `config_hash`, `strategy_versions`, hash hasil OOS, threshold, checks, metrik, disclaimer; disimpan
+  ke `app_state.backtest_gate` oleh `main.py backtest --save-gate` dan dibaca `bot/gates.py`
+  (perubahan `config_hash`/versi strategi membatalkan kelayakan).
+- **Sumber data** (`backtest/data.py`): aggregator (Yahoo; fetch mundur ≈1,6×warmup hari kalender) atau
+  CSV lokal per simbol (dinormalisasi lewat `normalize_ohlcv` yang sama, origin `fixture`).
+- CLI `main.py backtest` mengembalikan `0` lulus / `4` tidak lulus / `1` data tidak layak; laporan ke
+  `var/backtests/<periode>_<hash>/`.
+
+Bukti yang benar-benar dijalankan: `pytest` (327 test offline lulus, termasuk: sinyal lahir di
+sesi t dan terisi t+1 lalu TP dengan PnL R = R:R kotor; crash masa depan tidak mengubah sinyal
+dan gap ⇒ keluar di open; entry+SL satu bar ⇒ rugi konservatif −1R; pending kedaluwarsa bukan
+trade; biaya & slippage memburuk dan tercatat; batas kas & satu posisi; kapasitas; determinisme
+dan hash; metrik kasus tepi & MDD dari kurva; gate lulus/gagal per alasan; rekaman gate membuka
+gate runtime hanya untuk `config_hash` yang sama; CLI CSV menghasilkan laporan dan menyimpan
+`passed=false` apa adanya), `ruff`. **Backtest nyata** (Yahoo, 12 saham watchlist, 2025-01-01..
+2026-09-22, parameter CONTOH): in-sample 286 sesi, 47 trade, expectancy −0,00R, PF 0,99, MDD 9,3 %;
+**out-of-sample** 125 sesi, 15 trade, win 13 %, expectancy −0,54R, PF 0,33, MDD 9,9 % ⇒ **gate
+TIDAK lulus** (3 dari 5 pemeriksaan gagal). Mekanika diverifikasi manual (tidak ada anomali
+urutan harga/tanda PnL; biaya tepat). Kesimpulan jujur: strategi dengan parameter contoh belum
+menunjukkan edge pada universe ini; kalibrasi adalah pekerjaan riset terpisah, dan threshold
+tidak diturunkan agar lulus.

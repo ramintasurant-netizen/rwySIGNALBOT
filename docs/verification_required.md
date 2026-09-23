@@ -79,8 +79,10 @@ Legenda status: ❌ belum · ⚠️ sebagian · ✅ selesai
 
 | Item | Status | Catatan |
 |---|---|---|
-| Threshold gate (trade minimum, expectancy, PF, MDD), periode out-of-sample | ❌ | harus disepakati sebelum sinyal produksi |
-| Sumber data historis & survivorship bias | ❌ | idem |
+| Threshold gate (trade minimum 30, expectancy > 0R, PF ≥ 1,3, MDD ≤ 15 %, OOS 30 %) | ⚠️ | diimplementasikan sebagai default CONTOH / BELUM DISEPAKATI; ubah lewat argumen CLI atau sepakati nilai final |
+| Sumber data historis & survivorship bias | ⚠️ | Yahoo (satu provider) atau CSV pengguna; universe = watchlist saat ini → survivorship bias dinyatakan dalam laporan |
+| Hasil gate saat ini | ❌ | 2026-09-23: **TIDAK lulus** (OOS 15 trade, expectancy −0,54R, PF 0,33). Strategi/parameter perlu kalibrasi; jangan menurunkan threshold agar lulus |
+| Slippage aktual | ❌ | default CONTOH 1 tick per sisi |
 
 ## 9. WhatsApp (jika kelak diaktifkan)
 

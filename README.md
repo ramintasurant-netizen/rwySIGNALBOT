@@ -5,14 +5,13 @@ Bot Python asinkron yang menghasilkan laporan **pre-market (08:30 WIB)** dan **p
 dalam allowlist**. Engine deterministik menentukan seluruh angka trading; LLM (opsional)
 hanya merangkum konteks. Tidak ada eksekusi order, akses dana, atau transaksi broker.
 
-> **Status proyek: Tahap 5 dari 7 selesai (storage, bot Telegram grup-only, scheduler,
-> narator LLM opsional, ekspor teks Saluran WhatsApp).** Bot dapat dijalankan dan mengirim laporan ke grup dalam mode live
+> **Status proyek: Tahap 6 dari 7 selesai (backtest & gate produksi).** Bot dapat dijalankan dan mengirim laporan ke grup dalam mode live
 > **development** setelah Anda mengisi token + ID grup dan menyalakan saklar live secara
 > eksplisit. Mode **produksi** tetap diblokir sampai aturan bursa/kalender diverifikasi dan
 > gate backtest (Tahap 6) lulus. Semua nilai aturan masih **CONTOH / BELUM TERVERIFIKASI**
 > (lihat `docs/verification_required.md`). Arsitektur lengkap ada di `ARCHITECTURE.md`.
 
-## Yang sudah tersedia (Tahap 1–5)
+## Yang sudah tersedia (Tahap 1–6)
 
 - `ARCHITECTURE.md` — desain, alur data, kebijakan grup-only, gate produksi.
 - `config/settings.py` — konfigurasi env (pydantic-settings) dengan default aman dan
@@ -49,11 +48,15 @@ hanya merangkum konteks. Tidak ada eksekusi order, akses dana, atau transaksi br
 - `notifications/whatsapp_export.py` — teks siap salin untuk **Saluran WhatsApp** dari snapshot
   yang sama (angka/timestamp/disclaimer identik), format `*tebal*`/`_miring_`, disimpan lokal ke
   `var/exports/whatsapp/`. Tidak ada otomasi WhatsApp (lihat bagian WhatsApp di bawah).
-- `tests/` — 310 test offline (fixture sintetis berlabel, tanpa token, tanpa jaringan).
-- `main.py` — `config`, `health`, `fetch`, `evaluate`, `dryrun morning|afternoon`, `run`.
+- `backtest/` — runner yang memakai `SignalEngine` + `engine/lifecycle.py` **yang sama** dengan
+  produksi, evaluasi per sesi tanpa lookahead, biaya & slippage configurable, gap eksplisit, lot
+  penuh dibatasi kas, satu posisi per simbol; metrik dengan definisi kasus tepi; split
+  in-sample/out-of-sample berbasis waktu; gate kelayakan produksi yang terikat
+  `config_hash` + versi strategi dan disimpan ke DB.
+- `tests/` — 327 test offline (fixture sintetis berlabel, tanpa token, tanpa jaringan).
+- `main.py` — `config`, `health`, `fetch`, `evaluate`, `dryrun`, `run`, `backtest`.
 
-Belum tersedia: backtest & gate produksi (Tahap 6), Docker/Compose, paket ZIP, dokumentasi
-deployment lengkap (Tahap 7).
+Belum tersedia: Docker/Compose, paket ZIP, dokumentasi deployment lengkap (Tahap 7).
 
 ## Instalasi lokal
 
@@ -225,7 +228,37 @@ manual. **Tidak ada** integrasi otomatis: API WhatsApp Business belum diverifika
 Saluran, dan otomasi WhatsApp Web/library tidak resmi tidak dipakai. Kegagalan ekspor tidak
 memengaruhi pengiriman Telegram.
 
-### 12. Database
+### 12. Backtest dan gate produksi
+```bash
+# data Yahoo (development) untuk watchlist, periode 2025-01-01..2026-09-22
+uv run python main.py backtest --start 2025-01-01 --end 2026-09-22
+# data CSV lokal per simbol (kolom date,open,high,low,close,volume)
+uv run python main.py backtest --start 2025-01-01 --end 2026-06-30 --csv-dir data_csv/
+# simpan hasil gate ke DB (membuka gate produksi HANYA bila lulus)
+uv run python main.py backtest --start ... --end ... --save-gate
+```
+Keluaran di `var/backtests/<periode>_<hash>/`: `report.json`, `oos_trades.csv`, `oos_equity.csv`
+(dan in-sample). Kode keluar `0` = gate lulus, `4` = tidak lulus, `1` = data tidak layak.
+
+**Membaca metrik** (`report.json → out_of_sample.metrics`):
+- `trades` = trade selesai (TP/SL/masa tahan); sinyal yang tidak terisi dihitung di `signals_not_filled`.
+- `win_rate_pct`, `expectancy_r` (rata-rata PnL bersih dalam R rencana), `profit_factor`
+  (gross profit / gross loss; `null` + catatan bila tidak ada kerugian atau tidak ada trade).
+- `max_drawdown_pct` dari **equity curve** mark-to-market harian, bukan dari penjumlahan trade.
+- `by_strategy` memecah per strategi. `limitations` mencantumkan keterbatasan (survivorship bias,
+  aksi korporasi, satu provider, tanpa antrean/partial fill, SL diprioritaskan sebelum TP).
+
+**Gate** (threshold CONTOH, ubah lewat `--min-trades --min-pf --max-dd --oos-fraction`): pada
+periode **out-of-sample** (30 % akhir) trade ≥ 30, expectancy > 0R, profit factor ≥ 1,3,
+max drawdown ≤ 15 %. Hasil terikat `engine_version` + `config_hash` + versi strategi: mengubah
+parameter risk/scorer/aturan membatalkan kelayakan lama. **Tanpa gate yang lulus, mode produksi
+tidak akan menerbitkan sinyal.** Hasil backtest tidak menjamin keuntungan masa depan.
+
+> Hasil nyata pada 2026-09-23 (12 saham watchlist, Yahoo, parameter CONTOH): in-sample 47 trade,
+> expectancy −0,00R, PF 0,99; out-of-sample 15 trade, expectancy −0,54R, PF 0,33 → **gate TIDAK
+> lulus**. Ini dilaporkan apa adanya; strategi/parameter perlu dikalibrasi sebelum produksi.
+
+### 13. Database
 - Development: SQLite `var/dev.db` (skema dibuat otomatis).
 - Production: PostgreSQL, jalankan migrasi: `DATABASE_URL=postgresql+asyncpg://... uv run alembic upgrade head`.
 - Backup: salin berkas SQLite saat bot berhenti, atau `pg_dump` untuk PostgreSQL. Snapshot laporan
@@ -243,6 +276,7 @@ notifications/ base, telegram
 bot/         formatter, commands, handlers, gates, reports, scheduler, alerts, runtime
 ai/          llm_client (openai/anthropic/openai_compatible), narrator (validasi + template)
 notifications/whatsapp_export.py  teks Saluran WhatsApp (manual)
+backtest/    runner (engine+lifecycle produksi), metrics, gate, data (Yahoo/CSV)
 scripts/     test_telegram.py, reconcile_deliveries.py
 tests/       test offline
 docs/        verification_required.md
