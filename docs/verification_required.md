@@ -37,6 +37,8 @@ Legenda status: ❌ belum · ⚠️ sebagian · ✅ selesai
 | Sectors: endpoint, definisi foreign flow, delay publikasi, biaya, lisensi | ❌ | Dokumentasi resmi Sectors | adapter template nonaktif |
 | Broker read-only: ketersediaan API, scope read-only, delay, lisensi | ❌ | Dokumentasi broker | adapter template nonaktif; tidak akan ada endpoint order |
 | Kebijakan produksi satu provider (tanpa cross-validation) | ❌ | Persetujuan pemilik | `PRODUCTION_SINGLE_PROVIDER_APPROVED` |
+| Sumber data broker summary & foreign flow | ❌ | Ekspor CSV dari sekuritas pengguna (`local_flow`) atau API berbayar terverifikasi | tanpa data, `smart_money`/`foreign_flow` inactive; format & lisensi ekspor tanggung jawab pengguna |
+| Kode saham pada `config/universe_candidates.yaml` | ❌ | Daftar indeks likuid resmi BEI | CONTOH; screener melewati kode tanpa data (2026-09-23: 40/40 terambil dari Yahoo) |
 
 ## 4. Makro global (config/global_macro.yaml)
 

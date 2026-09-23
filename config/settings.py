@@ -36,7 +36,7 @@ UNVERIFIED_PROVIDERS: dict[str, str] = {
     "sectors": "Sectors",
     "broker_x": "Broker (read-only)",
 }
-KNOWN_PROVIDERS: frozenset[str] = frozenset({"yahoo", *UNVERIFIED_PROVIDERS})
+KNOWN_PROVIDERS: frozenset[str] = frozenset({"yahoo", "local_flow", *UNVERIFIED_PROVIDERS})
 
 _CHAT_TARGET_RE = re.compile(r"^(-?\d+)(?::(\d+))?$")
 
@@ -125,6 +125,9 @@ class Settings(BaseSettings):
 
     # --- Telegram ---
     telegram_bot_token: SecretStr | None = None
+    teaser_enabled: bool = True
+    teaser_text: str = "🔔 Are you ready for IHSG SIGNAL? 🔔"
+    teaser_only_with_signals: bool = True
     telegram_enable_live_send: bool = False
     telegram_signal_chat_ids: str = ""
     telegram_admin_chat_id: str = ""
@@ -151,6 +154,10 @@ class Settings(BaseSettings):
     sectors_api_key: SecretStr | None = None
     broker_x_enabled: bool = False
     broker_x_api_key: SecretStr | None = None
+
+    # Provider CSV lokal untuk foreign flow / broker summary (data yang Anda ekspor sendiri).
+    flow_csv_dir: Path | None = None
+    flow_history_sessions: int = Field(default=5, ge=1, le=30)
 
     data_request_timeout_seconds: float = Field(default=20.0, gt=0, le=300)
     data_max_concurrency: int = Field(default=4, ge=1, le=32)
@@ -280,8 +287,15 @@ class Settings(BaseSettings):
                 raise ValueError(
                     f"provider {name!r} ada di PROVIDER_PRIORITY tetapi nonaktif (template belum diverifikasi)"
                 )
+            if name == "local_flow" and self.flow_csv_dir is None:
+                raise ValueError("provider 'local_flow' membutuhkan FLOW_CSV_DIR")
         self._provider_order = order
-        if len(order) == 1:
+        if self.flow_csv_dir is not None and "local_flow" not in order:
+            warnings.append(
+                "FLOW_CSV_DIR diset tetapi 'local_flow' tidak ada di PROVIDER_PRIORITY: data flow tidak dipakai"
+            )
+        market_providers = [p for p in order if p != "local_flow"]
+        if len(market_providers) == 1:
             warnings.append(
                 "Hanya satu provider aktif: kualitas data maksimal 'degraded' (tanpa cross-validation); "
                 "produksi memerlukan PRODUCTION_SINGLE_PROVIDER_APPROVED=true"

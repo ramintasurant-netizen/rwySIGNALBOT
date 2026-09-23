@@ -53,8 +53,17 @@ hanya merangkum konteks. Tidak ada eksekusi order, akses dana, atau transaksi br
   penuh dibatasi kas, satu posisi per simbol; metrik dengan definisi kasus tepi; split
   in-sample/out-of-sample berbasis waktu; gate kelayakan produksi yang terikat
   `config_hash` + versi strategi dan disimpan ke DB.
-- `tests/` — 327 test offline (fixture sintetis berlabel, tanpa token, tanpa jaringan).
-- `main.py` — `config`, `health`, `fetch`, `evaluate`, `dryrun`, `run`, `backtest`.
+- **Smart money / broker akumulasi** (`engine/strategies/smart_money.py`): strategi swing yang aktif
+  hanya bila ada data broker summary beberapa sesi berturut (broker yang net buy setiap sesi,
+  intensitas vs nilai transaksi, konsentrasi top-3, "quiet accumulation", konfirmasi foreign).
+  Data dari **CSV yang Anda ekspor sendiri** (`data/providers/local_flow.py`) — belum ada API publik
+  terverifikasi; tanpa data strategi ini `inactive`, tidak menebak.
+- **Screener BSJP/BPJS** (`engine/short_term.py`, `main.py screen`): statistik historis gap overnight
+  dan pergerakan intraday atas watchlist ∪ `config/universe_candidates.yaml` — peringkat objektif,
+  bukan sinyal.
+- **Teaser** sebelum laporan ("Are you ready for IHSG SIGNAL?"), configurable, hanya bila ada setup.
+- `tests/` — 341 test offline (fixture sintetis berlabel, tanpa token, tanpa jaringan).
+- `main.py` — `config`, `health`, `fetch`, `evaluate`, `dryrun`, `run`, `backtest`, `screen`.
 
 Belum tersedia: Docker/Compose, paket ZIP, dokumentasi deployment lengkap (Tahap 7).
 
@@ -228,7 +237,45 @@ manual. **Tidak ada** integrasi otomatis: API WhatsApp Business belum diverifika
 Saluran, dan otomasi WhatsApp Web/library tidak resmi tidak dipakai. Kegagalan ekspor tidak
 memengaruhi pengiriman Telegram.
 
-### 12. Backtest dan gate produksi
+### 12. Smart money / broker akumulasi (data dari CSV Anda)
+Yahoo tidak menyediakan broker summary/foreign flow dan belum ada API publik terverifikasi. Jalur
+yang jujur: ekspor data dari aplikasi sekuritas/terminal Anda ke CSV, lalu:
+```
+FLOW_CSV_DIR=var/data/flow
+PROVIDER_PRIORITY=yahoo,local_flow
+FLOW_HISTORY_SESSIONS=5
+```
+Struktur berkas (tanggal WIB `YYYY-MM-DD`, nilai rupiah):
+```
+var/data/flow/foreign_flow/BBCA.csv        date,buy_value,sell_value      (atau date,net_value)
+var/data/flow/broker_summary/BBCA.csv      date,broker,buy_value,sell_value   (satu baris per broker)
+```
+Baris tanggal yang tidak ada ⇒ "tidak tersedia" (bukan nol); nol yang tertulis ⇒ nol yang sah.
+Strategi `smart_money` membutuhkan ≥3 sesi berturut yang berakhir pada sesi laporan; broker
+*akumulator* = net buy positif di setiap sesi jendela. Semua bukti (kode broker, intensitas,
+konsentrasi) tampil pada kartu sinyal. Lisensi/ketentuan data adalah tanggung jawab pengguna.
+
+### 13. Screener BSJP / BPJS (statistik, bukan sinyal)
+```bash
+uv run python main.py screen --style bsjp --top 5          # beli sore, jual pagi: gap overnight
+uv run python main.py screen --style bpjs --top 5          # beli pagi, jual sore: pergerakan intraday
+uv run python main.py screen --style bsjp --lookback 90 --symbols BBCA TLKM
+```
+Universe = watchlist ∪ `config/universe_candidates.yaml` (CONTOH; kode tanpa data dilewati). Kolom:
+rata-rata nilai transaksi 20 sesi (filter likuiditas), ATR %, rata-rata & win rate gap overnight
+(BSJP) atau intraday (BPJS), `t` = ukuran konsistensi untuk mengurutkan, gap terburuk (risiko).
+**Ini statistik historis, bukan prediksi.** BSJP menanggung risiko gap turun semalam tanpa stop loss;
+karena itu BSJP belum dijadikan strategi sinyal otomatis (butuh kebijakan exit di open, bukan TP/SL).
+
+### 14. Teaser sebelum laporan
+```
+TEASER_ENABLED=true
+TEASER_TEXT=🔔 Are you ready for IHSG SIGNAL? 🔔
+TEASER_ONLY_WITH_SIGNALS=true      # tidak ada setup ⇒ tanpa teaser
+```
+Teaser dikirim sebagai pesan pertama (tercatat dan dide-dup seperti bagian lain), diikuti laporan.
+
+### 15. Backtest dan gate produksi
 ```bash
 # data Yahoo (development) untuk watchlist, periode 2025-01-01..2026-09-22
 uv run python main.py backtest --start 2025-01-01 --end 2026-09-22
@@ -258,7 +305,7 @@ tidak akan menerbitkan sinyal.** Hasil backtest tidak menjamin keuntungan masa d
 > expectancy −0,00R, PF 0,99; out-of-sample 15 trade, expectancy −0,54R, PF 0,33 → **gate TIDAK
 > lulus**. Ini dilaporkan apa adanya; strategi/parameter perlu dikalibrasi sebelum produksi.
 
-### 13. Database
+### 16. Database
 - Development: SQLite `var/dev.db` (skema dibuat otomatis).
 - Production: PostgreSQL, jalankan migrasi: `DATABASE_URL=postgresql+asyncpg://... uv run alembic upgrade head`.
 - Backup: salin berkas SQLite saat bot berhenti, atau `pg_dump` untuk PostgreSQL. Snapshot laporan
@@ -269,8 +316,8 @@ tidak akan menerbitkan sinyal.** Hasil backtest tidak menjamin keuntungan masa d
 ```
 config/      settings + YAML aturan/kalender/watchlist/berita/makro
 core/        timeutil, redaction, logging
-data/        providers/ (base, yahoo, templates, news, global_macro), resilience, validation, aggregator
-engine/      indicators, strategies/, scorer, screener, risk, pipeline, lifecycle
+data/        providers/ (base, yahoo, local_flow CSV, templates, news, global_macro), resilience, validation, aggregator
+engine/      indicators, strategies/ (termasuk smart_money), scorer, screener, short_term, risk, pipeline, lifecycle
 storage/     models, repository, migrations/ (Alembic)
 notifications/ base, telegram
 bot/         formatter, commands, handlers, gates, reports, scheduler, alerts, runtime

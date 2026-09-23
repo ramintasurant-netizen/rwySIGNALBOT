@@ -19,7 +19,7 @@ from loguru import logger
 
 from ai.narrator import Narrator
 from bot.alerts import AlertSink
-from bot.formatter import format_report
+from bot.formatter import format_report, format_teaser
 from bot.gates import GateResult, evaluate_gates
 from config.market_rules import MarketRules
 from config.settings import Settings
@@ -40,7 +40,15 @@ from core.snapshot import (
 )
 from core.timeutil import to_wib, utc_now
 from data.aggregator import AggregatedOHLCV, MarketDataAggregator
-from data.providers.base import OHLCVFrame, QualityStatus, Timeframe
+from data.providers.base import (
+    BrokerSummary,
+    Capability,
+    ForeignFlow,
+    OHLCVFrame,
+    Ok,
+    QualityStatus,
+    Timeframe,
+)
 from data.providers.global_macro import GlobalMacroProvider
 from data.providers.news import NewsProvider
 from engine import ENGINE_VERSION
@@ -249,6 +257,7 @@ class ReportService:
         symbols = sorted({*watch, *(s.symbol for s in open_signals)})
 
         frames = await self._fetch_daily(symbols, session)
+        flow_sessions = self._recent_sessions(session, d.settings.flow_history_sessions)
         universe: dict[str, SymbolInput] = {}
         data_blocked: list[BlockedInfo] = []
         quality: dict[str, QualityStatus] = {}
@@ -256,10 +265,16 @@ class ReportService:
         for sym, agg in frames.items():
             if agg.frame is not None and agg.usable:
                 if sym in watch:
+                    flows, flow_reason = await self._flow_history(sym, flow_sessions)
+                    brokers, broker_reason = await self._broker_history(sym, flow_sessions)
                     universe[sym] = SymbolInput(
                         agg.frame,
                         agg.status,
-                        foreign_flow_reason="tidak ada provider foreign flow aktif",
+                        foreign_flows=flows,
+                        foreign_flow_reason=flow_reason,
+                        broker_summary=brokers[-1] if brokers else None,
+                        broker_summary_reason=broker_reason,
+                        broker_summaries=brokers,
                     )
                 quality[sym] = agg.status
                 providers.add(agg.provider_used or "?")
@@ -396,6 +411,57 @@ class ReportService:
         return await self._finish(job, snapshot, gates, trading_date)
 
     # ------------------------------------------------------------------ pendukung
+    def _recent_sessions(self, session: date, n: int) -> list[date]:
+        out = [session]
+        cursor = session
+        try:
+            while len(out) < n:
+                cursor = self.d.calendar.previous_trading_session(cursor)
+                out.append(cursor)
+        except CalendarCoverageError:
+            pass
+        return sorted(out)
+
+    async def _flow_history(
+        self, symbol: str, sessions: list[date]
+    ) -> tuple[tuple[ForeignFlow, ...] | None, str]:
+        if not self.d.aggregator.supports(Capability.FOREIGN_FLOW):
+            return (
+                None,
+                "tidak ada provider foreign flow aktif (butuh FLOW_CSV_DIR/local_flow atau provider berbayar)",
+            )
+        flows: list[ForeignFlow] = []
+        reasons: list[str] = []
+        for s in sessions:
+            result = await self.d.aggregator.get_foreign_flow(symbol, s)
+            if isinstance(result, Ok):
+                flows.append(result.value)
+            else:
+                reasons.append(f"{s}: {getattr(result, 'reason', getattr(result, 'error', '?'))}")
+        if not flows:
+            return None, "; ".join(reasons)[:300]
+        return tuple(flows), ""
+
+    async def _broker_history(
+        self, symbol: str, sessions: list[date]
+    ) -> tuple[tuple[BrokerSummary, ...] | None, str]:
+        if not self.d.aggregator.supports(Capability.BROKER_SUMMARY):
+            return (
+                None,
+                "tidak ada provider broker summary aktif (butuh FLOW_CSV_DIR/local_flow atau provider berbayar)",
+            )
+        summaries: list[BrokerSummary] = []
+        reasons: list[str] = []
+        for s in sessions:
+            result = await self.d.aggregator.get_broker_summary(symbol, s)
+            if isinstance(result, Ok):
+                summaries.append(result.value)
+            else:
+                reasons.append(f"{s}: {getattr(result, 'reason', getattr(result, 'error', '?'))}")
+        if not summaries:
+            return None, "; ".join(reasons)[:300]
+        return tuple(summaries), ""
+
     async def _fetch_daily(self, symbols: list[str], session: date) -> dict[str, AggregatedOHLCV]:
         sem = asyncio.Semaphore(self.d.fetch_concurrency)
 
@@ -563,6 +629,10 @@ class ReportService:
             except Exception as exc:  # noqa: BLE001 - narasi opsional, tidak boleh menggagalkan job
                 logger.warning("narator gagal, tanpa narasi: {}", redact_exception(exc))
         parts = tuple(format_report(snapshot))
+        if d.settings.teaser_enabled and (
+            snapshot.signals or not d.settings.teaser_only_with_signals
+        ):
+            parts = (format_teaser(d.settings.teaser_text, snapshot), *parts)
         await d.repo.mark_job(
             job.id, "running", snapshot_json=snapshot.to_json(), data_session_date=session
         )
@@ -678,7 +748,8 @@ class ReportService:
         if not self.d.whatsapp_export_enabled or self.d.export_dir is None:
             return None
         try:
-            return export_whatsapp(snapshot, self.d.export_dir)
+            teaser = self.d.settings.teaser_text if self.d.settings.teaser_enabled else None
+            return export_whatsapp(snapshot, self.d.export_dir, teaser=teaser)
         except Exception as exc:  # noqa: BLE001
             logger.warning("ekspor WhatsApp gagal: {}", redact_exception(exc))
             return None

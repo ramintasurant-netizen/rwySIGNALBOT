@@ -9,6 +9,7 @@ from config.settings import UNVERIFIED_PROVIDERS, Settings
 from data.providers.base import MarketDataProvider, ProviderConfigurationError
 from data.providers.broker_x import BrokerXProvider
 from data.providers.goapi import GoAPIProvider
+from data.providers.local_flow import LocalFlowProvider
 from data.providers.sectors import SectorsProvider
 from data.providers.yahoo import YahooFinanceProvider
 
@@ -33,6 +34,10 @@ def build_providers(
                     timeout_seconds=settings.data_request_timeout_seconds,
                 )
             )
+        elif name == "local_flow":
+            if settings.flow_csv_dir is None:  # pragma: no cover - dicegah validasi Settings
+                raise ProviderConfigurationError("local_flow membutuhkan FLOW_CSV_DIR")
+            providers.append(LocalFlowProvider(settings.flow_csv_dir))
         elif name in UNVERIFIED_PROVIDERS:
             raise ProviderConfigurationError(
                 f"provider {name!r} adalah template nonaktif: kontrak API belum diverifikasi "

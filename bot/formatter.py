@@ -40,6 +40,7 @@ STRATEGY_LABEL = {
     "breakout": "Breakout",
     "reversal": "Reversal",
     "foreign_flow": "Foreign Flow",
+    "smart_money": "Smart Money (Broker Akumulasi)",
 }
 
 
@@ -317,6 +318,17 @@ def split_blocks(blocks: list[str], *, limit: int = MAX_LEN) -> list[str]:
 
 def format_report(snapshot: ReportSnapshot, *, limit: int = MAX_LEN) -> list[str]:
     return split_blocks(report_blocks(snapshot), limit=limit)
+
+
+def format_teaser(text: str, s: ReportSnapshot) -> str:
+    """Pesan pembuka (hype) sebelum laporan; teks dari konfigurasi di-escape, tanpa angka trading."""
+    title = s.report_type.title
+    return (
+        f"<b>{esc(text.strip())}</b>\n"
+        f"{esc(title)} {esc(fmt_date(s.trading_date))} menyusul sebentar lagi — "
+        f"{len(s.signals)} setup dari engine."
+        + ("" if s.origin == "live" else f" <i>[{esc(s.origin.upper())}]</i>")
+    )
 
 
 def format_test_message() -> str:

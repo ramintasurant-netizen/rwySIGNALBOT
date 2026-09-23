@@ -965,3 +965,41 @@ TIDAK lulus** (3 dari 5 pemeriksaan gagal). Mekanika diverifikasi manual (tidak 
 urutan harga/tanda PnL; biaya tepat). Kesimpulan jujur: strategi dengan parameter contoh belum
 menunjukkan edge pada universe ini; kalibrasi adalah pekerjaan riset terpisah, dan threshold
 tidak diturunkan agar lulus.
+
+---
+
+## 26. Penambahan fitur atas permintaan pemilik (2026-09-24 WIB): smart money, screener BSJP/BPJS, teaser
+
+Permintaan: pilih saham menarik untuk BSJP/BPJS, tambahkan smart money flow & broker akumulasi,
+dan pesan pembuka "Are you ready for IHSG SIGNAL" sebelum sinyal. Implementasi dengan batas jujur:
+
+- **Provider CSV lokal** (`data/providers/local_flow.py`, nama `local_flow`): membaca broker summary &
+  foreign flow dari berkas yang diekspor pemilik. Tidak ada API publik terverifikasi untuk data ini
+  (Yahoo tidak menyediakan), sehingga ini satu-satunya jalur tanpa mengarang. Semantik tagged union
+  dijaga: tanggal tidak ada ⇒ `Unavailable`, nol tertulis ⇒ `Ok(0)`, berkas rusak ⇒ `Failed`.
+  Diaktifkan lewat `FLOW_CSV_DIR` + `PROVIDER_PRIORITY=yahoo,local_flow`; `local_flow` tidak dihitung
+  sebagai provider pasar kedua (kualitas OHLCV tetap `degraded`).
+- **`smart_money` v1** (`engine/strategies/smart_money.py`): aktif hanya bila broker summary tersedia
+  untuk 3 sesi berturut yang berakhir pada sesi evaluasi; akumulator = net buy > 0 di setiap sesi;
+  syarat intensitas ≥ 3 % rata-rata nilai transaksi 20 sesi, konsentrasi top-3 ≥ 40 %, close > EMA50;
+  bonus quiet accumulation (|Δharga| ≤ 4 %) dan konfirmasi foreign; entry `[close − 0,5×ATR, close]`,
+  struktur stop = low terendah jendela. `StrategyContext`/`SymbolInput` mendapat `broker_summaries`
+  (histori). `ReportService` pagi mengambil histori `FLOW_HISTORY_SESSIONS` sesi via kalender hanya
+  bila aggregator mendukung kapabilitasnya. Backtest EOD tetap menandai strategi ini `inactive`
+  (tidak ada data historis broker) — konsisten dengan larangan meluluskan strategi flow dari EOD.
+- **Screener BSJP/BPJS** (`engine/short_term.py`, `main.py screen`): statistik historis gap overnight
+  (`open_t/close_{t−1}`) dan intraday (`close/open`) selama lookback 60 sesi, filter likuiditas dari
+  `market_rules.liquidity`, peringkat dengan ukuran konsistensi `t`, disclaimer eksplisit. Universe =
+  watchlist ∪ `config/universe_candidates.yaml` (40 kode CONTOH). **BSJP tidak dijadikan strategi
+  sinyal** karena membutuhkan kebijakan exit di open (tanpa TP/SL) yang bertentangan dengan gate
+  R:R; ini keputusan terbuka untuk pemilik.
+- **Teaser** (`format_teaser`): pesan pertama sebelum laporan, teks dari `TEASER_TEXT` (di-escape),
+  default hanya bila ada setup (`TEASER_ONLY_WITH_SIGNALS`), ikut mekanisme delivery/dedup yang sama;
+  juga di ekspor WhatsApp. Tidak memuat angka trading.
+
+Bukti: `pytest` 341 lulus (smart money: inactive tanpa data, sinyal dengan akumulator, syarat
+persistensi/intensitas/tren, bonus foreign & nol sah, pipeline end-to-end; provider CSV: missing/
+nol/rusak; aggregator routing; settings; screener: statistik konstruksi diketahui, peringkat & filter;
+teaser hanya dengan setup; histori broker sampai ke engine di ReportService). Nyata: `screen --style
+bsjp|bpjs` atas 40 saham via Yahoo (40/40 terambil); `dryrun morning` selesai (tanpa CSV ⇒
+`smart_money` inactive, tanpa teaser karena tidak ada setup).

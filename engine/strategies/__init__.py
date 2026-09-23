@@ -4,6 +4,7 @@ from engine.strategies.base import Strategy, StrategyContext
 from engine.strategies.breakout import BreakoutStrategy
 from engine.strategies.foreign_flow import ForeignFlowStrategy
 from engine.strategies.reversal import ReversalStrategy
+from engine.strategies.smart_money import SmartMoneyStrategy
 from engine.strategies.trend_pullback import TrendPullbackStrategy
 
 DEFAULT_STRATEGIES: tuple[type[Strategy], ...] = (
@@ -11,6 +12,7 @@ DEFAULT_STRATEGIES: tuple[type[Strategy], ...] = (
     BreakoutStrategy,
     ReversalStrategy,
     ForeignFlowStrategy,
+    SmartMoneyStrategy,
 )
 
 __all__ = [
@@ -18,6 +20,7 @@ __all__ = [
     "BreakoutStrategy",
     "ForeignFlowStrategy",
     "ReversalStrategy",
+    "SmartMoneyStrategy",
     "Strategy",
     "StrategyContext",
     "TrendPullbackStrategy",

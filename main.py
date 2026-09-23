@@ -7,6 +7,8 @@ Tahap 2: perintah diagnostik tanpa token —
   python main.py evaluate [--symbols ...] jalankan engine pada watchlist, cetak kartu (JARINGAN, tanpa kirim)
   python main.py dryrun morning|afternoon  jalankan satu job end-to-end tanpa kirim; ekspor ke var/exports (JARINGAN)
   python main.py run                    bot Telegram (grup-only) + scheduler; tanpa token = scheduler dry-run saja
+  python main.py screen --style bsjp|bpjs [--top 5] [--lookback 60]
+                                        statistik historis gap overnight / intraday untuk kandidat (JARINGAN)
   python main.py backtest --start ... --end ... [--csv-dir DIR] [--save-gate]
                                         backtest engine yang sama; laporan + CSV ke var/backtests (JARINGAN bila tanpa CSV)
 """
@@ -373,6 +375,71 @@ async def cmd_backtest(settings: Settings, args: argparse.Namespace) -> int:
     return 0 if evaluation.passed else 4
 
 
+async def cmd_screen(settings: Settings, args: argparse.Namespace) -> int:
+    """Peringkat statistik BSJP/BPJS atas watchlist ∪ kandidat. Bukan sinyal, bukan prediksi."""
+    from engine.short_term import DISCLAIMER as ST_DISCLAIMER
+    from engine.short_term import compute_short_term_stats, rank_short_term
+
+    rules = load_market_rules(settings.config_dir / "market_rules.yaml")
+    calendar = load_trading_calendar(settings.config_dir / "trading_calendar.yaml")
+    watchlist = load_watchlist(settings.config_dir / "watchlist.yaml")
+    candidates_path = settings.config_dir / "universe_candidates.yaml"
+    candidates = load_watchlist(candidates_path).codes if candidates_path.exists() else ()
+    symbols = list(args.symbols) if args.symbols else sorted({*watchlist.codes, *candidates})
+    try:
+        session = calendar.previous_trading_session(datetime.now(WIB).date())
+    except CalendarCoverageError as exc:
+        print(f"Kalender: {exc}", file=sys.stderr)
+        return 1
+    aggregator = MarketDataAggregator(
+        build_providers(settings, rules), AggregatorConfig.from_settings(settings)
+    )
+    sem = asyncio.Semaphore(settings.data_max_concurrency)
+
+    async def one(sym: str):
+        async with sem:
+            return sym, await aggregator.get_ohlcv(
+                sym,
+                Timeframe.D1,
+                None,
+                None,
+                expected_last_session=session,
+                min_bars=args.lookback + 30,
+            )
+
+    results = await asyncio.gather(*(one(s) for s in symbols))
+    stats = []
+    skipped: dict[str, str] = {}
+    for sym, agg in results:
+        if agg.frame is None or not agg.usable:
+            skipped[sym] = f"{agg.status.value}: " + "; ".join(agg.issues)[:120]
+            continue
+        st = compute_short_term_stats(
+            agg.frame, lookback=args.lookback, min_avg_value=rules.liquidity.min_avg_daily_value_idr
+        )
+        if st is None:
+            skipped[sym] = "histori kurang untuk lookback"
+        else:
+            stats.append(st)
+    ranked = rank_short_term(stats, args.style, top=args.top)
+    print(
+        _json(
+            {
+                "style": args.style,
+                "session": session,
+                "lookback_sessions": args.lookback,
+                "evaluated": len(stats),
+                "skipped": skipped,
+                "liquidity_min_avg_value": str(rules.liquidity.min_avg_daily_value_idr),
+                "ranking": [st.as_dict() for st in ranked],
+                "disclaimer": ST_DISCLAIMER,
+                "rules_label": rules.label,
+            }
+        )
+    )
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="stock_signal_bot")
     parser.add_argument(
@@ -391,6 +458,11 @@ def build_parser() -> argparse.ArgumentParser:
     dry = sub.add_parser("dryrun", help="satu job end-to-end tanpa kirim (jaringan)")
     dry.add_argument("which", choices=["morning", "afternoon"])
     sub.add_parser("run", help="jalankan bot Telegram + scheduler")
+    sc = sub.add_parser("screen", help="statistik BSJP/BPJS (bukan sinyal)")
+    sc.add_argument("--style", choices=["bsjp", "bpjs"], required=True)
+    sc.add_argument("--top", type=int, default=5)
+    sc.add_argument("--lookback", type=int, default=60)
+    sc.add_argument("--symbols", nargs="*")
     bt = sub.add_parser("backtest", help="backtest engine yang sama; gate out-of-sample")
     bt.add_argument("--start", required=True, help="YYYY-MM-DD")
     bt.add_argument("--end", required=True, help="YYYY-MM-DD")
@@ -439,6 +511,8 @@ def main(argv: list[str] | None = None) -> int:
         return asyncio.run(cmd_run(settings))
     if args.command == "backtest":
         return asyncio.run(cmd_backtest(settings, args))
+    if args.command == "screen":
+        return asyncio.run(cmd_screen(settings, args))
     return 2
 
 

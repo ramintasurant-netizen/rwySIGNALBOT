@@ -59,9 +59,12 @@ def _card(c: SignalCardSnapshot, index: int) -> list[str]:
     return lines
 
 
-def render_whatsapp(s: ReportSnapshot) -> str:
+def render_whatsapp(s: ReportSnapshot, *, teaser: str | None = None) -> str:
     origin_tag = "" if s.origin == "live" else f" [{s.origin.upper()}]"
-    out: list[str] = [
+    out: list[str] = []
+    if teaser and s.signals:
+        out += [f"*{_wa_safe(teaser.strip())}*", ""]
+    out += [
         f"*📊 {s.report_type.title} — IDX*{origin_tag}",
         f"Tanggal: *{_date(s.trading_date)}* · dibuat {fmt_dt(s.generated_at)}",
         f"Data sesi: {_date(s.data_session_date)}",
@@ -148,9 +151,11 @@ def render_whatsapp(s: ReportSnapshot) -> str:
     return text
 
 
-def export_whatsapp(snapshot: ReportSnapshot, export_dir: Path) -> Path:
+def export_whatsapp(
+    snapshot: ReportSnapshot, export_dir: Path, *, teaser: str | None = None
+) -> Path:
     folder = export_dir / "whatsapp" / snapshot.origin.value
     folder.mkdir(parents=True, exist_ok=True)
     path = folder / f"{snapshot.trading_date.isoformat()}_{snapshot.report_type.value}.whatsapp.txt"
-    path.write_text(render_whatsapp(snapshot), encoding="utf-8")
+    path.write_text(render_whatsapp(snapshot, teaser=teaser), encoding="utf-8")
     return path

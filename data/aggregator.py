@@ -208,6 +208,9 @@ class MarketDataAggregator:
     def provider_names(self) -> tuple[str, ...]:
         return tuple(s.provider.name for s in self._slots)
 
+    def supports(self, capability: Capability) -> bool:
+        return any(s.provider.supports(capability) for s in self._slots)
+
     def _slots_for(self, capability: Capability) -> list[_ProviderSlot]:
         return [s for s in self._slots if s.provider.supports(capability)]
 

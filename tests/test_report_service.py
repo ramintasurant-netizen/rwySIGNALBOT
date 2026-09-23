@@ -465,3 +465,92 @@ async def test_narrator_and_whatsapp_export_are_integrated_and_isolated(
             assert out2.narrative_source == "template" and out2.whatsapp_path is None
     finally:
         await db.dispose()
+
+
+async def test_teaser_is_prepended_only_when_signals_exist(
+    tmp_path, settings_factory, market_rules, calendar
+) -> None:
+    settings = settings_factory(teaser_text="🔔 Are you ready for IHSG SIGNAL? 🔔")
+    service, repo, _, db = await _build(tmp_path, settings, market_rules, calendar)
+    try:
+        out = await service.run(ReportType.MORNING)
+        assert out.status == "completed" and out.snapshot is not None and out.snapshot.signals
+        assert "Are you ready for IHSG SIGNAL" in out.parts[0]
+        assert "menyusul sebentar lagi" in out.parts[0] and "PRE-MARKET BRIEF" in out.parts[1]
+        validate_html(out.parts[0])
+        assert "[DRY_RUN]" in out.parts[0]
+    finally:
+        await db.dispose()
+
+
+async def test_teaser_skipped_without_signals_and_disabled(
+    tmp_path, settings_factory, market_rules, calendar
+) -> None:
+    from tests.conftest import failed
+
+    # provider hanya mengembalikan FLAT (tanpa setup) → tidak ada teaser
+    def only_flat(symbol, timeframe, basis):
+        return ok_frame("fx", FRAMES["FLAT"]) if symbol == "FLAT" else failed("fx")
+
+    provider = FakeProvider("fx", ohlcv_results=only_flat)
+    service, repo, _, db = await _build(
+        tmp_path, settings_factory(), market_rules, calendar, provider=provider
+    )
+    try:
+        out = await service.run(ReportType.MORNING)
+        assert out.status == "completed" and out.snapshot is not None and not out.snapshot.signals
+        assert "Are you ready" not in "\n".join(out.parts)
+    finally:
+        await db.dispose()
+    (tmp_path / "b").mkdir()
+    service2, _, _, db2 = await _build(
+        tmp_path / "b", settings_factory(teaser_enabled=False), market_rules, calendar
+    )
+    try:
+        out2 = await service2.run(ReportType.MORNING)
+        assert out2.snapshot is not None and out2.snapshot.signals
+        assert "Are you ready" not in "\n".join(out2.parts)
+    finally:
+        await db2.dispose()
+
+
+async def test_morning_feeds_broker_history_to_engine(
+    tmp_path, settings_factory, market_rules, calendar
+) -> None:
+    from data.providers.local_flow import LocalFlowProvider
+    from tests.engine_fixtures import uptrend_frame
+
+    frame = uptrend_frame("UPTR")
+    FRAMES["UPTR"] = frame
+    sessions = [d.isoformat() for d in frame.frame["session_date"].iloc[-3:]]
+    root = tmp_path / "flow"
+    (root / "broker_summary").mkdir(parents=True)
+    rows = ["date,broker,buy_value,sell_value"]
+    for s in sessions:
+        rows += [
+            f"{s},AA,6000000000,1000000000",
+            f"{s},BB,3000000000,500000000",
+            f"{s},CC,200000000,2000000000",
+        ]
+    (root / "broker_summary" / "UPTR.csv").write_text("\n".join(rows) + "\n", encoding="utf-8")
+    settings = settings_factory(
+        provider_priority="yahoo,local_flow", flow_csv_dir=str(root), teaser_enabled=False
+    )
+    provider = _provider()
+    service, repo, _, db = await _build(
+        tmp_path, settings, market_rules, calendar, provider=provider
+    )
+    try:
+        # tambahkan provider flow lokal ke aggregator uji
+        service.d.aggregator = MarketDataAggregator(
+            [provider, LocalFlowProvider(root)], AggregatorConfig(daily_min_history_bars=250)
+        )
+        await repo.add_watchlist("UPTR", user_id=None)
+        out = await service.run(ReportType.MORNING)
+        assert out.status == "completed", out.reason
+        cards = {c.symbol: c for c in out.snapshot.signals}
+        assert "UPTR" in cards and cards["UPTR"].strategy == "smart_money"
+        assert "Broker akumulasi" in " ".join(cards["UPTR"].reasons)
+    finally:
+        FRAMES.pop("UPTR", None)
+        await db.dispose()

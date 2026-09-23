@@ -40,6 +40,7 @@ class SymbolInput:
     foreign_flow_reason: str = ""
     broker_summary: BrokerSummary | None = None
     broker_summary_reason: str = ""
+    broker_summaries: tuple[BrokerSummary, ...] | None = None
 
 
 class SignalEngine:
@@ -140,6 +141,7 @@ class SignalEngine:
             foreign_flow_reason=data.foreign_flow_reason,
             broker_summary=data.broker_summary,
             broker_summary_reason=data.broker_summary_reason,
+            broker_summaries=data.broker_summaries,
         )
         outcomes: tuple[StrategyOutcome, ...] = tuple(s.outcome(ctx) for s in self.strategies)
         conf = compute_confidence(outcomes, data.quality, self.scorer)

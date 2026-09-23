@@ -31,6 +31,8 @@ class StrategyContext:
     foreign_flow_reason: str = ""
     broker_summary: BrokerSummary | None = None
     broker_summary_reason: str = ""
+    # Histori broker summary beberapa sesi (terurut naik); None = tidak tersedia/tidak didukung.
+    broker_summaries: tuple[BrokerSummary, ...] | None = None
     extra: dict[str, object] = field(default_factory=dict)
 
 
