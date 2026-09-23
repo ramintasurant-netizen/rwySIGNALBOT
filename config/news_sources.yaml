@@ -1,0 +1,13 @@
+# Sumber berita RSS/Atom. Daftar sengaja KOSONG sampai Anda menyediakan URL yang boleh dipakai.
+# Artikel diperlakukan sebagai data tidak tepercaya (metadata saja: sumber, judul, URL, waktu).
+#
+# Contoh struktur (hapus tanda komentar dan isi URL yang sah):
+# sources:
+#   - { name: "Nama Media", url: "https://example.com/rss", kind: rss, enabled: true }
+schema_version: 1
+meta:
+  label: "CONTOH"
+  source: ""
+  verified: false
+  notes: "Periksa ketentuan penggunaan/lisensi setiap sumber sebelum diaktifkan."
+sources: []

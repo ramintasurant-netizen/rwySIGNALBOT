@@ -1,0 +1,68 @@
+[project]
+name = "stock-signal-bot"
+version = "0.1.0"
+description = "Bot Telegram sinyal saham IDX untuk grup: engine deterministik, fail-closed, tanpa eksekusi order."
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+license = { text = "Proprietary" }
+dependencies = [
+    # Versi minimum = versi yang diverifikasi resolve & smoke-test pada 2026-09-23 (lihat ARCHITECTURE.md §18).
+    "python-telegram-bot>=22.8,<23",
+    "APScheduler>=3.11.3,<4",
+    "pandas>=3.0.6,<4",
+    "numpy>=2.2.6,<2.3",          # dibatasi oleh numba==0.61.2 (dependency pandas-ta)
+    "pandas-ta==0.4.71b0",        # dipatok: rilis beta, API indikator diuji lewat test referensi
+    "SQLAlchemy[asyncio]>=2.0.54,<2.1",
+    "aiosqlite>=0.22.1",
+    "asyncpg>=0.31.0",
+    "alembic>=1.20.0",
+    "httpx>=0.28.1,<0.29",
+    "tenacity>=9.1.4,<10",
+    "pydantic>=2.13.5,<3",
+    "pydantic-settings>=2.15.0,<3",
+    "loguru>=0.7.3",
+    "PyYAML>=6.0.2",
+    "defusedxml>=0.7.1",          # parser RSS/Atom aman untuk input tidak tepercaya
+    "yfinance>=1.7.0,<2",
+    "tzdata>=2025.2",             # zona waktu Asia/Jakarta di image minimal / Windows
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1,<10",
+    "pytest-asyncio>=1.4.0,<2",
+    "ruff>=0.14",
+]
+
+[tool.uv]
+# Root repository adalah kumpulan paket datar (config/, data/, engine/, ...),
+# bukan distribusi wheel; uv hanya mengelola environment.
+package = false
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+filterwarnings = [
+    "error::RuntimeWarning:asyncio",
+]
+markers = [
+    "network: test yang membutuhkan akses jaringan (tidak dijalankan secara default)",
+]
+addopts = "-m 'not network' -q"
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+extend-exclude = ["var", ".venv"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "ASYNC", "S", "N", "W"]
+ignore = [
+    "S101",  # assert dipakai di test
+    "E501",  # panjang baris diserahkan ke formatter
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S105", "S106", "S108", "ASYNC"]

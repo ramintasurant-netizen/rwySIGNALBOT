@@ -1,0 +1,50 @@
+# Kandidat universe tambahan untuk screener (BUKAN rekomendasi). CONTOH: saham yang umumnya likuid;
+# validitas kode dan status (suspensi/papan) tidak diverifikasi — kode tanpa data akan dilewati
+# dan dilaporkan oleh screener. Perbarui dari daftar indeks likuid resmi (mis. LQ45/IDX80) bila perlu.
+schema_version: 1
+meta:
+  label: "CONTOH"
+  source: ""
+  verified: false
+  notes: "Daftar awam saham likuid; verifikasi kode di situs resmi BEI sebelum dipakai serius."
+symbols:
+  - { symbol: BBCA }
+  - { symbol: BBRI }
+  - { symbol: BMRI }
+  - { symbol: BBNI }
+  - { symbol: BRIS }
+  - { symbol: TLKM }
+  - { symbol: ASII }
+  - { symbol: ICBP }
+  - { symbol: INDF }
+  - { symbol: UNTR }
+  - { symbol: KLBF }
+  - { symbol: ANTM }
+  - { symbol: PTBA }
+  - { symbol: MDKA }
+  - { symbol: INCO }
+  - { symbol: PGAS }
+  - { symbol: SMGR }
+  - { symbol: INKP }
+  - { symbol: TPIA }
+  - { symbol: BRPT }
+  - { symbol: AMRT }
+  - { symbol: CPIN }
+  - { symbol: JPFA }
+  - { symbol: GOTO }
+  - { symbol: BREN }
+  - { symbol: ARTO }
+  - { symbol: MEDC }
+  - { symbol: ITMG }
+  - { symbol: AKRA }
+  - { symbol: EXCL }
+  - { symbol: ISAT }
+  - { symbol: MAPI }
+  - { symbol: SIDO }
+  - { symbol: UNVR }
+  - { symbol: MIKA }
+  - { symbol: TOWR }
+  - { symbol: BBTN }
+  - { symbol: ESSA }
+  - { symbol: PANI }
+  - { symbol: CUAN }

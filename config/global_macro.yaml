@@ -1,0 +1,24 @@
+# Instrumen makro global untuk ringkasan pagi.
+#
+# CONTOH / BELUM TERVERIFIKASI: simbol Yahoo, satuan, dan instrumen acuan harus diverifikasi.
+# Instrumen tanpa symbol/source dilaporkan "tidak tersedia" — TIDAK diganti proxy tanpa label & persetujuan.
+schema_version: 1
+meta:
+  label: "CONTOH / BELUM TERVERIFIKASI"
+  source: ""
+  verified: false
+  notes: "Cek ketentuan penggunaan data Yahoo Finance sebelum produksi."
+instruments:
+  - { id: sp500,   label: "S&P 500",            symbol: "^GSPC", source: yahoo, unit: "poin indeks", verified: false }
+  - { id: nasdaq,  label: "Nasdaq Composite",   symbol: "^IXIC", source: yahoo, unit: "poin indeks", verified: false }
+  - { id: dow,     label: "Dow Jones",          symbol: "^DJI",  source: yahoo, unit: "poin indeks", verified: false }
+  - { id: eido,    label: "EIDO (ETF Indonesia)", symbol: "EIDO", source: yahoo, unit: "USD",         verified: false }
+  - { id: usdidr,  label: "USD/IDR",            symbol: "IDR=X", source: yahoo, unit: "IDR per USD", verified: false }
+  - { id: gold,    label: "Emas (futures)",     symbol: "GC=F",  source: yahoo, unit: "USD/troy oz", verified: false }
+  - { id: oil_wti, label: "Minyak WTI (futures)", symbol: "CL=F", source: yahoo, unit: "USD/barel",  verified: false }
+  - { id: coal,    label: "Batu bara",          symbol: null, source: null, unit: "USD/ton",
+      notes: "Belum ada sumber terverifikasi (mis. Newcastle futures/ICE); tidak memakai proxy." }
+  - { id: nickel,  label: "Nikel",              symbol: null, source: null, unit: "USD/ton",
+      notes: "Belum ada sumber terverifikasi (mis. LME); tidak memakai proxy." }
+  - { id: cpo,     label: "CPO",                symbol: null, source: null, unit: "MYR/ton",
+      notes: "Belum ada sumber terverifikasi (mis. Bursa Malaysia FCPO); tidak memakai proxy." }
