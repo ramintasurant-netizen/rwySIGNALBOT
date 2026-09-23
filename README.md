@@ -53,16 +53,19 @@ hanya merangkum konteks. Tidak ada eksekusi order, akses dana, atau transaksi br
   penuh dibatasi kas, satu posisi per simbol; metrik dengan definisi kasus tepi; split
   in-sample/out-of-sample berbasis waktu; gate kelayakan produksi yang terikat
   `config_hash` + versi strategi dan disimpan ke DB.
-- **Smart money / broker akumulasi** (`engine/strategies/smart_money.py`): strategi swing yang aktif
-  hanya bila ada data broker summary beberapa sesi berturut (broker yang net buy setiap sesi,
-  intensitas vs nilai transaksi, konsentrasi top-3, "quiet accumulation", konfirmasi foreign).
-  Data dari **CSV yang Anda ekspor sendiri** (`data/providers/local_flow.py`) — belum ada API publik
-  terverifikasi; tanpa data strategi ini `inactive`, tidak menebak.
+- **Smart money proxy dari data Yahoo** (`engine/money_flow.py`, `engine/strategies/money_flow_proxy.py`):
+  Chaikin Money Flow 20, OBV (dalam "hari volume"), hari akumulasi/distribusi (close di area atas/
+  bawah range dengan volume di atas rata-rata), rasio volume naik/turun, "quiet accumulation".
+  Laporan pagi memuat bagian **💰 Money Flow** (top akumulasi & distribusi watchlist) dan strategi
+  `money_flow_proxy` menghasilkan setup swing. **Ini proxy dari harga & volume, bukan data broker/asing.**
+- **Smart money / broker akumulasi (data broker nyata)** (`engine/strategies/smart_money.py`): aktif
+  hanya bila ada broker summary dari **CSV yang Anda ekspor sendiri** (`data/providers/local_flow.py`);
+  Yahoo tidak menyediakan data ini dan belum ada API publik terverifikasi. Tanpa data ⇒ `inactive`.
 - **Screener BSJP/BPJS** (`engine/short_term.py`, `main.py screen`): statistik historis gap overnight
   dan pergerakan intraday atas watchlist ∪ `config/universe_candidates.yaml` — peringkat objektif,
   bukan sinyal.
 - **Teaser** sebelum laporan ("Are you ready for IHSG SIGNAL?"), configurable, hanya bila ada setup.
-- `tests/` — 341 test offline (fixture sintetis berlabel, tanpa token, tanpa jaringan).
+- `tests/` — 346 test offline (fixture sintetis berlabel, tanpa token, tanpa jaringan).
 - `main.py` — `config`, `health`, `fetch`, `evaluate`, `dryrun`, `run`, `backtest`, `screen`.
 
 Belum tersedia: Docker/Compose, paket ZIP, dokumentasi deployment lengkap (Tahap 7).
@@ -301,9 +304,11 @@ max drawdown ≤ 15 %. Hasil terikat `engine_version` + `config_hash` + versi st
 parameter risk/scorer/aturan membatalkan kelayakan lama. **Tanpa gate yang lulus, mode produksi
 tidak akan menerbitkan sinyal.** Hasil backtest tidak menjamin keuntungan masa depan.
 
-> Hasil nyata pada 2026-09-23 (12 saham watchlist, Yahoo, parameter CONTOH): in-sample 47 trade,
-> expectancy −0,00R, PF 0,99; out-of-sample 15 trade, expectancy −0,54R, PF 0,33 → **gate TIDAK
-> lulus**. Ini dilaporkan apa adanya; strategi/parameter perlu dikalibrasi sebelum produksi.
+> Hasil nyata pada 2026-09-23 (12 saham watchlist, Yahoo, parameter CONTOH, termasuk strategi
+> `money_flow_proxy`): in-sample 57 trade, expectancy +0,10R, PF 1,20 (proxy money flow: 11 trade,
+> win 64 %, +0,44R); out-of-sample 17 trade, expectancy −0,44R, PF 0,42 → **gate TIDAK lulus**.
+> Periode OOS (Mar–Sep 2026) merugikan semua strategi long. Dilaporkan apa adanya; kalibrasi dan
+> filter rezim pasar adalah pekerjaan riset sebelum produksi.
 
 ### 16. Database
 - Development: SQLite `var/dev.db` (skema dibuat otomatis).

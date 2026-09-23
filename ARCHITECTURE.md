@@ -1003,3 +1003,34 @@ nol/rusak; aggregator routing; settings; screener: statistik konstruksi diketahu
 teaser hanya dengan setup; histori broker sampai ke engine di ReportService). Nyata: `screen --style
 bsjp|bpjs` atas 40 saham via Yahoo (40/40 terambil); `dryrun morning` selesai (tanpa CSV ⇒
 `smart_money` inactive, tanpa teaser karena tidak ada setup).
+
+### 26.1 Smart money PROXY dari data Yahoo (permintaan lanjutan)
+
+Pemilik meminta memakai data Yahoo. Yahoo tidak menyediakan broker summary/foreign flow IDX, sehingga
+dibangun **proxy berbasis harga & volume** yang dilabeli eksplisit "bukan data broker":
+
+- `engine/indicators.py`: `cmf20` (Chaikin Money Flow), `obv` + `obv_ema20`, `mfi14` — rumus dicek
+  eksak terhadap implementasi pandas-native (CMF/MFI selisih ≤1e-10; OBV identik setelah seed NaN
+  diisi 0), warmup dipaksakan seperti indikator lain.
+- `engine/money_flow.py`: `MoneyFlowStats` per simbol (jendela 10 sesi): CMF sekarang vs 10 sesi lalu,
+  OBV netto dalam **hari volume** (Δ OBV ÷ rata-rata volume 20 sesi; batas teoretis ±10), hari
+  akumulasi/distribusi (close di 30 % atas/bawah range dengan volume > rata-rata), rasio volume
+  naik/turun (netral bila semua sesi searah), Δ harga & flag *quiet*, skor komposit −100…+100 dan
+  label akumulasi/distribusi/netral. Dihitung di pipeline untuk setiap simbol yang lolos likuiditas
+  dan dilampirkan ke `SymbolEvaluation.money_flow`.
+- `engine/strategies/money_flow_proxy.py` v1: CMF > 0,10 dan naik; OBV ≥ 2 hari volume; ≥3 hari
+  akumulasi dan > hari distribusi; rasio ≥ 1,3; close > EMA50; bonus quiet & MFI < 70. Karena berasal
+  dari EOD, strategi ini **boleh** di-backtest (berbeda dari `smart_money` berbasis broker).
+- Laporan: bagian **💰 Money Flow** (top-5 akumulasi & distribusi, netral disembunyikan) di Telegram
+  dan WhatsApp; masuk input narator (simbolnya diizinkan validator).
+- Temuan saat verifikasi nyata: skala OBV awalnya dikali 100 (tampil "167,7 hari vol") — dikoreksi ke
+  hari volume murni (ANTM: 1,7).
+
+Bukti: `pytest` 346 lulus (referensi rumus CMF/OBV/MFI; deteksi akumulasi pada fixture realistis
+8 naik/4 turun; fixture netral terkonstruksi ⇒ netral; strategi memberi sinyal & syarat; pipeline
+melampirkan stats; laporan Telegram/WA memuat bagian). Nyata: `dryrun morning` menampilkan Money Flow
+dari Yahoo (ANTM akumulasi; ICBP/UNTR/KLBF/BBCA/INDF distribusi). **Backtest ulang** 2025-01-01..
+2026-09-22: in-sample 57 trade, +0,10R, PF 1,20 (proxy: 11 trade, win 64 %, +0,44R — kontributor
+terbaik); out-of-sample 17 trade, −0,44R, PF 0,42 (proxy 4 trade, −0,39R) ⇒ gate **tetap tidak lulus**.
+Interpretasi jujur: proxy menambah nilai in-sample, tetapi periode OOS (Mar–Sep 2026) merugikan semua
+strategi long; diperlukan filter rezim pasar dan kalibrasi terpisah, bukan penurunan threshold.

@@ -29,6 +29,7 @@ from core.snapshot import (
     ActiveSignalSnapshot,
     BlockedInfo,
     GlobalContextSnapshot,
+    MoneyFlowSnapshot,
     NewsSnapshot,
     ReportSnapshot,
     ReportType,
@@ -298,6 +299,7 @@ class ReportService:
 
         macro_snap, news_snap = await self._context()
         result = d.engine.run(session, universe)
+        money_flow = _money_flow_snapshots(result)
         updates = await self._apply_lifecycle_daily(open_signals, frames, session)
         active = await self._active_snapshots()
         snapshot = build_snapshot(
@@ -317,6 +319,7 @@ class ReportService:
             entry_valid_sessions=d.lifecycle.entry_valid_sessions,
             active_signals=active,
             active_updates=updates,
+            money_flow=money_flow,
             data_notes=tuple(gates.warnings),
         )
         await d.repo.save_signals(
@@ -779,6 +782,29 @@ def _bar_for_session(frame: OHLCVFrame, session: date) -> Bar | None:
 
     return Bar(
         session, dec(r["open"]), dec(r["high"]), dec(r["low"]), dec(r["close"]), partial=False
+    )
+
+
+def _money_flow_snapshots(result: EngineResult, *, top: int = 5) -> tuple[MoneyFlowSnapshot, ...]:
+    """Top akumulasi dan distribusi (proxy volume) dari evaluasi engine; netral tidak ditampilkan."""
+    stats = [e.money_flow for e in result.evaluations if e.money_flow is not None]
+    ranked = sorted(stats, key=lambda m: (-m.score, m.symbol))
+    accumulation = [m for m in ranked if m.label == "akumulasi"][:top]
+    distribution = [m for m in reversed(ranked) if m.label == "distribusi"][:top]
+    return tuple(
+        MoneyFlowSnapshot(
+            symbol=m.symbol,
+            label=m.label,
+            score=m.score,
+            cmf20=str(m.cmf20),
+            obv_slope_days=str(m.obv_slope_days),
+            acc_days=m.acc_days,
+            dist_days=m.dist_days,
+            updown_ratio=str(m.updown_ratio),
+            price_change_pct=str(m.price_change_pct),
+            quiet=m.quiet,
+        )
+        for m in (*accumulation, *distribution)
     )
 
 

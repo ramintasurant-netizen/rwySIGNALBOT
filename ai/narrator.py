@@ -148,6 +148,10 @@ def build_llm_input(snapshot: ReportSnapshot) -> dict[str, object]:
         "sinyal_terbuka": [
             {"simbol": a.symbol, "status": a.status} for a in snapshot.active_signals
         ],
+        "money_flow_proxy": [
+            {"simbol": m.symbol, "label": m.label, "skor": m.score, "cmf20": m.cmf20}
+            for m in snapshot.money_flow
+        ],
         "catatan_engine": list(snapshot.engine_notes),
         "NEWS_TIDAK_TEPERCAYA": [
             {"sumber": n.source, "judul": n.title} for n in snapshot.news.items[:8]
@@ -179,6 +183,7 @@ def _collect_symbols(snapshot: ReportSnapshot) -> set[str]:
     symbols |= {u.symbol for u in snapshot.active_updates}
     symbols |= {a.symbol for a in snapshot.active_signals}
     symbols |= {b.symbol for b in snapshot.data_quality.blocked}
+    symbols |= {m.symbol for m in snapshot.money_flow}
     return symbols
 
 

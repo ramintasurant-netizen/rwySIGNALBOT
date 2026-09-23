@@ -128,6 +128,7 @@ class SymbolEvaluation:
     confidence: int | None
     card: SignalCard | None
     blocked: BlockedSymbol | None
+    money_flow: Any | None = None  # engine.money_flow.MoneyFlowStats (proxy volume), bila dihitung
 
 
 @dataclass(frozen=True, slots=True)

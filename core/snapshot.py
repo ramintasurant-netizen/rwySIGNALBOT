@@ -147,6 +147,21 @@ class ActiveSignalSnapshot(_Model):
     last_price_time: datetime | None = None
 
 
+class MoneyFlowSnapshot(_Model):
+    """Proxy money flow dari harga & volume (bukan data broker/asing)."""
+
+    symbol: str
+    label: str  # akumulasi | distribusi | netral
+    score: int
+    cmf20: str
+    obv_slope_days: str
+    acc_days: int
+    dist_days: int
+    updown_ratio: str
+    price_change_pct: str
+    quiet: bool
+
+
 class SignalUpdateSnapshot(_Model):
     symbol: str
     previous_status: str
@@ -173,6 +188,7 @@ class ReportSnapshot(_Model):
     signals: tuple[SignalCardSnapshot, ...]
     active_signals: tuple[ActiveSignalSnapshot, ...] = ()
     active_updates: tuple[SignalUpdateSnapshot, ...] = ()
+    money_flow: tuple[MoneyFlowSnapshot, ...] = ()  # diurutkan skor menurun; proxy volume
     narrative: str | None = None
     market_bias: str | None = None  # hanya dari aturan terdefinisi; None = dihilangkan
     disclaimer: str = DISCLAIMER
@@ -316,6 +332,7 @@ def build_snapshot(
     entry_valid_sessions: int,
     active_signals: tuple[ActiveSignalSnapshot, ...] = (),
     active_updates: tuple[SignalUpdateSnapshot, ...] = (),
+    money_flow: tuple[MoneyFlowSnapshot, ...] = (),
     data_notes: tuple[str, ...] = (),
 ) -> ReportSnapshot:
     levels: dict[str, int] = {}
@@ -351,5 +368,6 @@ def build_snapshot(
         ),
         active_signals=active_signals,
         active_updates=active_updates,
+        money_flow=money_flow,
         engine_notes=engine_result.notes,
     )

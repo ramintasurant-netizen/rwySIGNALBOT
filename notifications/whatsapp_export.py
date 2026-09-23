@@ -122,6 +122,17 @@ def render_whatsapp(s: ReportSnapshot, *, teaser: str | None = None) -> str:
         else:
             out.append("*🎯 Setup*: tidak ada data yang dapat dievaluasi.")
 
+    if s.money_flow:
+        out += ["", "*💰 Money Flow* (proxy volume, data harga Yahoo — bukan data broker)"]
+        for m in s.money_flow:
+            arrow = "▲" if m.label == "akumulasi" else "▼"
+            out.append(
+                f"{arrow} *{m.symbol}* skor {m.score:+d} · CMF {fmt_num(m.cmf20, 2)} · "
+                f"OBV {fmt_num(m.obv_slope_days, 1)} hari vol · akum/dist {m.acc_days}/{m.dist_days} · "
+                f"Δ{fmt_pct(m.price_change_pct)}"
+            )
+        out.append("_Skor −100…+100; bukan sinyal._")
+
     if s.active_updates or s.active_signals:
         out += ["", "*🔁 Sinyal berjalan*"]
         for u in s.active_updates:

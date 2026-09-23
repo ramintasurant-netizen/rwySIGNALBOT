@@ -14,6 +14,7 @@ from decimal import Decimal, InvalidOperation
 
 from core.snapshot import (
     ActiveSignalSnapshot,
+    MoneyFlowSnapshot,
     ReportSnapshot,
     ReportType,
     SignalCardSnapshot,
@@ -41,6 +42,7 @@ STRATEGY_LABEL = {
     "reversal": "Reversal",
     "foreign_flow": "Foreign Flow",
     "smart_money": "Smart Money (Broker Akumulasi)",
+    "money_flow_proxy": "Smart Money Proxy (Volume)",
 }
 
 
@@ -213,6 +215,34 @@ def _active_line(a: ActiveSignalSnapshot) -> str:
     )
 
 
+def _money_flow_line(m: MoneyFlowSnapshot) -> str:
+    arrow = "▲" if m.label == "akumulasi" else "▼"
+    quiet = " · harga tenang" if m.quiet and m.label == "akumulasi" else ""
+    return (
+        f"{arrow} <b>{esc(m.symbol)}</b> skor {m.score:+d} · CMF {fmt_num(m.cmf20, 2)} · "
+        f"OBV {fmt_num(m.obv_slope_days, 1)} hari vol · akum/dist {m.acc_days}/{m.dist_days} · "
+        f"Δ{esc(fmt_pct(m.price_change_pct))}{quiet}"
+    )
+
+
+def _money_flow(s: ReportSnapshot) -> str | None:
+    if not s.money_flow:
+        return None
+    lines = ["<b>💰 Money Flow</b> (proxy volume, data harga Yahoo — bukan data broker)"]
+    acc = [m for m in s.money_flow if m.label == "akumulasi"]
+    dist = [m for m in s.money_flow if m.label == "distribusi"]
+    if acc:
+        lines.append("Akumulasi:")
+        lines.extend(_money_flow_line(m) for m in acc)
+    if dist:
+        lines.append("Distribusi:")
+        lines.extend(_money_flow_line(m) for m in dist)
+    lines.append(
+        "<i>Skor −100…+100 dari CMF20, OBV, hari akumulasi/distribusi, rasio volume; bukan sinyal.</i>"
+    )
+    return "\n".join(lines)
+
+
 def _recap(s: ReportSnapshot) -> str | None:
     if not s.active_updates and not s.active_signals:
         return None
@@ -239,6 +269,9 @@ def report_blocks(s: ReportSnapshot) -> list[str]:
     if s.market_bias:
         blocks.append(f"<b>Bias pasar</b>: {esc(s.market_bias)}")
     blocks.extend(_signals(s))
+    money = _money_flow(s)
+    if money:
+        blocks.append(money)
     recap = _recap(s)
     if recap:
         blocks.append(recap)

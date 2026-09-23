@@ -26,6 +26,8 @@ RSI_LENGTH = 14
 ATR_LENGTH = 14
 VOLUME_AVG_LENGTH = 20
 RESISTANCE_LOOKBACK = 20
+CMF_LENGTH = 20
+MFI_LENGTH = 14
 
 # Bar minimum agar semua indikator memiliki nilai yang sudah "matang".
 WARMUP_BARS = EMA_SLOW + 50  # 250
@@ -56,6 +58,27 @@ def rsi(close: pd.Series, length: int = RSI_LENGTH) -> pd.Series:
 
 def atr(high: pd.Series, low: pd.Series, close: pd.Series, length: int = ATR_LENGTH) -> pd.Series:
     return _series(ta.atr(high, low, close, length=length), close.index, f"atr{length}")
+
+
+def cmf(
+    high: pd.Series, low: pd.Series, close: pd.Series, volume: pd.Series, length: int = CMF_LENGTH
+) -> pd.Series:
+    """Chaikin Money Flow: Σ(MFM×vol)/Σvol; MFM = ((close−low) − (high−close)) / (high−low)."""
+    return _series(ta.cmf(high, low, close, volume, length=length), close.index, f"cmf{length}")
+
+
+def obv(close: pd.Series, volume: pd.Series) -> pd.Series:
+    """On-Balance Volume (pandas-ta memberi NaN pada bar pertama; diisi 0 agar kumulatif konsisten)."""
+    out = _series(ta.obv(close, volume), close.index, "obv")
+    if len(out) and np.isnan(out.iloc[0]):
+        out.iloc[0] = 0.0
+    return out
+
+
+def mfi(
+    high: pd.Series, low: pd.Series, close: pd.Series, volume: pd.Series, length: int = MFI_LENGTH
+) -> pd.Series:
+    return _series(ta.mfi(high, low, close, volume, length=length), close.index, f"mfi{length}")
 
 
 def apply_warmup(series: pd.Series, warmup: int) -> pd.Series:
@@ -130,6 +153,10 @@ def compute_indicators(ohlcv: pd.DataFrame, *, warmup: int = WARMUP_BARS) -> Ind
     df["rsi14"] = apply_warmup(rsi(close, RSI_LENGTH), warmup)
     df["atr14"] = apply_warmup(atr(high, low, close, ATR_LENGTH), warmup)
     df["vol_avg20"] = apply_warmup(volume.rolling(VOLUME_AVG_LENGTH).mean(), warmup)
+    df["cmf20"] = apply_warmup(cmf(high, low, close, volume, CMF_LENGTH), warmup)
+    df["obv"] = apply_warmup(obv(close, volume), warmup)
+    df["obv_ema20"] = apply_warmup(ema(obv(close, volume).fillna(0.0), EMA_FAST), warmup)
+    df["mfi14"] = apply_warmup(mfi(high, low, close, volume, MFI_LENGTH), warmup)
     # Nilai transaksi: kolom `value` bila provider memberi; jika tidak, aproksimasi close×volume.
     if "value" in ohlcv.columns and ohlcv["value"].notna().all():
         df["value"] = ohlcv["value"].astype("float64")

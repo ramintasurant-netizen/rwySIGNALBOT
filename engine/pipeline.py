@@ -24,6 +24,7 @@ from engine.models import (
     StrategyOutcome,
     SymbolEvaluation,
 )
+from engine.money_flow import MoneyFlowStats, compute_money_flow
 from engine.risk import RiskConfig, RiskRejected, build_risk_plan
 from engine.scorer import ScorerConfig, compute_confidence, select_cards
 from engine.screener import Screener
@@ -144,9 +145,10 @@ class SignalEngine:
             broker_summaries=data.broker_summaries,
         )
         outcomes: tuple[StrategyOutcome, ...] = tuple(s.outcome(ctx) for s in self.strategies)
+        money_flow: MoneyFlowStats | None = compute_money_flow(indicators, symbol)
         conf = compute_confidence(outcomes, data.quality, self.scorer)
         if conf is None:
-            return SymbolEvaluation(symbol, outcomes, None, None, None)
+            return SymbolEvaluation(symbol, outcomes, None, None, None, money_flow)
 
         primary = next(o for o in outcomes if o.strategy_id == conf.primary_strategy)
         assert primary.signal is not None
@@ -163,7 +165,12 @@ class SignalEngine:
             )
         except RiskRejected as exc:
             return SymbolEvaluation(
-                symbol, outcomes, conf.confidence, None, BlockedSymbol(symbol, "risk", exc.reason)
+                symbol,
+                outcomes,
+                conf.confidence,
+                None,
+                BlockedSymbol(symbol, "risk", exc.reason),
+                money_flow,
             )
 
         reasons = list(primary.signal.reasons)
@@ -196,7 +203,7 @@ class SignalEngine:
             ),
             liquidity_avg_value_20d=liquidity.avg_value,
         )
-        return SymbolEvaluation(symbol, outcomes, conf.confidence, card, None)
+        return SymbolEvaluation(symbol, outcomes, conf.confidence, card, None, money_flow)
 
     # ------------------------------------------------------------------ satu sesi penuh
     def run(self, session_date: date, universe: dict[str, SymbolInput]) -> EngineResult:

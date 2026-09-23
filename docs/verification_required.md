@@ -83,7 +83,7 @@ Legenda status: ❌ belum · ⚠️ sebagian · ✅ selesai
 |---|---|---|
 | Threshold gate (trade minimum 30, expectancy > 0R, PF ≥ 1,3, MDD ≤ 15 %, OOS 30 %) | ⚠️ | diimplementasikan sebagai default CONTOH / BELUM DISEPAKATI; ubah lewat argumen CLI atau sepakati nilai final |
 | Sumber data historis & survivorship bias | ⚠️ | Yahoo (satu provider) atau CSV pengguna; universe = watchlist saat ini → survivorship bias dinyatakan dalam laporan |
-| Hasil gate saat ini | ❌ | 2026-09-23: **TIDAK lulus** (OOS 15 trade, expectancy −0,54R, PF 0,33). Strategi/parameter perlu kalibrasi; jangan menurunkan threshold agar lulus |
+| Hasil gate saat ini | ❌ | 2026-09-23 (dengan `money_flow_proxy`): **TIDAK lulus** — IS 57 trade PF 1,20 (+0,10R), OOS 17 trade PF 0,42 (−0,44R). Kalibrasi/filter rezim diperlukan; jangan menurunkan threshold agar lulus |
 | Slippage aktual | ❌ | default CONTOH 1 tick per sisi |
 
 ## 9. WhatsApp (jika kelak diaktifkan)
