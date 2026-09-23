@@ -1,8 +1,9 @@
 # ARCHITECTURE — Bot Sinyal Saham IDX untuk Grup Telegram
 
-> **Status dokumen:** arsitektur disetujui (Tahap 1); **Tahap 2–6 diimplementasikan** (fondasi &
+> **Status dokumen:** arsitektur disetujui (Tahap 1); **Tahap 2–7 diimplementasikan** (fondasi &
 > data layer, engine & risk, storage + Telegram + scheduler, narator LLM + ekspor WhatsApp,
-> backtest & gate) — lihat §21–§25 untuk keputusan dan penyesuaian.
+> backtest & gate, Docker & paket) plus fitur tambahan §26 — lihat §21–§27 untuk keputusan dan
+> penyesuaian.
 > Semua nilai angka pada dokumen ini (lot, fraksi harga, ARA/ARB, threshold, modal contoh)
 > adalah **CONTOH / BELUM TERVERIFIKASI** sampai dilabeli sebaliknya pada file konfigurasi.
 >
@@ -1034,3 +1035,39 @@ dari Yahoo (ANTM akumulasi; ICBP/UNTR/KLBF/BBCA/INDF distribusi). **Backtest ula
 terbaik); out-of-sample 17 trade, −0,44R, PF 0,42 (proxy 4 trade, −0,39R) ⇒ gate **tetap tidak lulus**.
 Interpretasi jujur: proxy menambah nilai in-sample, tetapi periode OOS (Mar–Sep 2026) merugikan semua
 strategi long; diperlukan filter rezim pasar dan kalibrasi terpisah, bukan penurunan threshold.
+
+---
+
+## 27. Catatan implementasi Tahap 7 — integrasi & deploy (2026-09-24 WIB)
+
+- **Dockerfile** multi-stage `python:3.12-slim`: builder memasang dependency dari `requirements.txt`
+  (ekspor `uv.lock`) ke venv; runtime menyalin venv + kode saja (COPY eksplisit per paket, tanpa
+  `.env`/`var/`/`tests/`), user non-root `bot` (uid 10001), `VOLUME /app/var`, `HEALTHCHECK` memakai
+  `scripts/healthcheck.py` (heartbeat ≤ 40 menit; tidak membaca rahasia), `STOPSIGNAL SIGTERM`,
+  `CMD python main.py run`.
+- **docker-compose.yml**: service `bot` dengan `env_file: .env`, volume `./var` dan `./config:ro`,
+  `read_only` + `tmpfs /tmp`, `no-new-privileges`, `restart: unless-stopped`, `stop_grace_period 30s`;
+  profil `production` menambah `postgres:16-alpine` (password wajib dari `.env`) dan job `migrate`
+  (`alembic upgrade head`).
+- **`.dockerignore`** mengecualikan `.env*` (kecuali `.env.example`), `var/`, `.git/`, metadata
+  platform, cache, `tests/`, `uv.lock`, dokumen panjang.
+- **`scripts/package_project.py`**: ZIP berbasis allowlist (berkas root tertentu + direktori kode/
+  konfigurasi/dokumen/tests dengan suffix yang diizinkan), menolak `.env`, `var/`, `.git`, cache,
+  virtualenv, metadata; memindai pola token Telegram/kunci API/assignment `KEY=nilai` (placeholder
+  kosong/`...`/`<...>` diabaikan; berkas test dan token palsu bertanda diabaikan) — bila ada temuan,
+  arsip dibatalkan dan hanya nama berkas + pola yang dicetak. Menambahkan `PACKAGE_INFO.txt` dan
+  `var/.gitkeep`.
+- **CI** (`ci/github-workflow-ci.yml` (pindahkan ke `.github/workflows/` untuk mengaktifkan; lihat `ci/README.md`)): `uv sync --locked`, ruff, pytest offline, package check, lalu
+  build image tanpa push + smoke test (`config` tanpa token, healthcheck harus gagal tanpa
+  heartbeat, impor modul).
+- `requirements*.txt` disinkronkan ulang dari `uv.lock`.
+
+Bukti yang benar-benar dijalankan: `pytest` 350 lulus (termasuk test packaging: allowlist,
+isi ZIP, pemindai menolak token nyata pada repo palsu, `--check` pada repo asli lolos); ZIP nyata
+dibuat (133 berkas, 316 KB) dan **diverifikasi di direktori bersih**: instal dari
+`requirements-dev.txt` di venv baru, `main.py config` berjalan tanpa `.env`, **seluruh test suite
+lulus di dalam ZIP**, `healthcheck.py` menolak tanpa heartbeat, `package_project.py --check` lolos;
+pemeriksaan statis Dockerfile (semua sumber COPY ada, non-root, healthcheck, STOPSIGNAL, tanpa
+COPY `.env`), compose diparse, `alembic upgrade head --sql` menghasilkan 9 `CREATE TABLE` untuk
+PostgreSQL. **Belum**: `docker build` nyata (sandbox tanpa Docker) — didelegasikan ke CI dan dicatat di
+`docs/verification_required.md`.

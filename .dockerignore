@@ -1,0 +1,34 @@
+# Rahasia & konfigurasi lokal — tidak boleh masuk build context
+.env
+.env.*
+!.env.example
+# Runtime & data
+var/
+*.db
+*.db-*
+*.sqlite*
+*.log
+# Repo & metadata platform
+.git/
+.github/
+.hoplite/
+.context/
+.idea/
+.vscode/
+# Python artefak & dev
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+build/
+dist/
+*.zip
+# Tidak dibutuhkan di image
+tests/
+requirements-dev.txt
+uv.lock
+ARCHITECTURE.md
+README.md

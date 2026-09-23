@@ -5,7 +5,8 @@ Bot Python asinkron yang menghasilkan laporan **pre-market (08:30 WIB)** dan **p
 dalam allowlist**. Engine deterministik menentukan seluruh angka trading; LLM (opsional)
 hanya merangkum konteks. Tidak ada eksekusi order, akses dana, atau transaksi broker.
 
-> **Status proyek: Tahap 6 dari 7 selesai (backtest & gate produksi).** Bot dapat dijalankan dan mengirim laporan ke grup dalam mode live
+> **Status proyek: semua 7 tahap selesai (arsitektur → data → engine → bot Telegram → narator/WhatsApp
+> → backtest/gate → Docker & paket).** Bot dapat dijalankan dan mengirim laporan ke grup dalam mode live
 > **development** setelah Anda mengisi token + ID grup dan menyalakan saklar live secara
 > eksplisit. Mode **produksi** tetap diblokir sampai aturan bursa/kalender diverifikasi dan
 > gate backtest (Tahap 6) lulus. Semua nilai aturan masih **CONTOH / BELUM TERVERIFIKASI**
@@ -68,7 +69,14 @@ hanya merangkum konteks. Tidak ada eksekusi order, akses dana, atau transaksi br
 - `tests/` — 346 test offline (fixture sintetis berlabel, tanpa token, tanpa jaringan).
 - `main.py` — `config`, `health`, `fetch`, `evaluate`, `dryrun`, `run`, `backtest`, `screen`.
 
-Belum tersedia: Docker/Compose, paket ZIP, dokumentasi deployment lengkap (Tahap 7).
+- `Dockerfile` (multi-stage, non-root, health check heartbeat), `docker-compose.yml` (SQLite dev;
+  profil `production` dengan PostgreSQL + migrasi), `.dockerignore`, `scripts/package_project.py`
+  (ZIP distribusi berbasis allowlist + pemindaian rahasia), CI GitHub Actions (lint, test, package
+  check, build image + smoke test).
+
+**Yang masih membutuhkan tindakan pemilik** (bukan kode): isi token bot & ID grup lalu uji `TEST`;
+verifikasi aturan BEI/kalender resmi (ganti nilai CONTOH, set `verified: true`); kalibrasi strategi
+sampai gate backtest lulus; sepakati threshold gate dan biaya aktual. Lihat `docs/verification_required.md`.
 
 ## Instalasi lokal
 
@@ -313,8 +321,67 @@ tidak akan menerbitkan sinyal.** Hasil backtest tidak menjamin keuntungan masa d
 ### 16. Database
 - Development: SQLite `var/dev.db` (skema dibuat otomatis).
 - Production: PostgreSQL, jalankan migrasi: `DATABASE_URL=postgresql+asyncpg://... uv run alembic upgrade head`.
-- Backup: salin berkas SQLite saat bot berhenti, atau `pg_dump` untuk PostgreSQL. Snapshot laporan
-  tersimpan immutable di tabel `job_runs`.
+- Snapshot laporan tersimpan immutable di tabel `job_runs`.
+
+### 17. Docker Compose
+Prasyarat: Docker Engine + Compose v2, berkas `.env` sudah diisi (lihat §2–§5).
+```bash
+# Development (SQLite di ./var, mode sesuai .env — default dry_run):
+docker compose build
+docker compose up -d bot
+docker compose logs -f bot
+docker compose exec bot python main.py config              # konfigurasi tersanitasi
+docker compose exec bot python scripts/test_telegram.py    # verifikasi tujuan (tanpa kirim)
+docker compose exec bot python main.py dryrun morning
+docker compose down                                        # SIGTERM → shutdown tertib (grace 30 s)
+
+# Production (PostgreSQL):
+#   di .env: DATABASE_URL=postgresql+asyncpg://bot:${POSTGRES_PASSWORD}@postgres:5432/stock_signal_bot
+#            POSTGRES_PASSWORD=<kata sandi kuat>   APP_ENV=production
+docker compose --profile production up -d postgres
+docker compose --profile production run --rm migrate       # alembic upgrade head
+docker compose --profile production up -d bot
+```
+Catatan keamanan image: berjalan sebagai user `bot` (uid 10001), filesystem read-only kecuali
+`/app/var` dan `/tmp`, `no-new-privileges`, tanpa `.env` di dalam image (hanya `env_file` saat
+runtime), health check membaca heartbeat tanpa menyentuh rahasia. `./config` di-mount read-only
+sehingga aturan/kalender/watchlist dapat diperbarui tanpa rebuild (restart container).
+
+> Build image belum dijalankan di lingkungan pengembangan ini (tanpa Docker); Dockerfile dan
+> Compose diperiksa statis dan dibangun + smoke-test oleh CI GitHub Actions (`ci/github-workflow-ci.yml` (pindahkan ke `.github/workflows/` untuk mengaktifkan; lihat `ci/README.md`)).
+
+### 18. Backup dan restore
+- **SQLite**: hentikan bot (`docker compose stop bot`), salin `var/dev.db` (beserta `-wal`/`-shm`
+  bila ada) ke lokasi aman, lalu jalankan lagi. Restore = kembalikan berkas saat bot berhenti.
+- **PostgreSQL**: `docker compose --profile production exec postgres pg_dump -U bot stock_signal_bot > backup.sql`;
+  restore dengan `psql -U bot stock_signal_bot < backup.sql` pada database kosong yang sudah dimigrasi.
+- Sertakan `var/exports/` (laporan HTML/WhatsApp) dan `var/backtests/` bila ingin menyimpan jejak audit.
+- `.env` **tidak** ikut backup otomatis; simpan di pengelola secret.
+
+### 19. Membuat arsip ZIP distribusi
+```bash
+uv run python scripts/package_project.py --check   # daftar berkas + pemindaian rahasia
+uv run python scripts/package_project.py           # -> dist/stock_signal_bot_<tgl>_<commit>.zip
+```
+Arsip berisi kode, konfigurasi contoh, dokumentasi, `uv.lock`/`requirements*.txt`, Dockerfile/Compose,
+dan `.env.example` — tanpa `.env`, database, log, cache, `.git`, virtualenv, atau metadata internal.
+Bila ada pola token/kunci di berkas non-test, pembuatan arsip dibatalkan. Memulai di mesin lain:
+ekstrak → `uv sync --all-groups` (atau `pip install -r requirements-dev.txt`) → `cp .env.example .env`
+→ `uv run pytest` → ikuti bagian Telegram di atas.
+
+### 20. Troubleshooting umum
+| Gejala | Penyebab umum | Tindakan |
+|---|---|---|
+| `Konfigurasi tidak valid: APP_MODE=live membutuhkan ...` | saklar live belum lengkap | isi `TELEGRAM_BOT_TOKEN`, `TELEGRAM_SIGNAL_CHAT_IDS`, `TELEGRAM_ENABLE_LIVE_SEND=true` |
+| `tujuan ... ditolak: tipe chat 'private'` | ID yang ditulis adalah chat pribadi | pakai ID grup/supergroup/channel (negatif); `scripts/test_telegram.py --discover` |
+| `bot tidak menjadi anggota` / `channel: bot harus administrator` | bot belum ditambahkan / tanpa hak posting | tambahkan bot ke grup; di channel jadikan admin dengan *post messages* |
+| Job pagi `skipped: ... bukan hari perdagangan` | akhir pekan/libur atau kalender belum mencakup tanggal | perbarui `config/trading_calendar.yaml` |
+| Semua simbol `missing: histori ... < minimum 250` | data provider pendek | cek jaringan/Yahoo; turunkan `DAILY_MIN_HISTORY_BARS` hanya untuk development |
+| Status pengiriman `unknown` | respons Telegram hilang setelah request | cek grup manual, `scripts/reconcile_deliveries.py` (§9) |
+| Command admin `Ditolak: hanya diterima di grup admin` | dikirim dari grup sinyal | kirim di `TELEGRAM_ADMIN_CHAT_ID` sebagai user dalam whitelist (bukan anonim) |
+| Produksi `blocked: market_rules.yaml belum terverifikasi` | nilai CONTOH | verifikasi aturan resmi, set `meta.verified: true` dengan `source` & `effective_from` |
+| Produksi `blocked: gate backtest belum tersedia/tidak lulus` | belum ada backtest OOS yang lulus | `main.py backtest ... --save-gate` setelah kalibrasi; jangan turunkan threshold |
+| Container `unhealthy` | heartbeat basi (> 40 menit) | cek log scheduler; pastikan waktu host benar (TZ) |
 
 ## Struktur singkat
 
@@ -329,7 +396,8 @@ bot/         formatter, commands, handlers, gates, reports, scheduler, alerts, r
 ai/          llm_client (openai/anthropic/openai_compatible), narrator (validasi + template)
 notifications/whatsapp_export.py  teks Saluran WhatsApp (manual)
 backtest/    runner (engine+lifecycle produksi), metrics, gate, data (Yahoo/CSV)
-scripts/     test_telegram.py, reconcile_deliveries.py
+scripts/     test_telegram.py, reconcile_deliveries.py, package_project.py, healthcheck.py
+Dockerfile · docker-compose.yml · .dockerignore · ci/github-workflow-ci.yml
 tests/       test offline
 docs/        verification_required.md
 var/         runtime (db, log, cache, ekspor) — gitignored

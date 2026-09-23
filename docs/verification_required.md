@@ -94,7 +94,15 @@ Legenda status: ❌ belum · ⚠️ sebagian · ✅ selesai
 | Kebijakan platform terkait konten finansial/sinyal | ❌ | wajib sebelum otomasi apa pun |
 | Larangan otomasi tidak resmi (WhatsApp Web, scraping sesi, library tak resmi) | ✅ | tidak dipakai, by design |
 
-## 10. Narator LLM (jika diaktifkan)
+## 10. Deployment
+
+| Item | Status | Catatan |
+|---|---|---|
+| Build image Docker & smoke test | ⚠️ | Dockerfile/Compose diperiksa statis; build dijalankan oleh CI GitHub Actions (belum dijalankan di sandbox tanpa Docker) |
+| Wheel `numba`/`llvmlite` untuk python:3.12-slim | ❌ | builder memasang `build-essential` sebagai cadangan; verifikasi ukuran/waktu build di CI |
+| Backup/restore PostgreSQL nyata | ❌ | prosedur di README §18 belum dijalankan pada instance nyata |
+
+## 11. Narator LLM (jika diaktifkan)
 
 | Item | Status | Catatan |
 |---|---|---|

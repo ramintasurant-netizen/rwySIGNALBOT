@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          version: "0.9.28"
+          enable-cache: true
+      - name: Sync dependencies (locked)
+        run: uv sync --all-groups --locked
+      - name: Lint
+        run: |
+          uv run ruff check .
+          uv run ruff format --check .
+      - name: Test (offline; tanpa token, tanpa jaringan pasar)
+        run: uv run pytest -q -p no:warnings
+      - name: Package check (allowlist + pemindaian rahasia)
+        run: uv run python scripts/package_project.py --check
+
+  docker:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - name: Build image (tanpa push)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: false
+          load: true
+          tags: stock-signal-bot:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - name: Smoke test image (config tanpa token; healthcheck harus gagal tanpa heartbeat)
+        run: |
+          docker run --rm stock-signal-bot:ci python main.py --env-file - config >/dev/null
+          if docker run --rm stock-signal-bot:ci python scripts/healthcheck.py; then
+            echo "healthcheck seharusnya gagal tanpa heartbeat"; exit 1; fi
+          docker run --rm stock-signal-bot:ci python -c "import bot.runtime, backtest.runner; print('import ok')"

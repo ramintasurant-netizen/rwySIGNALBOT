@@ -1,0 +1,65 @@
+# Development (default): SQLite di volume ./var, mode dry_run dari .env.
+#   docker compose up -d bot
+# Production: profil "production" menambah PostgreSQL; set DATABASE_URL di .env ke
+#   postgresql+asyncpg://bot:${POSTGRES_PASSWORD}@postgres:5432/stock_signal_bot
+#   docker compose --profile production up -d
+services:
+  bot:
+    build: .
+    image: stock-signal-bot:local
+    container_name: stock_signal_bot
+    env_file:
+      - .env                     # token & konfigurasi; tidak pernah di-bake ke image
+    environment:
+      VAR_DIR: /app/var
+      CONFIG_DIR: /app/config
+      TZ: Asia/Jakarta
+    volumes:
+      - ./var:/app/var           # database SQLite, log, ekspor, heartbeat, backtest
+      - ./config:/app/config:ro  # aturan/kalender/watchlist dapat diedit tanpa rebuild
+    restart: unless-stopped
+    stop_grace_period: 30s
+    init: true
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test: ["CMD", "python", "scripts/healthcheck.py"]
+      interval: 5m
+      timeout: 10s
+      start_period: 2m
+      retries: 3
+
+  postgres:
+    image: postgres:16-alpine
+    profiles: ["production"]
+    container_name: stock_signal_bot_postgres
+    environment:
+      POSTGRES_DB: stock_signal_bot
+      POSTGRES_USER: bot
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD di .env}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bot -d stock_signal_bot"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+
+  migrate:
+    build: .
+    image: stock-signal-bot:local
+    profiles: ["production"]
+    env_file:
+      - .env
+    command: ["python", "-m", "alembic", "upgrade", "head"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
+
+volumes:
+  pgdata:
