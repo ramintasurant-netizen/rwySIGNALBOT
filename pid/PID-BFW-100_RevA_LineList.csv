@@ -1,0 +1,24 @@
+﻿Line No.,From,To,Size,Material / Class,Fluid,Operating condition,Note
+"16""-FW-001",Condensate system,V-101A,"16""",A106 Gr B / 300#,Condensate,"40–120 °C, 12 barg",
+"8""-LS-010",Aux steam header / Extr #4,V-101A,"8""",A106 Gr B / 300#,LP steam,8 barg / 250 °C,
+"24""-FW-101",V-101B bottom,Suction header,"24""",A106 Gr B / 300#,Feedwater,"165 °C, ~10 barg",Velocity ≤ 1.5 m/s for NPSH
+"16""-FW-101A",Suction header,P-100A,"16""",A106 Gr B / 300#,Feedwater,"165 °C, ~10 barg",
+"10""-FW-108A",P-101A,Discharge header,"10""",A335 P11 / 1500#,Feedwater,"180 °C, ~195 barg",
+"6""-FW-109A",P-101A discharge,Recirc header,"6""",A335 P11 / 1500#,Feedwater,min-flow 25–30 %,
+"16""-FW-101B",Suction header,P-100B,"16""",A106 Gr B / 300#,Feedwater,"165 °C, ~10 barg",
+"10""-FW-108B",P-101B,Discharge header,"10""",A335 P11 / 1500#,Feedwater,"180 °C, ~195 barg",
+"6""-FW-109B",P-101B discharge,Recirc header,"6""",A335 P11 / 1500#,Feedwater,min-flow 25–30 %,
+"16""-FW-101C",Suction header,P-100C,"16""",A106 Gr B / 300#,Feedwater,"165 °C, ~10 barg",
+"10""-FW-108C",P-101C,Discharge header,"10""",A335 P11 / 1500#,Feedwater,"180 °C, ~195 barg",
+"6""-FW-109C",P-101C discharge,Recirc header,"6""",A335 P11 / 1500#,Feedwater,min-flow 25–30 %,
+"2""-FW-140 A/B/C",Discharge header,BFP suction (standby pump),"2""",A335 P11 / 1500#,Feedwater,warm-up flow via RO-140,Keeps casing ΔT < 40 °C
+"8""-FW-109",FV-109 A/B/C outlet,V-101B,"8""",A106 Gr C / 600#,Feedwater (flashing),downstream of breakdown,Restriction orifice RO-109 at tank nozzle
+"16""-FW-110",Discharge header,E-101 inlet,"16""",A335 P11 / 1500#,Feedwater,"180 °C, ~195 barg",
+"4""-FW-122 / 3""-FW-123",Discharge header (intermediate stage tap),SH / RH attemperator,"4"" / 3""",A335 P11 / 1500#,Feedwater,180 °C,Ref. PID-BLR-210
+"16""-FW-111",E-101,E-102,"16""",A335 P11 / 1500#,Feedwater,215 °C,
+"16""-FW-113",E-102,FW control station,"16""",A335 P11 / 1500#,Feedwater,"250 °C, ~190 barg",
+"6""-HD-114",E-101 shell,V-101B,"6""",A106 Gr B / 600#,Heater drain (saturated),215 °C,
+"4""-HD-115",E-102 shell,E-101 shell,"4""",A106 Gr B / 900#,Heater drain (saturated),250 °C,
+"16""-FW-130",Upstream MOV-131,Downstream MOV-132,"16""",A335 P11 / 1500#,Feedwater,180 °C,"Bypass, normally no flow"
+"6""-FW-119",Upstream FCV-116,Downstream FCV-116,"6""",A335 P11 / 1500#,Feedwater,250 °C,Start-up bypass
+"16""-FW-116",FW control station,Economizer inlet,"16""",A335 P11 / 1500#,Feedwater,"250 °C, ~185 barg",
