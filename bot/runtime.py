@@ -10,6 +10,8 @@ from pathlib import Path
 from loguru import logger
 from telegram.ext import Application
 
+from ai.llm_client import build_llm_client
+from ai.narrator import Narrator
 from bot.alerts import AlertSink
 from bot.commands import CommandDependencies, CommandRouter
 from bot.handlers import register_handlers
@@ -102,6 +104,9 @@ async def build_runtime(
     )
     news = NewsProvider(news_cfg.enabled_sources) if news_cfg.enabled_sources else None
     export_dir = settings.var_dir / "exports"
+    narrator = (
+        Narrator(build_llm_client(settings)) if settings.llm_provider != "none" else Narrator(None)
+    )
     service = ReportService(
         ReportDependencies(
             settings=settings,
@@ -115,6 +120,8 @@ async def build_runtime(
             macro=macro,
             news=news,
             lifecycle=LifecycleConfig(),
+            narrator=narrator,
+            whatsapp_export_enabled=settings.whatsapp_export_enabled,
             export_dir=export_dir,
         )
     )

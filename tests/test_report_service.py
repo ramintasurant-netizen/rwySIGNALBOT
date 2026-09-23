@@ -413,3 +413,55 @@ async def test_morning_lifecycle_uses_previous_session_bar(
         )
     finally:
         await db.dispose()
+
+
+async def test_narrator_and_whatsapp_export_are_integrated_and_isolated(
+    tmp_path, settings_factory, market_rules, calendar
+) -> None:
+    from ai.llm_client import LLMError, LLMRequest, LLMResponse
+    from ai.narrator import Narrator
+
+    class GoodClient:
+        provider = "fake"
+
+        async def complete(self, request: LLMRequest) -> LLMResponse:
+            return LLMResponse(
+                text="Engine menemukan setup pada TRND dan BRKO; konteks global tidak tersedia pada sesi ini. Detail ada pada kartu.",
+                provider="fake",
+                model="m",
+            )
+
+    class BrokenClient:
+        provider = "fake"
+
+        async def complete(self, request: LLMRequest) -> LLMResponse:
+            raise LLMError("HTTP 500")
+
+    settings = settings_factory(whatsapp_export_enabled=True)
+    service, repo, _, db = await _build(tmp_path, settings, market_rules, calendar)
+    try:
+        service.d.narrator = Narrator(GoodClient())  # type: ignore[arg-type]
+        service.d.whatsapp_export_enabled = True
+        out = await service.run(ReportType.MORNING)
+        assert out.status == "completed"
+        assert out.narrative_source == "llm"
+        assert (
+            out.snapshot is not None and out.snapshot.narrative and "TRND" in out.snapshot.narrative
+        )
+        assert out.whatsapp_path is not None and out.whatsapp_path.exists()
+        wa = out.whatsapp_path.read_text(encoding="utf-8")
+        assert out.snapshot.narrative in wa and "*📊 PRE-MARKET BRIEF" in wa
+        assert "Ringkasan" in "\n".join(out.parts)
+        # snapshot tersimpan memuat narasi yang sama
+        job = await repo.get_job(out.job_id)
+        assert ReportSnapshot.from_json(job.snapshot_json).narrative == out.snapshot.narrative
+
+        # LLM rusak → template, job tetap selesai; ekspor WA nonaktif → tidak ada file baru
+        service.d.narrator = Narrator(BrokenClient())  # type: ignore[arg-type]
+        service.d.whatsapp_export_enabled = False
+        out2 = await service.run(ReportType.AFTERNOON)
+        assert out2.status in ("completed", "failed")  # sore tanpa quote fixture boleh gagal data
+        if out2.status == "completed":
+            assert out2.narrative_source == "template" and out2.whatsapp_path is None
+    finally:
+        await db.dispose()

@@ -86,4 +86,15 @@ Legenda status: ❌ belum · ⚠️ sebagian · ✅ selesai
 
 | Item | Status | Catatan |
 |---|---|---|
-| Dukungan API resmi untuk Saluran/grup, batas fitur, biaya, kebijakan konten finansial | ❌ | tahap awal hanya ekspor teks manual |
+| Dukungan API resmi (WhatsApp Business Platform) untuk **Saluran**, batas fitur/peserta, biaya | ❌ | tahap awal hanya ekspor teks manual (`notifications/whatsapp_export.py`); tidak ada endpoint palsu |
+| Kebijakan platform terkait konten finansial/sinyal | ❌ | wajib sebelum otomasi apa pun |
+| Larangan otomasi tidak resmi (WhatsApp Web, scraping sesi, library tak resmi) | ✅ | tidak dipakai, by design |
+
+## 10. Narator LLM (jika diaktifkan)
+
+| Item | Status | Catatan |
+|---|---|---|
+| Kontrak API OpenAI Chat Completions (`POST /chat/completions`, Bearer) | ⚠️ | diverifikasi dari dokumentasi resmi 2026-09; belum diuji dengan kunci nyata |
+| Kontrak API Anthropic Messages (`POST /v1/messages`, `x-api-key`, `anthropic-version: 2023-06-01`) | ⚠️ | idem |
+| Biaya token dan batas rate provider | ❌ | menunggu keputusan pemilik |
+| Kebijakan data: snapshot engine dikirim ke pihak ketiga | ❌ | hanya JSON ringkas (tanpa OHLCV mentah); pastikan sesuai kebijakan Anda |

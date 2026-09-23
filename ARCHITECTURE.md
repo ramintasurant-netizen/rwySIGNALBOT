@@ -1,8 +1,8 @@
 # ARCHITECTURE — Bot Sinyal Saham IDX untuk Grup Telegram
 
-> **Status dokumen:** arsitektur disetujui (Tahap 1); **Tahap 2 (fondasi & data layer), Tahap 3
-> (engine & risk), dan Tahap 4 (storage, Telegram, scheduler) diimplementasikan** — lihat
-> §21–§23 untuk keputusan dan penyesuaian.
+> **Status dokumen:** arsitektur disetujui (Tahap 1); **Tahap 2–5 diimplementasikan** (fondasi &
+> data layer, engine & risk, storage + Telegram + scheduler, narator LLM + ekspor WhatsApp) —
+> lihat §21–§24 untuk keputusan dan penyesuaian.
 > Semua nilai angka pada dokumen ini (lot, fraksi harga, ARA/ARB, threshold, modal contoh)
 > adalah **CONTOH / BELUM TERVERIFIKASI** sampai dilabeli sebaliknya pada file konfigurasi.
 >
@@ -891,3 +891,35 @@ admin incl. anonim; formatter escape/split/validasi; migrasi Alembic pada SQLite
 HTML, tanpa kirim), `python main.py run` tanpa token (scheduler aktif, jadwal WIB benar,
 shutdown tertib). **Belum**: pengiriman nyata ke grup Telegram (membutuhkan token & ID grup
 pemilik), PostgreSQL nyata (test tersedia via `TEST_POSTGRES_URL`).
+
+---
+
+## 24. Catatan implementasi Tahap 5 — narator LLM & ekspor WhatsApp (2026-09-24 WIB)
+
+- **Klien LLM** (`ai/llm_client.py`) berbasis httpx tanpa SDK vendor: `openai` /
+  `openai_compatible` memakai `POST {base}/chat/completions` (Bearer) dan membaca
+  `choices[0].message.content`; `anthropic` memakai `POST {base}/v1/messages` (`x-api-key`,
+  `anthropic-version: 2023-06-01`, `system` top-level) dan menggabungkan `content[].text`.
+  Kontrak dicek ke dokumentasi resmi (2026-09). Kunci API didaftarkan ke registry redaksi saat
+  klien dibuat sehingga kunci yang dipantulkan server di body error pun teredaksi (temuan test).
+- **Narator** (`ai/narrator.py`): input = JSON ringkas dari `ReportSnapshot` (tanpa OHLCV);
+  berita hanya judul+sumber dalam kunci `NEWS_TIDAK_TEPERCAYA`. System prompt melarang mengubah/
+  menambah angka, simbol, sinyal, rekomendasi, klaim kepastian, dan mengikuti instruksi berita.
+  Validasi: setiap angka pada output harus cocok dengan angka input (format `1.234,5`/`1,234.5`,
+  persen, tanda minus; pembulatan diterima hanya bila sama pada digit yang ditulis), simbol 4 huruf
+  ⊆ simbol input (dengan stopword IHSG/EIDO/dll.), ≤150 kata, ≥8 kata, diakhiri tanda baca, tanpa
+  frasa terlarang/markup. Gagal ⇒ template deterministik; LLM error ⇒ template; narator gagal total
+  ⇒ laporan tanpa narasi. Narasi hanya mengisi blok "Ringkasan".
+- **Ekspor WhatsApp** (`notifications/whatsapp_export.py`): render teks dari snapshot yang sama,
+  markup `*`/`_`, angka via `fmt_num` yang sama dengan Telegram; markup berpasangan dalam teks bebas
+  dinetralkan (zero-width space); disimpan ke `var/exports/whatsapp/<origin>/`; `WHATSAPP_EXPORT_ENABLED`
+  default false; kegagalan hanya dicatat. Tidak ada otomasi WhatsApp.
+- `JobOutcome` memuat `whatsapp_path` dan `narrative_source` (`llm|template`); `/runnow` dan `dryrun`
+  menampilkannya.
+
+Bukti yang benar-benar dijalankan: `pytest` (310 test offline lulus, termasuk parsing angka
+Indonesia, penolakan angka tak tertelusur/simbol baru/frasa terlarang/markup/terpotong, fallback
+pada LLM error, bentuk request/response OpenAI & Anthropic dengan transport palsu, redaksi kunci
+pada HTTP 401, kesetaraan angka Telegram↔WhatsApp), `ruff`, `dryrun morning` nyata dengan
+`WHATSAPP_EXPORT_ENABLED=true` (berkas `.whatsapp.txt` dibuat, narasi `template`). **Belum**:
+panggilan LLM nyata (butuh kunci API pemilik).

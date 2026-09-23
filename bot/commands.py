@@ -385,6 +385,10 @@ def outcome_text(o: JobOutcome) -> str:
         )
     if o.export_path is not None:
         lines.append(f"Ekspor: <code>{esc(o.export_path)}</code>")
+    if o.whatsapp_path is not None:
+        lines.append(f"Ekspor WhatsApp: <code>{esc(o.whatsapp_path)}</code>")
+    if o.narrative_source:
+        lines.append(f"Narasi: {esc(o.narrative_source)}")
     for w in o.warnings[:5]:
         lines.append(f"⚠️ {esc(w)}")
     return "\n".join(lines)

@@ -249,6 +249,10 @@ async def cmd_dryrun(settings: Settings, which: str) -> int:
         print(f"peringatan: {w}")
     if outcome.export_path:
         print(f"ekspor: {outcome.export_path}")
+    if outcome.whatsapp_path:
+        print(f"ekspor whatsapp: {outcome.whatsapp_path}")
+    if outcome.narrative_source:
+        print(f"narasi: {outcome.narrative_source}")
     for i, part in enumerate(outcome.parts, 1):
         print(f"\n----- bagian {i}/{len(outcome.parts)} ({len(part)} karakter) -----\n{part}")
     logger.info(outcome_text(outcome).replace("<", "[").replace(">", "]"))

@@ -17,6 +17,7 @@ from pathlib import Path
 
 from loguru import logger
 
+from ai.narrator import Narrator
 from bot.alerts import AlertSink
 from bot.formatter import format_report
 from bot.gates import GateResult, evaluate_gates
@@ -47,6 +48,7 @@ from engine.lifecycle import Bar, LifecycleConfig, SignalState, SignalStatus, st
 from engine.models import EngineResult
 from engine.pipeline import SignalEngine, SymbolInput
 from notifications.base import DeliveryStatus, Notifier, TargetRejectedError, TargetVerification
+from notifications.whatsapp_export import export_whatsapp
 from storage.models import JobRun, Signal
 from storage.repository import DeliveryPart, Repository
 
@@ -86,6 +88,8 @@ class JobOutcome:
     parts: tuple[str, ...] = ()
     delivery: DeliverySummary | None = None
     export_path: Path | None = None
+    whatsapp_path: Path | None = None
+    narrative_source: str = ""
     live_sent: bool = False
 
 
@@ -102,6 +106,8 @@ class ReportDependencies:
     macro: GlobalMacroProvider | None = None
     news: NewsProvider | None = None
     lifecycle: LifecycleConfig = field(default_factory=LifecycleConfig)
+    narrator: Narrator | None = None
+    whatsapp_export_enabled: bool = False
     clock: Callable[[], datetime] = utc_now
     export_dir: Path | None = None
     job_timeout_seconds: float = 600.0
@@ -546,11 +552,22 @@ class ReportService:
         self, job: JobRun, snapshot: ReportSnapshot, gates: GateResult, session: date
     ) -> JobOutcome:
         d = self.d
+        narrative_source = ""
+        if d.narrator is not None:
+            try:
+                narrative = await d.narrator.narrate(snapshot)
+                snapshot = snapshot.model_copy(update={"narrative": narrative.text})
+                narrative_source = narrative.source
+                if narrative.rejected_reason and d.narrator.enabled:
+                    logger.info("narasi memakai template: {}", narrative.rejected_reason)
+            except Exception as exc:  # noqa: BLE001 - narasi opsional, tidak boleh menggagalkan job
+                logger.warning("narator gagal, tanpa narasi: {}", redact_exception(exc))
         parts = tuple(format_report(snapshot))
         await d.repo.mark_job(
             job.id, "running", snapshot_json=snapshot.to_json(), data_session_date=session
         )
         export_path = self._export(snapshot, parts)
+        whatsapp_path = self._export_whatsapp(snapshot)
         delivery: DeliverySummary | None = None
         live_sent = False
         if self.origin is SnapshotOrigin.LIVE:
@@ -584,6 +601,8 @@ class ReportService:
                     snapshot=snapshot,
                     parts=parts,
                     export_path=export_path,
+                    whatsapp_path=whatsapp_path,
+                    narrative_source=narrative_source,
                 )
         await d.repo.mark_job(job.id, "completed")
         return JobOutcome(
@@ -597,6 +616,8 @@ class ReportService:
             parts=parts,
             delivery=delivery,
             export_path=export_path,
+            whatsapp_path=whatsapp_path,
+            narrative_source=narrative_source,
             live_sent=live_sent,
         )
 
@@ -651,6 +672,16 @@ class ReportService:
         return DeliverySummary(
             planned=len(plan), sent=sent, failed=failed, unknown=unknown, skipped=skipped
         )
+
+    def _export_whatsapp(self, snapshot: ReportSnapshot) -> Path | None:
+        """Ekspor teks Saluran WhatsApp (manual). Kegagalan tidak memengaruhi Telegram."""
+        if not self.d.whatsapp_export_enabled or self.d.export_dir is None:
+            return None
+        try:
+            return export_whatsapp(snapshot, self.d.export_dir)
+        except Exception as exc:  # noqa: BLE001
+            logger.warning("ekspor WhatsApp gagal: {}", redact_exception(exc))
+            return None
 
     def _export(self, snapshot: ReportSnapshot, parts: tuple[str, ...]) -> Path | None:
         if self.d.export_dir is None:

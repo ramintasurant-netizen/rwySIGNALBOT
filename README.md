@@ -5,14 +5,14 @@ Bot Python asinkron yang menghasilkan laporan **pre-market (08:30 WIB)** dan **p
 dalam allowlist**. Engine deterministik menentukan seluruh angka trading; LLM (opsional)
 hanya merangkum konteks. Tidak ada eksekusi order, akses dana, atau transaksi broker.
 
-> **Status proyek: Tahap 4 dari 7 selesai (storage, bot Telegram grup-only, scheduler,
-> dry-run end-to-end).** Bot dapat dijalankan dan mengirim laporan ke grup dalam mode live
+> **Status proyek: Tahap 5 dari 7 selesai (storage, bot Telegram grup-only, scheduler,
+> narator LLM opsional, ekspor teks Saluran WhatsApp).** Bot dapat dijalankan dan mengirim laporan ke grup dalam mode live
 > **development** setelah Anda mengisi token + ID grup dan menyalakan saklar live secara
 > eksplisit. Mode **produksi** tetap diblokir sampai aturan bursa/kalender diverifikasi dan
 > gate backtest (Tahap 6) lulus. Semua nilai aturan masih **CONTOH / BELUM TERVERIFIKASI**
 > (lihat `docs/verification_required.md`). Arsitektur lengkap ada di `ARCHITECTURE.md`.
 
-## Yang sudah tersedia (Tahap 1–4)
+## Yang sudah tersedia (Tahap 1–5)
 
 - `ARCHITECTURE.md` — desain, alur data, kebijakan grup-only, gate produksi.
 - `config/settings.py` — konfigurasi env (pydantic-settings) dengan default aman dan
@@ -41,11 +41,19 @@ hanya merangkum konteks. Tidak ada eksekusi order, akses dana, atau transaksi br
   scheduler APScheduler WIB, alert admin dengan rate limit, adapter python-telegram-bot.
 - `scripts/test_telegram.py` (uji koneksi/kirim TEST, default dry-run) dan
   `scripts/reconcile_deliveries.py` (rekonsiliasi status `unknown`).
-- `tests/` — 283 test offline (fixture sintetis berlabel, tanpa token, tanpa jaringan).
+- `ai/` — adapter LLM provider-agnostic (`openai`, `anthropic`, `openai_compatible`/lokal,
+  `none`) via httpx; narator yang hanya merangkum konteks ≤150 kata dari JSON engine dengan
+  validasi ketat (angka harus dapat ditelusuri ke input, simbol tidak boleh bertambah, frasa
+  "pasti naik/dijamin/beli sekarang" dan markup ditolak, output kosong/terpotong ditolak) dan
+  fallback template deterministik. Tanpa API key bot tetap berjalan penuh.
+- `notifications/whatsapp_export.py` — teks siap salin untuk **Saluran WhatsApp** dari snapshot
+  yang sama (angka/timestamp/disclaimer identik), format `*tebal*`/`_miring_`, disimpan lokal ke
+  `var/exports/whatsapp/`. Tidak ada otomasi WhatsApp (lihat bagian WhatsApp di bawah).
+- `tests/` — 310 test offline (fixture sintetis berlabel, tanpa token, tanpa jaringan).
 - `main.py` — `config`, `health`, `fetch`, `evaluate`, `dryrun morning|afternoon`, `run`.
 
-Belum tersedia: narator LLM & ekspor teks WhatsApp (Tahap 5), backtest & gate produksi (Tahap 6),
-Docker/Compose, paket ZIP, dokumentasi deployment lengkap (Tahap 7).
+Belum tersedia: backtest & gate produksi (Tahap 6), Docker/Compose, paket ZIP, dokumentasi
+deployment lengkap (Tahap 7).
 
 ## Instalasi lokal
 
@@ -194,7 +202,30 @@ uv run python scripts/reconcile_deliveries.py mark-failed 12 --by "admin:1234567
 uv run python scripts/reconcile_deliveries.py requeue 12      # failed → pending
 ```
 
-### 10. Database
+### 10. Narator LLM (opsional)
+Default `LLM_PROVIDER=none`: ringkasan memakai template deterministik. Untuk mengaktifkan:
+```
+LLM_PROVIDER=openai            # atau anthropic | openai_compatible (server lokal, mis. Ollama/vLLM)
+LLM_API_KEY=...                # tidak diperlukan untuk openai_compatible tanpa autentikasi
+LLM_BASE_URL=                  # wajib untuk openai_compatible, mis. http://localhost:11434/v1
+LLM_MODEL=nama-model
+```
+LLM hanya menulis paragraf "Ringkasan"; kartu entry/SL/TP selalu dari engine. Output yang
+memuat angka tak tertelusur, simbol baru, klaim kepastian, ajakan beli/jual, atau markup ditolak
+dan diganti template (alasan dicatat di log). Berita masuk ke LLM hanya sebagai judul/sumber
+yang ditandai tidak tepercaya.
+
+### 11. Ekspor teks Saluran WhatsApp (manual)
+```
+WHATSAPP_EXPORT_ENABLED=true
+```
+Setiap laporan menghasilkan `var/exports/whatsapp/<origin>/<tanggal>_<jenis>.whatsapp.txt` dengan
+format WhatsApp, dari snapshot yang sama dengan Telegram. Salin isinya ke Saluran WhatsApp secara
+manual. **Tidak ada** integrasi otomatis: API WhatsApp Business belum diverifikasi mendukung
+Saluran, dan otomasi WhatsApp Web/library tidak resmi tidak dipakai. Kegagalan ekspor tidak
+memengaruhi pengiriman Telegram.
+
+### 12. Database
 - Development: SQLite `var/dev.db` (skema dibuat otomatis).
 - Production: PostgreSQL, jalankan migrasi: `DATABASE_URL=postgresql+asyncpg://... uv run alembic upgrade head`.
 - Backup: salin berkas SQLite saat bot berhenti, atau `pg_dump` untuk PostgreSQL. Snapshot laporan
@@ -210,6 +241,8 @@ engine/      indicators, strategies/, scorer, screener, risk, pipeline, lifecycl
 storage/     models, repository, migrations/ (Alembic)
 notifications/ base, telegram
 bot/         formatter, commands, handlers, gates, reports, scheduler, alerts, runtime
+ai/          llm_client (openai/anthropic/openai_compatible), narrator (validasi + template)
+notifications/whatsapp_export.py  teks Saluran WhatsApp (manual)
 scripts/     test_telegram.py, reconcile_deliveries.py
 tests/       test offline
 docs/        verification_required.md
