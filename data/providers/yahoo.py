@@ -12,6 +12,7 @@ Catatan penting:
 from __future__ import annotations
 
 import asyncio
+import re
 from collections.abc import Callable
 from datetime import datetime
 from decimal import Decimal
@@ -86,7 +87,19 @@ def yfinance_downloader(
     return yf.Ticker(ticker).history(**kwargs)
 
 
+_INDEX_RE = re.compile(r"^\^[A-Z0-9]{2,10}$")
+
+
+def _internal_symbol(symbol: str) -> str:
+    raw = symbol.strip().upper()
+    return raw if _INDEX_RE.match(raw) else canonical_symbol(symbol)
+
+
 def to_yahoo_ticker(symbol: str) -> str:
+    """Saham IDX → ``KODE.JK``; simbol indeks Yahoo (diawali ``^``, mis. ``^JKSE``) dipakai apa adanya."""
+    raw = symbol.strip().upper()
+    if _INDEX_RE.match(raw):
+        return raw
     return f"{canonical_symbol(symbol)}{YAHOO_SUFFIX}"
 
 
@@ -177,7 +190,7 @@ class YahooFinanceProvider(MarketDataProvider):
         try:
             frame = normalize_ohlcv(
                 raw,
-                symbol=canonical_symbol(symbol),
+                symbol=_internal_symbol(symbol),
                 timeframe=timeframe,
                 provider=self.name,
                 fetched_at=fetched_at,
@@ -212,7 +225,7 @@ class YahooFinanceProvider(MarketDataProvider):
         try:
             bars = normalize_ohlcv(
                 intraday,
-                symbol=canonical_symbol(symbol),
+                symbol=_internal_symbol(symbol),
                 timeframe=Timeframe.M1,
                 provider=self.name,
                 fetched_at=fetched_at,
@@ -235,7 +248,7 @@ class YahooFinanceProvider(MarketDataProvider):
             if daily is not None and not daily.empty:
                 dframe = normalize_ohlcv(
                     daily,
-                    symbol=canonical_symbol(symbol),
+                    symbol=_internal_symbol(symbol),
                     timeframe=Timeframe.D1,
                     provider=self.name,
                     fetched_at=fetched_at,
@@ -249,7 +262,7 @@ class YahooFinanceProvider(MarketDataProvider):
             notes.append(f"prev_close tidak tersedia: {redact_exception(exc)}")
 
         quote = Quote(
-            symbol=canonical_symbol(symbol),
+            symbol=_internal_symbol(symbol),
             price=Decimal(repr(float(last["close"]))),
             market_time=market_time,
             fetched_at=to_utc(fetched_at),

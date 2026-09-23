@@ -25,6 +25,7 @@ from engine.models import (
     SymbolEvaluation,
 )
 from engine.money_flow import MoneyFlowStats, compute_money_flow
+from engine.regime import RegimeConfig, RegimeState
 from engine.risk import RiskConfig, RiskRejected, build_risk_plan
 from engine.scorer import ScorerConfig, compute_confidence, select_cards
 from engine.screener import Screener
@@ -54,10 +55,12 @@ class SignalEngine:
         strategies: Sequence[Strategy] | None = None,
         warmup: int = WARMUP_BARS,
         with_sizing: bool = True,
+        regime: RegimeConfig | None = None,
     ) -> None:
         self.rules = rules
         self.risk = risk or RiskConfig()
         self.scorer = scorer or ScorerConfig()
+        self.regime = regime or RegimeConfig()
         self.strategies: tuple[Strategy, ...] = (
             tuple(strategies)
             if strategies is not None
@@ -79,6 +82,7 @@ class SignalEngine:
             "rules": self.rules.model_dump(mode="json"),
             "risk": self.risk.as_dict(),
             "scorer": self.scorer.as_dict(),
+            "regime": self.regime.as_dict(),
             "strategies": [
                 {
                     "id": s.id,
@@ -206,14 +210,31 @@ class SignalEngine:
         return SymbolEvaluation(symbol, outcomes, conf.confidence, card, None, money_flow)
 
     # ------------------------------------------------------------------ satu sesi penuh
-    def run(self, session_date: date, universe: dict[str, SymbolInput]) -> EngineResult:
+    def run(
+        self,
+        session_date: date,
+        universe: dict[str, SymbolInput],
+        *,
+        regime: RegimeState | None = None,
+    ) -> EngineResult:
         evaluations = tuple(
             self.evaluate_symbol(symbol, universe[symbol], session_date)
             for symbol in sorted(universe)
         )
-        cards = select_cards((e.card for e in evaluations if e.card is not None), self.scorer)
-        blocked = tuple(e.blocked for e in evaluations if e.blocked is not None)
+        candidates = [e.card for e in evaluations if e.card is not None]
         notes: list[str] = []
+        held_by_regime = False
+        if regime is not None and self.regime.enabled:
+            notes.append(regime.summary)
+            if not regime.allow_new_longs(self.regime):
+                held_by_regime = True
+                notes.append(
+                    f"filter rezim: {len(candidates)} kandidat setup ditahan "
+                    f"(pasar {regime.regime.value})"
+                )
+                candidates = []
+        cards = select_cards(candidates, self.scorer)
+        blocked = tuple(e.blocked for e in evaluations if e.blocked is not None)
         below = [
             e
             for e in evaluations
@@ -223,7 +244,7 @@ class SignalEngine:
         ]
         if below:
             notes.append(f"{len(below)} setup di bawah threshold {self.scorer.threshold}")
-        if not cards and any(e.blocked is None for e in evaluations):
+        if not cards and not held_by_regime and any(e.blocked is None for e in evaluations):
             notes.append("data valid tetapi tidak ada setup layak")
         return EngineResult(
             session_date=session_date,
@@ -234,4 +255,5 @@ class SignalEngine:
             blocked=blocked,
             universe=tuple(sorted(universe)),
             notes=tuple(notes),
+            regime=regime.regime.value if regime is not None else None,
         )

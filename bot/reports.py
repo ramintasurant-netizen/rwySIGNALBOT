@@ -56,6 +56,7 @@ from engine import ENGINE_VERSION
 from engine.lifecycle import Bar, LifecycleConfig, SignalState, SignalStatus, step
 from engine.models import EngineResult
 from engine.pipeline import SignalEngine, SymbolInput
+from engine.regime import RegimeState, compute_regime
 from notifications.base import DeliveryStatus, Notifier, TargetRejectedError, TargetVerification
 from notifications.whatsapp_export import export_whatsapp
 from storage.models import JobRun, Signal
@@ -298,7 +299,8 @@ class ReportService:
             )
 
         macro_snap, news_snap = await self._context()
-        result = d.engine.run(session, universe)
+        regime = await self._regime(session)
+        result = d.engine.run(session, universe, regime=regime)
         money_flow = _money_flow_snapshots(result)
         updates = await self._apply_lifecycle_daily(open_signals, frames, session)
         active = await self._active_snapshots()
@@ -322,6 +324,8 @@ class ReportService:
             money_flow=money_flow,
             data_notes=tuple(gates.warnings),
         )
+        if regime is not None and regime.regime.value != "unknown":
+            snapshot = snapshot.model_copy(update={"regime_detail": regime.summary})
         await d.repo.save_signals(
             job, result.cards, app_env=d.settings.app_env, published_session=session
         )
@@ -414,6 +418,30 @@ class ReportService:
         return await self._finish(job, snapshot, gates, trading_date)
 
     # ------------------------------------------------------------------ pendukung
+    async def _regime(self, session: date) -> RegimeState | None:
+        """Rezim pasar dari indeks acuan; data indeks gagal ⇒ UNKNOWN (kebijakan di RegimeConfig)."""
+        cfg = self.d.engine.regime
+        if not cfg.enabled:
+            return None
+        agg = await self.d.aggregator.get_ohlcv(
+            cfg.index_symbol,
+            Timeframe.D1,
+            None,
+            None,
+            expected_last_session=session,
+            min_bars=cfg.warmup,
+        )
+        frame = agg.frame if agg.frame is not None and agg.usable else None
+        state = compute_regime(frame, session, cfg)
+        if frame is None:
+            state = RegimeState(
+                state.regime,
+                session,
+                cfg.index_symbol,
+                reason=f"{agg.status.value}: " + "; ".join(agg.issues)[:160],
+            )
+        return state
+
     def _recent_sessions(self, session: date, n: int) -> list[date]:
         out = [session]
         cursor = session

@@ -28,6 +28,7 @@ from data.providers.global_macro import GlobalMacroProvider, load_global_macro_c
 from data.providers.news import NewsProvider, load_news_sources
 from engine.lifecycle import LifecycleConfig
 from engine.pipeline import SignalEngine
+from engine.regime import RegimeConfig
 from engine.risk import RiskConfig
 from engine.scorer import ScorerConfig
 from notifications.base import TargetRejectedError
@@ -78,7 +79,10 @@ async def build_runtime(
         build_providers(settings, rules), AggregatorConfig.from_settings(settings)
     )
     engine = SignalEngine(
-        rules, risk=RiskConfig.from_settings(settings), scorer=ScorerConfig.from_settings(settings)
+        rules,
+        risk=RiskConfig.from_settings(settings),
+        scorer=ScorerConfig.from_settings(settings),
+        regime=RegimeConfig.from_settings(settings),
     )
 
     app: Application | None = None

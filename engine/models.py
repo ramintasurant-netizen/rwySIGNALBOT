@@ -141,6 +141,7 @@ class EngineResult:
     blocked: tuple[BlockedSymbol, ...]
     universe: tuple[str, ...]
     notes: tuple[str, ...] = field(default_factory=tuple)
+    regime: str | None = None  # bullish | neutral | bearish | unknown | None (tanpa filter)
 
     @property
     def symbols_evaluated(self) -> int:

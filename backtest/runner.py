@@ -36,6 +36,7 @@ from engine import ENGINE_VERSION
 from engine.lifecycle import Bar, LifecycleConfig, SignalState, SignalStatus, step
 from engine.models import SignalCard
 from engine.pipeline import SignalEngine, SymbolInput
+from engine.regime import compute_regime
 from engine.risk import round_to_tick
 
 LIMITATIONS = (
@@ -214,9 +215,12 @@ class BacktestRunner:
         return max(0, lots) * self.rules.lot_size
 
     # ------------------------------------------------------------------ jalur utama
-    def run(self, frames: dict[str, OHLCVFrame]) -> BacktestResult:
+    def run(
+        self, frames: dict[str, OHLCVFrame], *, index_frame: OHLCVFrame | None = None
+    ) -> BacktestResult:
         if not frames:
             raise ValueError("tidak ada data untuk backtest")
+        regime_counts: dict[str, int] = {}
         provider = next(iter(frames.values())).provider
         origin = next(iter(frames.values())).origin.value
         # Sesi kandidat = gabungan session_date bar lengkap dalam [start, end] yang punya cukup histori.
@@ -334,7 +338,12 @@ class BacktestRunner:
                 )
             capacity = self.cfg.max_open_positions - len(positions)
             if universe and capacity > 0:
-                result = self.engine.run(session, universe)
+                regime = None
+                if self.engine.regime.enabled:
+                    regime = compute_regime(index_frame, session, self.engine.regime)
+                    key = regime.regime.value
+                    regime_counts[key] = regime_counts.get(key, 0) + 1
+                result = self.engine.run(session, universe, regime=regime)
                 for card in result.cards[:capacity]:
                     signals_generated += 1
                     shares = self._size(card, cash)
@@ -387,6 +396,17 @@ class BacktestRunner:
             clean_notes = (
                 *clean_notes,
                 f"{pending_at_end} sinyal masih menunggu entry di akhir periode (tidak dihitung)",
+            )
+        if self.engine.regime.enabled:
+            if index_frame is None:
+                clean_notes = (
+                    *clean_notes,
+                    "filter rezim aktif tetapi data indeks tidak diberikan: semua sesi 'unknown'",
+                )
+            summary = ", ".join(f"{k}={v}" for k, v in sorted(regime_counts.items()))
+            clean_notes = (
+                *clean_notes,
+                f"rezim {self.engine.regime.index_symbol} per sesi: {summary or '-'}",
             )
         metrics = compute_metrics(
             trades,

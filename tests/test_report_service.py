@@ -60,6 +60,20 @@ FRAMES = {
 }
 
 
+def _index_bull():
+    from dataclasses import replace
+
+    import numpy as np
+
+    from tests.engine_fixtures import _frame_from_close
+
+    frame = _frame_from_close(6000.0 * (1.0012 ** np.arange(320)), symbol="IDXX")
+    return replace(frame, symbol="^JKSE")
+
+
+FRAMES["^JKSE"] = _index_bull()  # rezim bullish agar setup fixture tidak ditahan filter
+
+
 def _provider() -> FakeProvider:
     def ohlcv(symbol, timeframe, basis):
         frame = FRAMES.get(symbol)

@@ -34,16 +34,26 @@ def validate_ohlcv(
     now: datetime | None = None,
     max_age: timedelta | None = None,
 ) -> ValidationReport:
-    """Periksa OHLCVFrame. Urutan: struktur (INVALID) → histori (MISSING) → kesegaran (STALE) → OK."""
-    df = frame.frame
-    if df.empty:
+    """Periksa OHLCVFrame. Urutan: struktur (INVALID) → histori (MISSING) → kesegaran (STALE) → OK.
+
+    Pemeriksaan struktur (NaN/relasi OHLC/volume) hanya berlaku untuk bar LENGKAP: bar hari berjalan
+    yang belum selesai boleh parsial (mis. close kosong) karena tidak pernah dipakai engine; bar itu
+    tetap dilaporkan sebagai catatan.
+    """
+    df_all = frame.frame
+    if df_all.empty:
         return ValidationReport(QualityStatus.MISSING, ("tidak ada bar",))
 
     issues: list[str] = []
-    if df.index.has_duplicates:
-        issues.append(f"{int(df.index.duplicated().sum())} timestamp duplikat")
-    if not df.index.is_monotonic_increasing:
+    if df_all.index.has_duplicates:
+        issues.append(f"{int(df_all.index.duplicated().sum())} timestamp duplikat")
+    if not df_all.index.is_monotonic_increasing:
         issues.append("index tidak terurut")
+    df = df_all.loc[df_all["complete"].astype(bool)]
+    if df.empty:
+        return ValidationReport(
+            QualityStatus.MISSING, ("tidak ada bar lengkap",), bars_total=len(df_all)
+        )
 
     ohlc = df[["open", "high", "low", "close"]]
     nan_rows = int(ohlc.isna().any(axis=1).sum())
@@ -69,10 +79,10 @@ def validate_ohlcv(
     if neg_vol:
         issues.append(f"{neg_vol} bar dengan volume negatif")
 
-    complete = df.loc[df["complete"].astype(bool)]
+    complete = df
     last_complete_session = complete["session_date"].iloc[-1] if not complete.empty else None
     base = {
-        "bars_total": len(df),
+        "bars_total": len(df_all),
         "bars_complete": len(complete),
         "last_complete_session": last_complete_session,
     }
@@ -91,7 +101,7 @@ def validate_ohlcv(
             return ValidationReport(
                 QualityStatus.INVALID, ("validasi intraday membutuhkan now dan max_age",), **base
             )
-        last_time = df.index[-1].to_pydatetime()
+        last_time = df_all.index[-1].to_pydatetime()
         age = to_utc(now) - last_time
         if age > max_age:
             return ValidationReport(

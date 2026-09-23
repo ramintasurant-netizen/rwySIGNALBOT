@@ -217,3 +217,46 @@ def test_cross_validation_not_comparable_cases() -> None:
         cross_validate_close(a, other_symbol, max_diff_pct=Decimal("0.5")).status
         == "not_comparable"
     )
+
+
+def test_incomplete_last_bar_with_nan_close_does_not_invalidate_frame(market_rules) -> None:
+    """Yahoo mengembalikan bar hari berjalan dengan Close NaN (indeks ^JKSE 2026-09-23): bar belum
+    lengkap boleh parsial; bar lengkap tetap wajib utuh."""
+    fetched = datetime(2026, 3, 16, 3, 0, tzinfo=UTC)  # Senin 10:00 WIB
+    raw = make_yf_frame(300, end_session=date(2026, 3, 16))
+    raw.loc[raw.index[-1], "Close"] = np.nan
+    raw.loc[raw.index[-1], "Volume"] = 0
+    frame = normalize_ohlcv(
+        raw,
+        symbol="BBCA",
+        timeframe=Timeframe.D1,
+        provider="t",
+        fetched_at=fetched,
+        now=fetched,
+        is_daily_complete=market_rules.is_daily_bar_complete,
+    )
+    assert bool(frame.frame["complete"].iloc[-1]) is False
+    report = validate_ohlcv(frame, min_bars=250, expected_last_session=date(2026, 3, 13))
+    assert report.status is QualityStatus.OK
+    assert report.bars_total == 300 and report.bars_complete == 299
+    # bar LENGKAP dengan NaN tetap INVALID
+    raw2 = make_yf_frame(300, end_session=date(2026, 3, 13))
+    raw2.loc[raw2.index[-5], "Close"] = np.nan
+    frame2 = normalize_ohlcv(
+        raw2, symbol="BBCA", timeframe=Timeframe.D1, provider="t", fetched_at=NOW, now=NOW
+    )
+    assert validate_ohlcv(frame2, min_bars=250).status is QualityStatus.INVALID
+
+
+def test_last_bar_with_nan_ohlc_is_never_complete_even_if_date_passed() -> None:
+    """Yahoo dapat memberi bar terakhir bertanggal sesi lewat namun Close NaN (indeks ^JKSE)."""
+    raw = make_yf_frame(20, end_session=date(2026, 3, 12))  # semua sesi < hari ini
+    raw.loc[raw.index[-1], "Close"] = np.nan
+    frame = normalize_ohlcv(
+        raw, symbol="BBCA", timeframe=Timeframe.D1, provider="t", fetched_at=NOW, now=NOW
+    )
+    assert bool(frame.frame["complete"].iloc[-1]) is False
+    assert frame.frame["complete"].iloc[:-1].all()
+    assert any("belum ditutup" in n for n in frame.notes)
+    assert frame.last_complete_session == date(2026, 3, 11)
+    assert validate_ohlcv(frame, min_bars=10).status is QualityStatus.OK

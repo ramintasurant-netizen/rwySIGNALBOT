@@ -20,7 +20,7 @@ import asyncio
 import json
 import sys
 from dataclasses import asdict
-from datetime import date, datetime
+from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 
 from loguru import logger
@@ -39,6 +39,7 @@ from data.providers.base import Timeframe
 from data.providers.global_macro import load_global_macro_config
 from data.providers.news import load_news_sources
 from engine.pipeline import SignalEngine, SymbolInput
+from engine.regime import RegimeConfig
 from engine.risk import RiskConfig
 from engine.scorer import ScorerConfig
 
@@ -168,7 +169,10 @@ async def cmd_evaluate(settings: Settings, symbols: list[str] | None) -> int:
         build_providers(settings, rules), AggregatorConfig.from_settings(settings)
     )
     engine = SignalEngine(
-        rules, risk=RiskConfig.from_settings(settings), scorer=ScorerConfig.from_settings(settings)
+        rules,
+        risk=RiskConfig.from_settings(settings),
+        scorer=ScorerConfig.from_settings(settings),
+        regime=RegimeConfig.from_settings(settings),
     )
     fetched = await asyncio.gather(
         *(
@@ -283,7 +287,10 @@ async def cmd_backtest(settings: Settings, args: argparse.Namespace) -> int:
     rules = load_market_rules(settings.config_dir / "market_rules.yaml")
     watchlist = load_watchlist(settings.config_dir / "watchlist.yaml")
     engine = SignalEngine(
-        rules, risk=RiskConfig.from_settings(settings), scorer=ScorerConfig.from_settings(settings)
+        rules,
+        risk=RiskConfig.from_settings(settings),
+        scorer=ScorerConfig.from_settings(settings),
+        regime=RegimeConfig.from_settings(settings),
     )
     start, end = date.fromisoformat(args.start), date.fromisoformat(args.end)
     symbols = [s.upper() for s in (args.symbols or watchlist.codes)]
@@ -302,6 +309,34 @@ async def cmd_backtest(settings: Settings, args: argparse.Namespace) -> int:
     if not frames:
         print(f"Tidak ada data layak untuk backtest: {skipped}", file=sys.stderr)
         return 1
+    index_frame = None
+    if engine.regime.enabled:
+        if args.csv_dir:
+            idx_path = Path(args.csv_dir) / f"{engine.regime.index_symbol.lstrip('^')}.index.csv"
+            if idx_path.exists():
+                from backtest.data import load_csv_frame
+
+                index_frame = load_csv_frame(
+                    idx_path, symbol=None, raw_symbol=engine.regime.index_symbol
+                )
+            else:
+                logger.warning(
+                    "filter rezim aktif tetapi {} tidak ada; rezim 'unknown'", idx_path.name
+                )
+        else:
+            idx_agg = await aggregator.get_ohlcv(
+                engine.regime.index_symbol,
+                Timeframe.D1,
+                datetime.combine(start, datetime.min.time(), tzinfo=UTC)
+                - timedelta(days=int(engine.regime.warmup * 1.6) + 30),
+                datetime.combine(end, datetime.min.time(), tzinfo=UTC) + timedelta(days=1),
+                min_bars=engine.regime.warmup,
+            )
+            index_frame = idx_agg.frame if idx_agg.frame is not None and idx_agg.usable else None
+            if index_frame is None:
+                logger.warning(
+                    "data indeks {} tidak layak: {}", engine.regime.index_symbol, idx_agg.issues
+                )
 
     thresholds = GateThresholds(
         min_trades=args.min_trades,
@@ -324,7 +359,9 @@ async def cmd_backtest(settings: Settings, args: argparse.Namespace) -> int:
 
     def run_segment(seg_start: date, seg_end: date):
         cfg = BacktestConfig(start=seg_start, end=seg_end, **cfg_common)
-        return BacktestRunner(engine, rules, cfg, progress=progress).run(frames)
+        return BacktestRunner(engine, rules, cfg, progress=progress).run(
+            frames, index_frame=index_frame
+        )
 
     try:
         in_sample = run_segment(is_start, is_end)

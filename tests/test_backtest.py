@@ -13,6 +13,7 @@ from bot.gates import evaluate_gates
 from data.providers.base import OHLCVFrame, QualityStatus
 from engine.lifecycle import LifecycleConfig
 from engine.pipeline import SignalEngine
+from engine.regime import RegimeConfig
 from engine.scorer import ScorerConfig
 from tests.engine_fixtures import (
     breakout_frame,
@@ -54,7 +55,10 @@ def _extend(frame: OHLCVFrame, future: list[tuple[float, float, float, float]]) 
 
 
 def _engine(market_rules) -> SignalEngine:
-    return SignalEngine(market_rules, scorer=ScorerConfig(max_signals=5))
+    # Test mekanika eksekusi: filter rezim dimatikan (diuji terpisah di test_regime.py).
+    return SignalEngine(
+        market_rules, scorer=ScorerConfig(max_signals=5), regime=RegimeConfig(enabled=False)
+    )
 
 
 def _card_for(market_rules, frame: OHLCVFrame):

@@ -1071,3 +1071,39 @@ pemeriksaan statis Dockerfile (semua sumber COPY ada, non-root, healthcheck, STO
 COPY `.env`), compose diparse, `alembic upgrade head --sql` menghasilkan 9 `CREATE TABLE` untuk
 PostgreSQL. **Belum**: `docker build` nyata (sandbox tanpa Docker) — didelegasikan ke CI dan dicatat di
 `docs/verification_required.md`.
+
+---
+
+## 28. Filter rezim pasar (lanjutan riset kalibrasi, 2026-09-24 WIB)
+
+Tujuan: mengurangi kerugian out-of-sample dengan membuat bot diam saat pasar agregat turun — tanpa
+menurunkan threshold gate.
+
+- `engine/regime.py`: rezim dari indeks acuan (`^JKSE` Yahoo; hanya simbol berawalan `^` yang dipetakan
+  apa adanya oleh adapter Yahoo) dengan bar lengkap ≤ sesi evaluasi: `close > EMA50 > EMA200` ⇒ bullish,
+  `close < EMA50 < EMA200` ⇒ bearish, lainnya netral; bar sesi tidak ada / histori < warmup ⇒ unknown.
+  Kebijakan: bearish menahan setup long baru; unknown mengikuti `REGIME_POLICY_ON_UNKNOWN` (default
+  `block`, fail-closed); netral dapat diblokir opsional. Sinyal terbuka tetap dikelola lifecycle.
+- `SignalEngine.run(..., regime=)`: evaluasi per simbol tetap dijalankan (audit/Money Flow tetap
+  tampil), tetapi kandidat kartu ditahan dengan catatan "filter rezim: N kandidat setup ditahan";
+  `EngineResult.regime` disimpan; `RegimeConfig` masuk `config_hash` (perubahan filter membatalkan gate).
+  Tanpa argumen `regime` engine tidak memfilter — pemanggil (ReportService/backtest) bertanggung jawab.
+- ReportService mengambil frame indeks lewat aggregator yang sama; snapshot memuat `market_bias`
+  (bullish/neutral/bearish) dan `regime_detail`; formatter menampilkan "📈 Rezim pasar" (bias hanya dari
+  aturan terdefinisi, sesuai §14). Backtest menghitung rezim per sesi dari frame indeks yang dipotong ≤
+  sesi dan melaporkan distribusi rezim.
+- Dua temuan data nyata saat verifikasi: (1) Yahoo memberi bar IHSG hari berjalan dengan Close NaN,
+  dan tanggalnya berbeda antara mode `period` (23 Sep) dan `start/end` (22 Sep). Perbaikan: bar
+  **terakhir** dengan OHLC kosong tidak pernah dianggap lengkap (dicatat di `notes`); bar kosong di
+  tengah histori tetap membuat frame INVALID. (2) Validator kini memeriksa struktur hanya pada bar
+  lengkap (bar hari berjalan boleh parsial) — kesegaran intraday tetap memakai bar terbaru.
+
+Bukti: `pytest` 359 lulus (klasifikasi rezim, unknown/policy, anti-lookahead, engine menahan kandidat
+di bearish/unknown tetapi tidak di bullish, hash konfigurasi, settings, backtest per sesi, bar terakhir
+NaN). **Backtest nyata dengan filter** (2025-01-01..2026-09-22): in-sample 50 trade, +0,04R, PF 1,05
+(rezim bullish 111 / netral 64 / bearish 77 sesi); out-of-sample 8 trade, −0,37R, PF 0,54, MDD 5,5 %
+(82/125 sesi bearish ⇒ sebagian besar setup ditahan). Dibanding tanpa filter (OOS −7,7 %, PF 0,42,
+MDD 8,8 %): kerugian dan drawdown berkurang, tetapi trade yang lolos di sesi netral masih negatif dan
+jumlah trade OOS < 30 ⇒ **gate tetap tidak lulus**. Langkah riset berikutnya (di luar lingkup ini):
+`REGIME_BLOCK_NEUTRAL=true`, bobot per strategi (breakout −0,29R IS / −0,49R OOS konsisten negatif),
+universe lebih besar untuk jumlah trade — semuanya diuji di in-sample dulu.

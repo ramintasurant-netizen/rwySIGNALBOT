@@ -66,6 +66,10 @@ hanya merangkum konteks. Tidak ada eksekusi order, akses dana, atau transaksi br
   dan pergerakan intraday atas watchlist ∪ `config/universe_candidates.yaml` — peringkat objektif,
   bukan sinyal.
 - **Teaser** sebelum laporan ("Are you ready for IHSG SIGNAL?"), configurable, hanya bila ada setup.
+- **Filter rezim pasar** (`engine/regime.py`): dari indeks IHSG (`^JKSE`, Yahoo) — bearish
+  (close < EMA50 < EMA200) ⇒ bot **tidak menerbitkan setup long baru** (evaluasi tetap dilaporkan,
+  sinyal terbuka tetap dikelola). Data indeks tidak tersedia ⇒ `unknown` ⇒ default menahan
+  (fail-closed). Dipakai identik oleh live dan backtest; tampil sebagai "📈 Rezim pasar" di laporan.
 - `tests/` — 346 test offline (fixture sintetis berlabel, tanpa token, tanpa jaringan).
 - `main.py` — `config`, `health`, `fetch`, `evaluate`, `dryrun`, `run`, `backtest`, `screen`.
 
@@ -312,11 +316,13 @@ max drawdown ≤ 15 %. Hasil terikat `engine_version` + `config_hash` + versi st
 parameter risk/scorer/aturan membatalkan kelayakan lama. **Tanpa gate yang lulus, mode produksi
 tidak akan menerbitkan sinyal.** Hasil backtest tidak menjamin keuntungan masa depan.
 
-> Hasil nyata pada 2026-09-23 (12 saham watchlist, Yahoo, parameter CONTOH, termasuk strategi
-> `money_flow_proxy`): in-sample 57 trade, expectancy +0,10R, PF 1,20 (proxy money flow: 11 trade,
-> win 64 %, +0,44R); out-of-sample 17 trade, expectancy −0,44R, PF 0,42 → **gate TIDAK lulus**.
-> Periode OOS (Mar–Sep 2026) merugikan semua strategi long. Dilaporkan apa adanya; kalibrasi dan
-> filter rezim pasar adalah pekerjaan riset sebelum produksi.
+> Hasil nyata pada 2026-09-23 (12 saham watchlist, Yahoo, parameter CONTOH, **dengan filter rezim
+> IHSG**): in-sample 50 trade, expectancy +0,04R, PF 1,05 (rezim: 111 sesi bullish, 64 netral,
+> 77 bearish); out-of-sample 8 trade, expectancy −0,37R, PF 0,54, MDD 5,5 % (rezim: 82 dari 125 sesi
+> **bearish** → sebagian besar setup ditahan) → **gate TIDAK lulus** (trade < 30, expectancy < 0).
+> Tanpa filter rezim, OOS sebelumnya −7,7 % / PF 0,42 / MDD 8,8 %: filter mengurangi kerugian,
+> tetapi setup yang lolos di sesi netral masih negatif. Dilaporkan apa adanya; kalibrasi strategi
+> tetap diperlukan sebelum produksi.
 
 ### 16. Database
 - Development: SQLite `var/dev.db` (skema dibuat otomatis).

@@ -267,7 +267,11 @@ def report_blocks(s: ReportSnapshot) -> list[str]:
         if maybe:
             blocks.append(maybe)
     if s.market_bias:
-        blocks.append(f"<b>Bias pasar</b>: {esc(s.market_bias)}")
+        label = {"bullish": "naik", "neutral": "netral", "bearish": "turun"}.get(
+            s.market_bias, s.market_bias
+        )
+        detail = f" — {esc(s.regime_detail)}" if s.regime_detail else ""
+        blocks.append(f"<b>📈 Rezim pasar</b>: {esc(label)} ({esc(s.market_bias)}){detail}")
     blocks.extend(_signals(s))
     money = _money_flow(s)
     if money:

@@ -375,6 +375,14 @@ def normalize_ohlcv(
             out["complete"] = [bool(is_daily_complete(d, now)) for d in session_dates]
     out["complete"] = out["complete"].astype(bool)
 
+    # Yahoo dapat mengembalikan bar terakhir yang "belum ditutup" (Close NaN) meski tanggalnya
+    # sudah lewat — dan tanggalnya bahkan bisa bergeser antara mode period vs start/end. Bar
+    # TERAKHIR dengan OHLC kosong tidak pernah dianggap lengkap; bar kosong di tengah histori
+    # dibiarkan agar validator menandai frame INVALID (bukan dibuang diam-diam).
+    if len(out) and out.iloc[-1][["open", "high", "low", "close"]].isna().any():
+        out.iloc[-1, out.columns.get_loc("complete")] = False
+        notes = (*notes, f"bar terakhir ({session_dates[-1]}) belum ditutup di sumber: OHLC kosong")
+
     actions: list[CorporateAction] = []
     if "dividends" in df.columns:
         div = pd.to_numeric(df["dividends"], errors="coerce").fillna(0.0)

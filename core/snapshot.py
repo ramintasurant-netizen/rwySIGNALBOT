@@ -190,7 +190,10 @@ class ReportSnapshot(_Model):
     active_updates: tuple[SignalUpdateSnapshot, ...] = ()
     money_flow: tuple[MoneyFlowSnapshot, ...] = ()  # diurutkan skor menurun; proxy volume
     narrative: str | None = None
-    market_bias: str | None = None  # hanya dari aturan terdefinisi; None = dihilangkan
+    market_bias: str | None = (
+        None  # dari filter rezim terdefinisi (bullish/neutral/bearish); None = dihilangkan
+    )
+    regime_detail: str | None = None
     disclaimer: str = DISCLAIMER
     engine_notes: tuple[str, ...] = ()
 
@@ -370,4 +373,5 @@ def build_snapshot(
         active_updates=active_updates,
         money_flow=money_flow,
         engine_notes=engine_result.notes,
+        market_bias=engine_result.regime if engine_result.regime not in (None, "unknown") else None,
     )

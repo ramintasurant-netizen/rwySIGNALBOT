@@ -183,6 +183,13 @@ class Settings(BaseSettings):
     risk_fee_sell_pct: Decimal = Field(default=Decimal("0.25"), ge=0, le=5)
     risk_apply_fees_to_rr: bool = True
     risk_max_entry_zone_pct: Decimal = Field(default=Decimal("3.0"), gt=0, le=20)
+    # Filter rezim pasar dari indeks acuan (Yahoo ^JKSE). Bearish ⇒ tidak ada setup long baru.
+    regime_enabled: bool = True
+    regime_index_symbol: str = Field(default="^JKSE", pattern=r"^\^[A-Z0-9]{2,10}$")
+    regime_fast: int = Field(default=50, ge=2, le=400)
+    regime_slow: int = Field(default=200, ge=3, le=800)
+    regime_policy_on_unknown: Literal["block", "allow"] = "block"
+    regime_block_neutral: bool = False
     scorer_threshold: int = Field(default=70, ge=0, le=100)
     scorer_max_signals: int = Field(default=5, ge=1, le=20)
     scorer_degraded_penalty: int = Field(default=10, ge=0, le=100)
@@ -309,6 +316,8 @@ class Settings(BaseSettings):
             if not self.llm_model:
                 raise ValueError("LLM_PROVIDER aktif membutuhkan LLM_MODEL")
 
+        if self.regime_slow <= self.regime_fast:
+            raise ValueError("REGIME_SLOW harus > REGIME_FAST")
         self._warnings = tuple(warnings)
         return self
 

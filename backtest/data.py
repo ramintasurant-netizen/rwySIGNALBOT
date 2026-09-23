@@ -17,8 +17,11 @@ from data.aggregator import MarketDataAggregator
 from data.providers.base import DataOrigin, OHLCVFrame, Timeframe, normalize_ohlcv
 
 
-def load_csv_frame(path: Path, *, symbol: str | None = None) -> OHLCVFrame:
-    sym = canonical_symbol(symbol or path.stem)
+def load_csv_frame(
+    path: Path, *, symbol: str | None = None, raw_symbol: str | None = None
+) -> OHLCVFrame:
+    """``raw_symbol`` dipakai apa adanya (mis. indeks ``^JKSE``); selain itu kode saham dikanonikkan."""
+    sym = raw_symbol if raw_symbol else canonical_symbol(symbol or path.stem)
     raw = pd.read_csv(path)
     cols = {c.lower(): c for c in raw.columns}
     for required in ("date", "open", "high", "low", "close", "volume"):
