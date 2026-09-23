@@ -1,0 +1,5 @@
+.venv/
+work/
+.hoplite/
+laporan-wpt/generator/img/
+__pycache__/
