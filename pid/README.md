@@ -58,3 +58,11 @@ P&ID satu halaman A3, gaya klasik hitam‑putih, siklus uap PLTU lengkap: **Econ
 → Main Steam (PSV → Silencer) → MSV/GV (Turbine Trip / Governor) → Turbin → Generator → Kondensor (Cooling Tower + CW Pump)
 → Condensate Pump → Deaerator → BFP → Economizer. Kontrol: LIC‑01 → FCV‑01 (level drum), TIC‑01 → TCV‑01 (spray attemperator).
 Dibangun ulang dengan `python3 make_pid_simple.py` (juga menghasilkan `.svg`).
+
+## Versi kompleks hitam‑putih — `PID-STM-002_Complex.vsdx`
+
+Siklus uap lengkap gaya klasik (A3): flue gas furnace → **Superheater → Evaporator → Economizer** → stack (TT/AT‑06, damper);
+air: Tank → BCP (min‑flow FV‑13) → FE/FT‑01 → FCV‑01 → Economizer → Mixer → Evaporator → Steam Drum (downcomer/riser, PSV, CBD)
+→ Superheater (spray TCV‑04 dari TIC‑04) → MSV‑01/GV‑01 (Turbine Trip / Governor + ST‑02) → **HPT → IPT → LPT** (POWER 1/2/3)
+→ Condenser (CW TCV‑09/TIC‑10, vakum, LT/LIC‑11) → CEP → LCV‑11 → Feedwater Tank/Deaerator (ekstraksi PCV‑15, make‑up LCV‑12).
+Dibangun ulang dengan `python3 make_pid_complex.py`.
