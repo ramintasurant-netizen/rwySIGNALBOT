@@ -51,3 +51,10 @@ TT-111/112/113, LT-114/115 (2oo3, LSHH → I-3).
 | I-5 | LSLL/LSHH-117 drum (2oo3) → Master Fuel Trip; FCV hold; turbine trip → FIC-116 SP minimum, PDIC-110 manual-hold. |
 
 Rev. A — *Issued for Review*; ukuran pipa & setpoint adalah estimasi desain awal, bukan untuk konstruksi.
+
+## Versi sederhana — `PID-STM-001_Simple.vsdx`
+
+P&ID satu halaman A3, gaya klasik hitam‑putih, siklus uap PLTU lengkap: **Economizer → Steam Drum → Evaporator → Superheater**
+→ Main Steam (PSV → Silencer) → MSV/GV (Turbine Trip / Governor) → Turbin → Generator → Kondensor (Cooling Tower + CW Pump)
+→ Condensate Pump → Deaerator → BFP → Economizer. Kontrol: LIC‑01 → FCV‑01 (level drum), TIC‑01 → TCV‑01 (spray attemperator).
+Dibangun ulang dengan `python3 make_pid_simple.py` (juga menghasilkan `.svg`).

@@ -11,6 +11,8 @@ PT = 1 / 72.0  # inch per point
 
 shapes = []
 _id = [0]
+STYLE = {"mono": False}  # mono: black ink, white fills (classic drawing-office look)
+_MONO_FILL = {F_EQ: F_WHITE, F_PUMP: F_WHITE, F_VALVE: F_WHITE, F_NOTE: F_WHITE, "#FFE0E0": F_WHITE, C_PROC: C_INK}
 instr_index, line_list, valve_list = [], [], []
 
 
@@ -27,6 +29,10 @@ class Shape:
         self.x0, self.y0, self.w, self.h = x0, y0, max(w, 0.04), max(h, 0.04)
         self.layer, self.text, self.size, self.bold = layer, text, size, bold
         self.halign, self.valign = halign, valign
+        if STYLE["mono"]:
+            fill = _MONO_FILL.get(fill, fill)
+            line = C_INK
+            text_color = C_INK
         self.line, self.weight, self.pattern, self.fill = line, weight, pattern, fill
         self.end_arrow, self.begin_arrow = end_arrow, begin_arrow
         self.props = props or {}
@@ -66,6 +72,8 @@ _LINE_LAYER = {"process": "Process Piping", "steam": "Process Piping", "recirc":
 
 def line(pts, kind="process", label=None, lpos=None, arrow=True, weight=None, lsize=6.5, lalign=1, layer=None):
     col, wt, pat = _LINE_STYLE[kind]
+    if STYLE["mono"]:
+        col = C_INK
     if weight:
         wt = weight
     xs, ys = [p[0] for p in pts], [p[1] for p in pts]
@@ -241,3 +249,11 @@ def L(no, frm, to, size, cls, fluid, cond, note=""):
 
 def V(tag, typ, size, fail, service, note=""):
     valve_list.append([tag, typ, size, fail, service, note])
+
+
+def hexflag(cx, cy, w, h, txt, size=6.5):
+    """Pointed-both-ends flag for external systems / logic (as in classic P&IDs)."""
+    s = Shape(cx - w / 2, cy - h / 2, w, h, "Annotation", text=txt, size=size, bold=True, weight=1.0, fill=F_WHITE, name=txt)
+    a = h * 0.5
+    s.poly([(0, h / 2), (a, 0), (w - a, 0), (w, h / 2), (w - a, h), (a, h)], close=True)
+    return s
