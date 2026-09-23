@@ -4,6 +4,7 @@ Tahap 2: perintah diagnostik tanpa token —
   python main.py config                 ringkasan konfigurasi tersanitasi + status verifikasi
   python main.py health                 health check provider aktif (JARINGAN)
   python main.py fetch --symbol BBCA    ambil & validasi OHLCV harian lewat aggregator (JARINGAN)
+  python main.py evaluate [--symbols ...] jalankan engine pada watchlist, cetak kartu (JARINGAN, tanpa kirim)
 Perintah `run` (bot + scheduler) tersedia pada Tahap 4.
 """
 
@@ -30,6 +31,9 @@ from data.providers import build_providers
 from data.providers.base import Timeframe
 from data.providers.global_macro import load_global_macro_config
 from data.providers.news import load_news_sources
+from engine.pipeline import SignalEngine, SymbolInput
+from engine.risk import RiskConfig
+from engine.scorer import ScorerConfig
 
 
 def _json(data: object) -> str:
@@ -142,6 +146,83 @@ async def cmd_fetch(settings: Settings, symbol: str, timeframe: str) -> int:
     return 0 if result.usable else 1
 
 
+async def cmd_evaluate(settings: Settings, symbols: list[str] | None) -> int:
+    """Jalankan engine pada watchlist (atau --symbols) memakai data Yahoo. Tidak mengirim apa pun."""
+    rules = load_market_rules(settings.config_dir / "market_rules.yaml")
+    calendar = load_trading_calendar(settings.config_dir / "trading_calendar.yaml")
+    watchlist = load_watchlist(settings.config_dir / "watchlist.yaml")
+    universe_symbols = tuple(symbols) if symbols else watchlist.codes
+    try:
+        session = calendar.previous_trading_session(datetime.now(WIB).date())
+    except CalendarCoverageError as exc:
+        print(f"Kalender: {exc}", file=sys.stderr)
+        return 1
+    aggregator = MarketDataAggregator(
+        build_providers(settings, rules), AggregatorConfig.from_settings(settings)
+    )
+    engine = SignalEngine(
+        rules, risk=RiskConfig.from_settings(settings), scorer=ScorerConfig.from_settings(settings)
+    )
+    fetched = await asyncio.gather(
+        *(
+            aggregator.get_ohlcv(sym, Timeframe.D1, None, None, expected_last_session=session)
+            for sym in universe_symbols
+        )
+    )
+    universe: dict[str, SymbolInput] = {}
+    data_blocked: list[dict[str, object]] = []
+    for agg in fetched:
+        if agg.frame is None or not agg.usable:
+            data_blocked.append(
+                {"symbol": agg.symbol, "status": agg.status.value, "issues": list(agg.issues)}
+            )
+            continue
+        universe[agg.symbol] = SymbolInput(
+            agg.frame, agg.status, foreign_flow_reason="tidak ada provider foreign flow aktif"
+        )
+    result = engine.run(session, universe)
+    out = {
+        "session_date": session,
+        "engine_version": result.engine_version,
+        "config_hash": result.config_hash,
+        "rules_label": rules.label,
+        "calendar_label": calendar.label,
+        "universe": list(universe_symbols),
+        "data_blocked": data_blocked,
+        "engine_blocked": [b.__dict__ for b in result.blocked],
+        "evaluated_without_setup": [
+            e.symbol for e in result.evaluations if e.card is None and e.blocked is None
+        ],
+        "strategy_states": {
+            e.symbol: {o.strategy_id: o.state.value for o in e.outcomes}
+            for e in result.evaluations
+            if e.outcomes
+        },
+        "notes": list(result.notes),
+        "cards": [
+            {
+                "symbol": c.symbol,
+                "strategy": c.primary_strategy,
+                "confidence": c.confidence,
+                "breakdown": c.score_breakdown,
+                "entry": [c.risk.entry_low, c.risk.entry_high],
+                "stop_loss": c.risk.stop_loss,
+                "tp": [c.risk.tp1, c.risk.tp2, c.risk.tp3],
+                "rr_tp1": {"gross": c.risk.rr_tp1_gross, "net": c.risk.rr_tp1_net},
+                "ara_arb": [c.risk.ara, c.risk.arb],
+                "sizing": c.risk.sizing.__dict__ if c.risk.sizing else None,
+                "reasons": list(c.reasons),
+                "risk_notes": list(c.risk.notes),
+                "data": c.data.__dict__,
+            }
+            for c in result.cards
+        ],
+        "disclaimer": "Bukan ajakan jual/beli. Analisis bersifat informasional. Keputusan dan risiko sepenuhnya milik Anda.",
+    }
+    print(_json(out))
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="stock_signal_bot")
     parser.add_argument(
@@ -153,6 +234,10 @@ def build_parser() -> argparse.ArgumentParser:
     fetch = sub.add_parser("fetch", help="ambil & validasi OHLCV lewat aggregator (jaringan)")
     fetch.add_argument("--symbol", required=True)
     fetch.add_argument("--timeframe", default="1d", choices=[t.value for t in Timeframe])
+    evaluate = sub.add_parser(
+        "evaluate", help="jalankan engine pada watchlist tanpa mengirim (jaringan)"
+    )
+    evaluate.add_argument("--symbols", nargs="*", help="override watchlist, mis. BBCA BBRI")
     sub.add_parser("run", help="jalankan bot + scheduler (Tahap 4)")
     return parser
 
@@ -175,6 +260,8 @@ def main(argv: list[str] | None = None) -> int:
         return asyncio.run(cmd_health(settings))
     if args.command == "fetch":
         return asyncio.run(cmd_fetch(settings, args.symbol, args.timeframe))
+    if args.command == "evaluate":
+        return asyncio.run(cmd_evaluate(settings, args.symbols))
     if args.command == "run":
         print(
             "Perintah `run` belum tersedia: bot, storage, dan scheduler dibangun pada Tahap 4.",

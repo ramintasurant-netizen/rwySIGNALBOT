@@ -67,9 +67,12 @@ Legenda status: ❌ belum · ⚠️ sebagian · ✅ selesai
 
 | Item | Status | Catatan |
 |---|---|---|
-| Definisi R:R, biaya beli/jual, slippage | ❌ | menunggu keputusan pemilik |
-| Kebijakan exit (partial TP), masa berlaku entry, gap handling | ❌ | idem |
-| Modal contoh & risiko per transaksi | ❌ | default CONTOH 100 juta / 1% |
+| Definisi R:R | ✅ | R = entry_high − SL; gate 2,0 pada TP1 setelah pembulatan, dengan biaya (ARCHITECTURE §22) |
+| Biaya beli/jual aktual (broker + levy + PPh final) | ❌ | default CONTOH 0,15 % / 0,25 %; sesuaikan dengan broker pengguna |
+| Slippage | ❌ | akan dipakai backtest (Tahap 6) |
+| Kebijakan exit (tanpa partial TP), masa berlaku entry 3 sesi, gap ⇒ keluar di open | ⚠️ | disepakati; implementasi lifecycle di Tahap 4/6 |
+| Modal contoh & risiko per transaksi | ⚠️ | default CONTOH 100 juta / 1 %; ubah lewat `.env` |
+| Bobot strategi & threshold confidence | ⚠️ | default bobot 1,0 / threshold 70; belum dikalibrasi backtest |
 
 ## 8. Backtest & gate (Tahap 6)
 

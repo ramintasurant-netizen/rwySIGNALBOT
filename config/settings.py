@@ -167,9 +167,18 @@ class Settings(BaseSettings):
     # --- WhatsApp (hanya ekspor teks manual) ---
     whatsapp_export_enabled: bool = False
 
-    # --- Sizing contoh (CONTOH; dikonfirmasi pada Tahap 3) ---
+    # --- Engine: risk & scorer (nilai CONTOH; biaya BELUM TERVERIFIKASI) ---
     sizing_capital_example: Decimal = Field(default=Decimal("100000000"), gt=0)
     sizing_risk_pct: Decimal = Field(default=Decimal("1.0"), gt=0, le=5)
+    risk_atr_multiple: Decimal = Field(default=Decimal("1.5"), gt=0, le=10)
+    risk_min_rr: Decimal = Field(default=Decimal("2.0"), gt=0, le=20)
+    risk_fee_buy_pct: Decimal = Field(default=Decimal("0.15"), ge=0, le=5)
+    risk_fee_sell_pct: Decimal = Field(default=Decimal("0.25"), ge=0, le=5)
+    risk_apply_fees_to_rr: bool = True
+    risk_max_entry_zone_pct: Decimal = Field(default=Decimal("3.0"), gt=0, le=20)
+    scorer_threshold: int = Field(default=70, ge=0, le=100)
+    scorer_max_signals: int = Field(default=5, ge=1, le=20)
+    scorer_degraded_penalty: int = Field(default=10, ge=0, le=100)
 
     _signal_targets: tuple[ChatTarget, ...] = PrivateAttr(default=())
     _admin_target: ChatTarget | None = PrivateAttr(default=None)

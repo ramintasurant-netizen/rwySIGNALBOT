@@ -1,7 +1,7 @@
 # ARCHITECTURE — Bot Sinyal Saham IDX untuk Grup Telegram
 
-> **Status dokumen:** arsitektur disetujui (Tahap 1); **Tahap 2 (fondasi & data layer)
-> diimplementasikan** — lihat §21 untuk keputusan yang diambil dan penyimpangan kecil.
+> **Status dokumen:** arsitektur disetujui (Tahap 1); **Tahap 2 (fondasi & data layer) dan
+> Tahap 3 (engine & risk) diimplementasikan** — lihat §21–§22 untuk keputusan dan penyesuaian.
 > Semua nilai angka pada dokumen ini (lot, fraksi harga, ARA/ARB, threshold, modal contoh)
 > adalah **CONTOH / BELUM TERVERIFIKASI** sampai dilabeli sebaliknya pada file konfigurasi.
 >
@@ -789,3 +789,50 @@ Penyesuaian terhadap rancangan awal:
 Bukti yang benar-benar dijalankan: `pytest` (131 test offline lulus), `ruff check/format`,
 `python main.py config` tanpa token, dan satu `python main.py fetch --symbol BBCA` dengan
 jaringan (479 bar harian, bar hari berjalan ditandai belum lengkap, status `degraded`).
+
+---
+
+## 22. Catatan implementasi Tahap 3 — engine & risk (2026-09-24 WIB)
+
+Keputusan Tahap 3 diambil dengan default yang diusulkan, dengan satu penyempurnaan pada
+kebijakan target agar syarat "R:R minimum 2.0 **dengan biaya**" dapat dipenuhi secara konsisten:
+
+- **R** = `entry_high − SL` (entry paling konservatif). **SL** = min(`entry_high − 1.5×ATR14`,
+  `struktur − 1 tick`), dibulatkan ke bawah.
+- **TP1** = harga terendah pada grid fraksi yang memenuhi *keduanya*: ≥ `entry_high + 2R`
+  (floor kotor) **dan** R:R bersih setelah biaya beli/jual ≥ 2.0. TP2 = TP1 + 1R, TP3 = TP1 + 2R
+  (dibulatkan ke atas). Tanpa penyesuaian ini, target "tepat 2R" hampir selalu gagal gate bersih
+  karena biaya (contoh acuan: entry 1000, SL 955 → TP1 1105, R:R kotor 2.33, bersih 2.06).
+- Biaya default **CONTOH / BELUM TERVERIFIKASI**: beli 0,15 %, jual 0,25 %; dapat dimatikan
+  dengan `RISK_APPLY_FEES_TO_RR=false` (gate kotor saja).
+- **ARA/ARB** sesi berikutnya dihitung dari close sesi lengkap terakhir; zona entry di-clamp ke
+  `[ARB, ARA]` (zona di luar batas ⇒ ditolak); SL/TP tidak di-clamp (target multi-sesi) tetapi
+  diberi catatan. Zona entry lebih lebar dari 3 % ditolak.
+- Setelah rounding/clamp divalidasi ulang `SL < entry_low ≤ entry_high < TP1 ≤ TP2 ≤ TP3` dan
+  R:R kotor & bersih ≥ minimum; gagal ⇒ setup dibuang (dicatat sebagai `blocked` tahap `risk`).
+- **Sizing**: risiko 1 % dari modal contoh Rp100 juta, lot penuh, dibatasi modal; 0 lot tetap
+  ditampilkan dengan catatan eksplisit.
+- **Exit/lifecycle** (untuk Tahap 4/6): masa berlaku entry 3 sesi, gap melewati SL ⇒ keluar di
+  open, tanpa partial TP. Belum ada kode lifecycle pada tahap ini.
+- **Laporan sore**: strategi berbasis close harian tidak dijalankan pada bar belum lengkap
+  (`Strategy.supports_incomplete_bar=False` untuk keempat strategi); pipeline memotong frame ke
+  bar lengkap ≤ sesi evaluasi sebagai batas anti-lookahead.
+- **Warmup** eksplisit 250 bar (EMA200 + 50) dipaksakan oleh `engine/indicators.py`;
+  test referensi membandingkan EMA (seed SMA), SMA, RSI (Wilder), ATR (RMA) dengan rumus
+  pandas-native.
+- **Scorer** sesuai §10.3 dengan bobot per strategi (default 1.0); strategi `inactive` /
+  `insufficient_data` / `no_setup` menyumbang 0 tanpa redistribusi bobot; penalti 10 untuk
+  kualitas `degraded`; threshold 70; maksimum 5; tie-break confidence ↓ → R:R bersih TP1 ↓ →
+  rata-rata nilai transaksi 20 hari ↓ → simbol A–Z.
+- **Breakout**: resistance dan rata-rata volume dihitung dari bar *sebelum* candle sinyal;
+  zona entry `[max(resistance, close − 1×ATR), close]` (retest dekat breakout).
+- **Reversal**: pivot low hanya sah setelah `pivot_right` bar konfirmasi tersedia; sinyal
+  hanya dalam 3 bar setelah konfirmasi pivot kedua.
+- **Foreign flow**: `inactive` bila data tidak tersedia/tidak segar; nol yang sah dihitung
+  sebagai "bukan net buy". Belum ada provider yang menyediakannya (semua template nonaktif).
+- Nilai transaksi untuk likuiditas memakai kolom `value` provider bila ada; Yahoo tidak
+  menyediakannya sehingga dipakai aproksimasi `close×volume` (dilabeli pada evidence).
+
+Bukti yang benar-benar dijalankan: `pytest` (215 test offline lulus), `ruff check/format`,
+`python main.py evaluate` dengan jaringan pada 12 saham watchlist (semua data `degraded`
+dapat dipakai; hasil hari itu "data valid tetapi tidak ada setup layak" — bukan dipaksakan).

@@ -147,3 +147,17 @@ def test_secrets_never_appear_in_summary_and_are_redactable(settings_factory) ->
 def test_admin_chat_equal_signal_chat_warns(settings_factory) -> None:
     s = settings_factory(telegram_signal_chat_ids="-1001", telegram_admin_chat_id="-1001")
     assert any("sama dengan" in w for w in s.config_warnings)
+
+
+def test_engine_configs_from_settings(settings_factory) -> None:
+    from decimal import Decimal
+
+    from engine.risk import RiskConfig
+    from engine.scorer import ScorerConfig
+
+    s = settings_factory(risk_min_rr="2.5", sizing_capital_example="50000000", scorer_threshold=80)
+    risk = RiskConfig.from_settings(s)
+    assert risk.min_rr == Decimal("2.5") and risk.capital_example == Decimal("50000000")
+    assert risk.fee_buy_pct == Decimal("0.15") and risk.apply_fees_to_rr is True
+    scorer = ScorerConfig.from_settings(s)
+    assert scorer.threshold == 80 and scorer.max_signals == 5
