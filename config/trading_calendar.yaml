@@ -1,0 +1,21 @@
+# Kalender perdagangan BEI.
+#
+# CONTOH / BELUM TERVERIFIKASI. Tanggal di luar coverage TIDAK dianggap hari perdagangan;
+# job produksi diblokir sampai kalender diperbarui. Daftar libur di bawah ini tidak lengkap:
+# lengkapi dari kalender libur bursa resmi (termasuk cuti bersama) sebelum meta.verified: true.
+schema_version: 1
+meta:
+  label: "CONTOH / BELUM TERVERIFIKASI"
+  source: ""                 # contoh: URL pengumuman kalender libur bursa BEI tahun berjalan
+  effective_from: null
+  scope: ["BEI"]
+  verified: false
+  notes: "Hanya libur nasional bertanggal tetap yang dicantumkan sebagai contoh."
+coverage:
+  start: 2026-01-01
+  end: 2026-12-31
+weekend_days: [6, 7]         # ISO weekday: 6=Sabtu, 7=Minggu
+holidays:
+  - { date: 2026-01-01, name: "Tahun Baru (CONTOH)" }
+  - { date: 2026-08-17, name: "Hari Kemerdekaan RI (CONTOH)" }
+  - { date: 2026-12-25, name: "Hari Raya Natal (CONTOH)" }

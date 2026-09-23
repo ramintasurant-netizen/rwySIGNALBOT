@@ -1,9 +1,9 @@
 # ARCHITECTURE — Bot Sinyal Saham IDX untuk Grup Telegram
 
-> **Status dokumen:** TAHAP 1 — usulan arsitektur, **menunggu persetujuan**.
-> Belum ada kode aplikasi di repository ini. Semua nilai angka pada dokumen ini
-> (lot, fraksi harga, ARA/ARB, threshold, modal contoh) adalah **CONTOH / BELUM
-> TERVERIFIKASI** sampai dilabeli sebaliknya pada file konfigurasi.
+> **Status dokumen:** arsitektur disetujui (Tahap 1); **Tahap 2 (fondasi & data layer)
+> diimplementasikan** — lihat §21 untuk keputusan yang diambil dan penyimpangan kecil.
+> Semua nilai angka pada dokumen ini (lot, fraksi harga, ARA/ARB, threshold, modal contoh)
+> adalah **CONTOH / BELUM TERVERIFIKASI** sampai dilabeli sebaliknya pada file konfigurasi.
 >
 > Tanggal: 2026-09-23 · Bahasa: Indonesia · Timezone acuan: Asia/Jakarta (WIB)
 
@@ -759,3 +759,33 @@ Setiap akhir tahap: daftar file/fitur selesai, pemeriksaan yang dijalankan dan
 hasilnya, apa yang belum tersedia, konfigurasi/persetujuan yang dibutuhkan
 berikutnya. "Implementasi selesai" selalu dipisahkan dari "integrasi live
 terverifikasi".
+
+---
+
+## 21. Catatan implementasi Tahap 2 (2026-09-23)
+
+Keputusan §19 diambil dengan default: tata letak datar + `var/`; `pyproject.toml` +
+`uv.lock` (+ `requirements*.txt` ekspor); `pandas-ta==0.4.71b0` dipertahankan; Yahoo aktif
+untuk development, GoAPI/Sectors/broker template nonaktif; daftar berita kosong; `RWYJ`
+dihapus.
+
+Penyesuaian terhadap rancangan awal:
+
+- Ditambahkan paket pendukung `core/` (timeutil, redaction, logging) dan modul
+  `data/resilience.py`, `data/validation.py` agar `aggregator.py` tetap ringkas.
+- Berkas konfigurasi tambahan: `config/news_sources.yaml`, `config/global_macro.yaml`
+  (sumber berita dan instrumen makro juga membawa `meta.verified`).
+- Dependency tambahan kecil: `PyYAML` (baca YAML), `defusedxml` (parser RSS/Atom aman untuk
+  input tidak tepercaya), `tzdata` (zona waktu di image minimal). Tidak ada penggantian
+  library wajib. `numpy` dibatasi `<2.3` karena `pandas-ta` mewajibkan `numba==0.61.2`.
+- Quote antar-provider hanya dibandingkan bila `market_time` identik; jika berbeda, status
+  `degraded` dengan catatan — konsisten dengan larangan membandingkan snapshot berbeda waktu.
+- Adapter Yahoo memakai `period` default eksplisit per timeframe (harian `2y`) saat
+  `start/end` kosong, karena default yfinance (`1mo`) terlalu pendek untuk warmup EMA200 —
+  ditemukan lewat uji `fetch` nyata.
+- `AggregatedOHLCV.usable` memperhitungkan `require_cross_validation`: di produksi tanpa
+  persetujuan satu-provider, hasil `degraded` tidak dapat dipakai.
+
+Bukti yang benar-benar dijalankan: `pytest` (131 test offline lulus), `ruff check/format`,
+`python main.py config` tanpa token, dan satu `python main.py fetch --symbol BBCA` dengan
+jaringan (479 bar harian, bar hari berjalan ditandai belum lengkap, status `degraded`).

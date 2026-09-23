@@ -1,0 +1,21 @@
+# Watchlist global awal. Dikelola admin lewat /watchlist add|remove (Tahap 4).
+# BUKAN rekomendasi; hanya universe awal yang tetap melewati filter kualitas & likuiditas.
+schema_version: 1
+meta:
+  label: "CONTOH"
+  source: ""
+  verified: false
+  notes: "Nama emiten bersifat informasional dan dapat berubah (aksi korporasi/rebranding)."
+symbols:
+  - { symbol: BBCA, name: "Bank Central Asia" }
+  - { symbol: BBRI, name: "Bank Rakyat Indonesia" }
+  - { symbol: BMRI, name: "Bank Mandiri" }
+  - { symbol: BBNI, name: "Bank Negara Indonesia" }
+  - { symbol: TLKM, name: "Telkom Indonesia" }
+  - { symbol: ASII, name: "Astra International" }
+  - { symbol: ICBP, name: "Indofood CBP Sukses Makmur" }
+  - { symbol: INDF, name: "Indofood Sukses Makmur" }
+  - { symbol: UNTR, name: "United Tractors" }
+  - { symbol: KLBF, name: "Kalbe Farma" }
+  - { symbol: ANTM, name: "Aneka Tambang" }
+  - { symbol: PTBA, name: "Bukit Asam" }

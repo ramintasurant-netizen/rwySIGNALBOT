@@ -1,0 +1,66 @@
+# Aturan perdagangan BEI yang dipakai engine.
+#
+# SEMUA NILAI DI BERKAS INI ADALAH CONTOH / BELUM TERVERIFIKASI.
+# Sebelum produksi: isi meta.source dengan peraturan/keputusan resmi BEI yang berlaku,
+# set meta.effective_from, ganti meta.label, lalu meta.verified: true.
+# Selama meta.verified: false, mode produksi diblokir (fail-closed).
+schema_version: 1
+meta:
+  label: "CONTOH / BELUM TERVERIFIKASI"
+  source: ""                 # contoh: URL Peraturan Perdagangan BEI Nomor II-A + Keputusan Direksi terkait
+  effective_from: null
+  scope: ["Papan Utama", "Papan Pengembangan"]
+  verified: false
+  notes: >-
+    Nilai lot, fraksi harga, ARA/ARB, dan jam sesi adalah contoh untuk pengembangan/uji.
+    Papan Akselerasi, papan pemantauan khusus (full call auction), waran, dan right
+    memiliki ketentuan berbeda dan belum dimodelkan.
+
+# Satu lot = N lembar (CONTOH).
+lot_size: 100
+
+# Fraksi harga berjenjang (CONTOH). Rentang [min_price, max_price); rentang terakhir terbuka.
+tick_table:
+  - { min_price: 0,    max_price: 200,  tick: 1 }
+  - { min_price: 200,  max_price: 500,  tick: 2 }
+  - { min_price: 500,  max_price: 2000, tick: 5 }
+  - { min_price: 2000, max_price: 5000, tick: 10 }
+  - { min_price: 5000, max_price: null, tick: 25 }
+
+# Auto rejection atas/bawah (CONTOH). Persentase terhadap harga referensi.
+price_limits:
+  reference_price: previous_close
+  min_price: 50
+  bands:
+    - { min_price: 0,    max_price: 200,  up_pct: 35, down_pct: 15 }
+    - { min_price: 200,  max_price: 5000, up_pct: 25, down_pct: 15 }
+    - { min_price: 5000, max_price: null, up_pct: 20, down_pct: 15 }
+
+# Jam perdagangan WIB (CONTOH). Jumat memakai jadwal terpisah.
+sessions:
+  regular:
+    pre_opening:  { start: "08:45", end: "08:59" }
+    session_1:    { start: "09:00", end: "12:00" }
+    session_2:    { start: "13:30", end: "15:49" }
+    pre_closing:  { start: "15:50", end: "16:00" }
+    post_trading: { start: "16:01", end: "16:15" }
+  friday:
+    pre_opening:  { start: "08:45", end: "08:59" }
+    session_1:    { start: "09:00", end: "11:30" }
+    session_2:    { start: "14:00", end: "15:49" }
+    pre_closing:  { start: "15:50", end: "16:00" }
+    post_trading: { start: "16:01", end: "16:15" }
+
+# Bar harian dianggap final setelah jendela terakhir + buffer menit ini.
+daily_bar_completion_buffer_minutes: 15
+
+# Ambang likuiditas universe (CONTOH). Rata-rata selama lookback_days sesi.
+liquidity:
+  min_avg_daily_value_idr: 5000000000      # 5 miliar rupiah/hari (CONTOH)
+  min_avg_daily_volume_shares: 1000000     # 1 juta lembar/hari (CONTOH)
+  lookback_days: 20
+
+# Pengecualian: suspensi dan papan pemantauan khusus. Diperbarui manual dari pengumuman BEI.
+exclusions:
+  suspended_symbols: []
+  special_monitoring_board_symbols: []
