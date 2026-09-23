@@ -4,6 +4,8 @@ from xml.sax.saxutils import escape, quoteattr
 
 from pidlib import LAYERS, PT, shapes, instr_index, line_list, valve_list
 
+FONT = ["Arial"]  # settable by drawing scripts (e.g. Times New Roman for classic look)
+
 NS = ('xmlns="http://schemas.microsoft.com/office/visio/2012/main" '
       'xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xml:space="preserve"')
 
@@ -46,7 +48,7 @@ def shape_xml(s):
              cell("LayerMember", str(LAYERS.index(s.layer))),
              cell("VerticalAlign", s.valign), cell("LeftMargin", 0.02), cell("RightMargin", 0.02),
              cell("TopMargin", 0.02), cell("BottomMargin", 0.02)]
-    parts.append(f'<Section N="Character"><Row IX="0">{cell("Font", "Arial")}{cell("Color", s.text_color)}'
+    parts.append(f'<Section N="Character"><Row IX="0">{cell("Font", FONT[0])}{cell("Color", s.text_color)}'
                  f'{cell("Style", 1 if s.bold else 0)}{cell("Size", f(s.size * PT))}</Row></Section>')
     parts.append(f'<Section N="Paragraph"><Row IX="0">{cell("HorzAlign", s.halign)}{cell("SpLine", -1.1)}</Row></Section>')
     if s.props:
@@ -134,7 +136,7 @@ def write_vsdx(path, page_name, page_w, page_h, title):
                 '<SnapAngles/><DynamicGridEnabled>1</DynamicGridEnabled><ProtectStyles>0</ProtectStyles><ProtectShapes>0</ProtectShapes>'
                 '<ProtectMasters>0</ProtectMasters><ProtectBkgnds>0</ProtectBkgnds></DocumentSettings>'
                 '<Colors><ColorEntry IX="0" RGB="#000000"/><ColorEntry IX="1" RGB="#FFFFFF"/></Colors>'
-                '<FaceNames><FaceName NameU="Arial" UnicodeRanges="-536859905 -1073711037 9 0" CharSets="1073742335 -65536" '
+                f'<FaceNames><FaceName NameU="{FONT[0]}" UnicodeRanges="-536859905 -1073711037 9 0" CharSets="1073742335 -65536" '
                 'Panos="2 11 6 4 2 2 2 2 2 4" Flags="325"/></FaceNames>'
                 f'<StyleSheets>{style0()}</StyleSheets>'
                 f'<DocumentSheet NameU="TheDoc" Name="TheDoc" LineStyle="0" FillStyle="0" TextStyle="0">{cell("OutputFormat", 0)}'
@@ -217,7 +219,7 @@ def write_svg(path, page_w, page_h, scale=40.0):
         return f"A{r * S:.2f} {r * S:.2f} 0 {large} {sweep} {X(x1):.2f} {Y(y1):.2f}"
 
     out = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{page_w * S:.0f}" height="{page_h * S:.0f}" '
-           f'viewBox="0 0 {page_w * S:.0f} {page_h * S:.0f}" font-family="Arial, Liberation Sans, sans-serif">',
+           f'viewBox="0 0 {page_w * S:.0f} {page_h * S:.0f}" font-family="{FONT[0]}, {"Liberation Serif, serif" if "Times" in FONT[0] else "Liberation Sans, sans-serif"}">',
            '<rect width="100%" height="100%" fill="white"/>']
     for s in shapes:
         dash = {1: "", 2: "6,4", 3: "2,3", 0: ""}[s.pattern]

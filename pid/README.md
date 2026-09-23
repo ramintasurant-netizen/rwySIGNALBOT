@@ -66,3 +66,9 @@ air: Tank → BCP (min‑flow FV‑13) → FE/FT‑01 → FCV‑01 → Economize
 → Superheater (spray TCV‑04 dari TIC‑04) → MSV‑01/GV‑01 (Turbine Trip / Governor + ST‑02) → **HPT → IPT → LPT** (POWER 1/2/3)
 → Condenser (CW TCV‑09/TIC‑10, vakum, LT/LIC‑11) → CEP → LCV‑11 → Feedwater Tank/Deaerator (ekstraksi PCV‑15, make‑up LCV‑12).
 Dibangun ulang dengan `python3 make_pid_complex.py`.
+
+## Gaya Visio pengguna — `PID-STM-003_VisioStyle.vsdx`
+
+Reproduksi tata letak & gaya gambar Visio pengguna (huruf Times New Roman, bubble ISA tipis, tanda “//” pada garis,
+vessel kapsul dengan nozzle, turbin trapesium HPT/IPT/LPT dengan POWER 1‑3 biru, aksen merah untuk flue gas & air pendingin,
+tanki terbuka, BCP). Koordinat ditulis dalam piksel gambar referensi sehingga posisi mudah disesuaikan — `python3 make_pid_visio.py`.

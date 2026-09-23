@@ -387,9 +387,9 @@
 <text x="822.27" y="402.83" font-size="3.33" text-anchor="start" fill="#C62828">EXTRACTION #6</text>
 <text x="822.27" y="406.67" font-size="3.33" text-anchor="start" fill="#C62828">(XV-106 FC, NRV)</text>
 <path d="M798.80 427.60 L805.20 415.60 L805.20 427.60 L798.80 415.60 L798.80 427.60" fill="#E6FFE6" stroke="#000000" stroke-width="0.67" stroke-linejoin="round"/>
-<path d="M802.00 421.60 L797.20 421.60" fill="none" stroke="#000000" stroke-width="0.67" stroke-linejoin="round"/>
-<path d="M797.20 427.20 A5.67 5.67 0 0 1 797.20 416.00" fill="none" stroke="#000000" stroke-width="0.67" stroke-linejoin="round"/>
-<path d="M797.20 427.20 L797.20 416.00" fill="none" stroke="#000000" stroke-width="0.67" stroke-linejoin="round"/>
+<path d="M802.00 421.60 L798.00 421.60" fill="none" stroke="#000000" stroke-width="0.67" stroke-linejoin="round"/>
+<path d="M798.00 426.27 A4.72 4.72 0 0 1 798.00 416.93" fill="none" stroke="#000000" stroke-width="0.67" stroke-linejoin="round"/>
+<path d="M798.00 426.27 L798.00 416.93" fill="none" stroke="#000000" stroke-width="0.67" stroke-linejoin="round"/>
 <text x="809.60" y="422.75" font-size="3.33" text-anchor="start" fill="#000000" font-weight="bold">XV-106</text>
 <path d="M788.00 391.60 L807.20 391.60 L816.00 383.60 L807.20 375.60 L788.00 375.60 L788.00 391.60" fill="none" stroke="#000000" stroke-width="0.56" stroke-linejoin="round"/>
 <text x="802.00" y="384.85" font-size="3.61" text-anchor="middle" fill="#000000">4</text>
@@ -398,9 +398,9 @@
 <text x="954.27" y="402.83" font-size="3.33" text-anchor="start" fill="#C62828">EXTRACTION #7</text>
 <text x="954.27" y="406.67" font-size="3.33" text-anchor="start" fill="#C62828">(XV-107 FC, NRV)</text>
 <path d="M930.80 427.60 L937.20 415.60 L937.20 427.60 L930.80 415.60 L930.80 427.60" fill="#E6FFE6" stroke="#000000" stroke-width="0.67" stroke-linejoin="round"/>
-<path d="M934.00 421.60 L929.20 421.60" fill="none" stroke="#000000" stroke-width="0.67" stroke-linejoin="round"/>
-<path d="M929.20 427.20 A5.67 5.67 0 0 1 929.20 416.00" fill="none" stroke="#000000" stroke-width="0.67" stroke-linejoin="round"/>
-<path d="M929.20 427.20 L929.20 416.00" fill="none" stroke="#000000" stroke-width="0.67" stroke-linejoin="round"/>
+<path d="M934.00 421.60 L930.00 421.60" fill="none" stroke="#000000" stroke-width="0.67" stroke-linejoin="round"/>
+<path d="M930.00 426.27 A4.72 4.72 0 0 1 930.00 416.93" fill="none" stroke="#000000" stroke-width="0.67" stroke-linejoin="round"/>
+<path d="M930.00 426.27 L930.00 416.93" fill="none" stroke="#000000" stroke-width="0.67" stroke-linejoin="round"/>
 <text x="941.60" y="422.75" font-size="3.33" text-anchor="start" fill="#000000" font-weight="bold">XV-107</text>
 <path d="M920.00 391.60 L939.20 391.60 L948.00 383.60 L939.20 375.60 L920.00 375.60 L920.00 391.60" fill="none" stroke="#000000" stroke-width="0.56" stroke-linejoin="round"/>
 <text x="934.00" y="384.85" font-size="3.61" text-anchor="middle" fill="#000000">5</text>
@@ -408,18 +408,18 @@
 <path d="M824.00 499.60 L826.45 505.08 L821.55 505.08 z" fill="#1F3B73" stroke="none"/>
 <text x="860.00" y="527.85" font-size="3.06" text-anchor="middle" fill="#1F3B73">4"-HD-115 drain (cascade ke E-101)</text>
 <path d="M898.00 538.80 L910.00 532.40 L910.00 538.80 L898.00 532.40 L898.00 538.80" fill="#E6FFE6" stroke="#000000" stroke-width="0.67" stroke-linejoin="round"/>
-<path d="M904.00 535.60 L904.00 529.20" fill="none" stroke="#000000" stroke-width="0.67" stroke-linejoin="round"/>
-<path d="M897.20 529.20 A6.85 6.85 0 0 1 910.80 529.20" fill="none" stroke="#000000" stroke-width="0.67" stroke-linejoin="round"/>
-<path d="M897.20 529.20 L910.80 529.20" fill="none" stroke="#000000" stroke-width="0.67" stroke-linejoin="round"/>
+<path d="M904.00 535.60 L904.00 530.27" fill="none" stroke="#000000" stroke-width="0.67" stroke-linejoin="round"/>
+<path d="M898.33 530.27 A5.71 5.71 0 0 1 909.67 530.27" fill="none" stroke="#000000" stroke-width="0.67" stroke-linejoin="round"/>
+<path d="M898.33 530.27 L909.67 530.27" fill="none" stroke="#000000" stroke-width="0.67" stroke-linejoin="round"/>
 <text x="904.00" y="545.63" font-size="3.33" text-anchor="middle" fill="#000000" font-weight="bold">LV-115A</text>
 <text x="904.00" y="549.47" font-size="3.33" text-anchor="middle" fill="#000000" font-weight="bold">FC 4"</text>
 <path d="M780.00 499.60 L780.00 535.60 L714.00 535.60" fill="none" stroke="#1F3B73" stroke-width="0.61" stroke-linejoin="round"/>
 <path d="M714.00 535.60 L719.48 533.15 L719.48 538.05 z" fill="#1F3B73" stroke="none"/>
 <text x="764.00" y="545.45" font-size="3.06" text-anchor="middle" fill="#1F3B73">6"-HD-114 → V-101B</text>
 <path d="M730.00 538.80 L742.00 532.40 L742.00 538.80 L730.00 532.40 L730.00 538.80" fill="#E6FFE6" stroke="#000000" stroke-width="0.67" stroke-linejoin="round"/>
-<path d="M736.00 535.60 L736.00 529.20" fill="none" stroke="#000000" stroke-width="0.67" stroke-linejoin="round"/>
-<path d="M729.20 529.20 A6.85 6.85 0 0 1 742.80 529.20" fill="none" stroke="#000000" stroke-width="0.67" stroke-linejoin="round"/>
-<path d="M729.20 529.20 L742.80 529.20" fill="none" stroke="#000000" stroke-width="0.67" stroke-linejoin="round"/>
+<path d="M736.00 535.60 L736.00 530.27" fill="none" stroke="#000000" stroke-width="0.67" stroke-linejoin="round"/>
+<path d="M730.33 530.27 A5.71 5.71 0 0 1 741.67 530.27" fill="none" stroke="#000000" stroke-width="0.67" stroke-linejoin="round"/>
+<path d="M730.33 530.27 L741.67 530.27" fill="none" stroke="#000000" stroke-width="0.67" stroke-linejoin="round"/>
 <text x="736.00" y="545.63" font-size="3.33" text-anchor="middle" fill="#000000" font-weight="bold">LV-114A</text>
 <text x="736.00" y="549.47" font-size="3.33" text-anchor="middle" fill="#000000" font-weight="bold">FC 6"</text>
 <path d="M700.80 542.80 L712.00 542.80 L712.00 528.40 L700.80 528.40 L692.00 535.60 L700.80 542.80" fill="none" stroke="#000000" stroke-width="0.56" stroke-linejoin="round"/>
@@ -476,9 +476,9 @@
 <ellipse cx="1080.00" cy="471.60" rx="2.00" ry="2.00" fill="#1F3B73" stroke="#1F3B73" stroke-width="0.28"/>
 <ellipse cx="1172.00" cy="471.60" rx="2.00" ry="2.00" fill="#1F3B73" stroke="#1F3B73" stroke-width="0.28"/>
 <path d="M1108.00 476.00 L1124.00 467.20 L1124.00 476.00 L1108.00 467.20 L1108.00 476.00" fill="#E6FFE6" stroke="#000000" stroke-width="0.67" stroke-linejoin="round"/>
-<path d="M1116.00 471.60 L1116.00 465.20" fill="none" stroke="#000000" stroke-width="0.67" stroke-linejoin="round"/>
-<path d="M1109.20 465.20 A6.85 6.85 0 0 1 1122.80 465.20" fill="none" stroke="#000000" stroke-width="0.67" stroke-linejoin="round"/>
-<path d="M1109.20 465.20 L1122.80 465.20" fill="none" stroke="#000000" stroke-width="0.67" stroke-linejoin="round"/>
+<path d="M1116.00 471.60 L1116.00 464.49" fill="none" stroke="#000000" stroke-width="0.67" stroke-linejoin="round"/>
+<path d="M1108.44 464.49 A7.61 7.61 0 0 1 1123.56 464.49" fill="none" stroke="#000000" stroke-width="0.67" stroke-linejoin="round"/>
+<path d="M1108.44 464.49 L1123.56 464.49" fill="none" stroke="#000000" stroke-width="0.67" stroke-linejoin="round"/>
 <text x="1116.00" y="482.83" font-size="3.33" text-anchor="middle" fill="#000000" font-weight="bold">FCV-116</text>
 <text x="1116.00" y="486.67" font-size="3.33" text-anchor="middle" fill="#000000" font-weight="bold">FO 14"  (100 %)</text>
 <path d="M1080.00 471.60 L1080.00 375.60 L1172.00 375.60 L1172.00 471.60" fill="none" stroke="#2E7D32" stroke-width="0.89" stroke-linejoin="round" stroke-dasharray="6,4"/>
