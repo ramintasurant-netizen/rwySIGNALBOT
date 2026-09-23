@@ -1,0 +1,284 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1234" height="965" viewBox="0 0 1234 965" font-family="Times New Roman, Liberation Serif, serif">
+<rect width="100%" height="100%" fill="white"/>
+<path d="M142.62 18.00 L142.62 947.08" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round" stroke-dasharray="6,4"/>
+<path d="M938.77 18.00 L938.77 947.08" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round" stroke-dasharray="6,4"/>
+<path d="M243.14 145.38 L346.71 145.38 A31.22 31.22 0 0 0 346.71 84.46 L243.14 84.46 A31.22 31.22 0 0 0 243.14 145.38" fill="#FFFFFF" stroke="#000000" stroke-width="1.38" stroke-linejoin="round"/>
+<path d="M288.62 84.46 L301.22 84.46 L301.22 78.16 L288.62 78.16 L288.62 84.46" fill="#FFFFFF" stroke="#000000" stroke-width="1.38" stroke-linejoin="round"/>
+<path d="M212.47 121.22 L218.77 121.22 L218.77 108.62 L212.47 108.62 L212.47 121.22" fill="#FFFFFF" stroke="#000000" stroke-width="1.38" stroke-linejoin="round"/>
+<path d="M371.08 121.22 L377.38 121.22 L377.38 108.62 L371.08 108.62 L371.08 121.22" fill="#FFFFFF" stroke="#000000" stroke-width="1.38" stroke-linejoin="round"/>
+<text x="294.92" y="118.16" font-size="9.38" text-anchor="middle" fill="#000000" font-weight="bold">SUPERHEATER</text>
+<path d="M240.92 437.54 L348.92 437.54 A28.38 28.38 0 0 0 348.92 382.15 L240.92 382.15 A28.38 28.38 0 0 0 240.92 437.54" fill="#FFFFFF" stroke="#000000" stroke-width="1.38" stroke-linejoin="round"/>
+<path d="M288.62 443.84 L301.22 443.84 L301.22 437.54 L288.62 437.54 L288.62 443.84" fill="#FFFFFF" stroke="#000000" stroke-width="1.38" stroke-linejoin="round"/>
+<path d="M212.47 416.15 L218.77 416.15 L218.77 403.55 L212.47 403.55 L212.47 416.15" fill="#FFFFFF" stroke="#000000" stroke-width="1.38" stroke-linejoin="round"/>
+<path d="M371.08 416.15 L377.38 416.15 L377.38 403.55 L371.08 403.55 L371.08 416.15" fill="#FFFFFF" stroke="#000000" stroke-width="1.38" stroke-linejoin="round"/>
+<text x="294.92" y="413.08" font-size="9.38" text-anchor="middle" fill="#000000" font-weight="bold">EVAPORATOR</text>
+<path d="M240.92 682.62 L348.92 682.62 A28.38 28.38 0 0 0 348.92 627.23 L240.92 627.23 A28.38 28.38 0 0 0 240.92 682.62" fill="#FFFFFF" stroke="#000000" stroke-width="1.38" stroke-linejoin="round"/>
+<path d="M288.62 627.23 L301.22 627.23 L301.22 620.93 L288.62 620.93 L288.62 627.23" fill="#FFFFFF" stroke="#000000" stroke-width="1.38" stroke-linejoin="round"/>
+<path d="M288.62 688.92 L301.22 688.92 L301.22 682.62 L288.62 682.62 L288.62 688.92" fill="#FFFFFF" stroke="#000000" stroke-width="1.38" stroke-linejoin="round"/>
+<path d="M212.47 661.22 L218.77 661.22 L218.77 648.62 L212.47 648.62 L212.47 661.22" fill="#FFFFFF" stroke="#000000" stroke-width="1.38" stroke-linejoin="round"/>
+<text x="294.92" y="658.16" font-size="9.38" text-anchor="middle" fill="#000000" font-weight="bold">ECONOMIZER</text>
+<path d="M436.85 321.92 L436.85 254.08 A31.93 31.93 0 0 1 499.15 254.08 L499.15 321.92 A31.93 31.93 0 0 1 436.85 321.92" fill="#FFFFFF" stroke="#000000" stroke-width="1.38" stroke-linejoin="round"/>
+<path d="M461.70 229.15 L474.30 229.15 L474.30 222.85 L461.70 222.85 L461.70 229.15" fill="#FFFFFF" stroke="#000000" stroke-width="1.38" stroke-linejoin="round"/>
+<path d="M461.70 353.15 L474.30 353.15 L474.30 346.85 L461.70 346.85 L461.70 353.15" fill="#FFFFFF" stroke="#000000" stroke-width="1.38" stroke-linejoin="round"/>
+<path d="M430.55 294.30 L436.85 294.30 L436.85 281.70 L430.55 281.70 L430.55 294.30" fill="#FFFFFF" stroke="#000000" stroke-width="1.38" stroke-linejoin="round"/>
+<text x="468.00" y="285.84" font-size="9.38" text-anchor="middle" fill="#000000" font-weight="bold">STEAM</text>
+<text x="468.00" y="296.63" font-size="9.38" text-anchor="middle" fill="#000000" font-weight="bold">DRUM</text>
+<path d="M274.22 519.44 L274.22 479.84 L315.62 479.84 L315.62 519.44 L294.92 539.24 L274.22 519.44" fill="#FFFFFF" stroke="#000000" stroke-width="1.38" stroke-linejoin="round"/>
+<path d="M280.52 501.44 L309.32 501.44" fill="none" stroke="#000000" stroke-width="1.38" stroke-linejoin="round"/>
+<path d="M294.92 501.44 L294.92 519.44" fill="none" stroke="#000000" stroke-width="1.38" stroke-linejoin="round"/>
+<text x="232.62" y="512.77" font-size="9.38" text-anchor="middle" fill="#000000" font-weight="bold">MIXER</text>
+<text x="198.00" y="29.54" font-size="9.38" text-anchor="middle" fill="#C00000" font-weight="bold">FLUE GAS</text>
+<path d="M169.58 69.50 L176.58 76.50" fill="none" stroke="#C00000" stroke-width="0.87" stroke-linejoin="round"/>
+<path d="M169.58 75.80 L176.58 82.80" fill="none" stroke="#C00000" stroke-width="0.87" stroke-linejoin="round"/>
+<path d="M173.08 37.38 L173.08 114.92 L218.77 114.92" fill="none" stroke="#C00000" stroke-width="1.12" stroke-linejoin="round"/>
+<path d="M218.77 114.92 L213.29 117.37 L213.29 112.48 z" fill="#C00000" stroke="none"/>
+<path d="M167.23 72.21 L178.93 52.41 L178.93 72.21 L167.23 52.41 L167.23 72.21" fill="#E6FFE6" stroke="#000000" stroke-width="1.50" stroke-linejoin="round"/>
+<ellipse cx="253.38" cy="62.31" rx="15.30" ry="15.30" fill="#FFFFFF" stroke="#000000" stroke-width="1.00"/>
+<text x="253.38" y="65.11" font-size="8.12" text-anchor="middle" fill="#000000">TC</text>
+<ellipse cx="325.38" cy="81.69" rx="15.30" ry="15.30" fill="#FFFFFF" stroke="#000000" stroke-width="1.00"/>
+<text x="325.38" y="84.50" font-size="8.12" text-anchor="middle" fill="#000000">TT</text>
+<path d="M325.38 66.46 L325.38 48.46 L281.08 48.46 L281.08 62.31 L268.62 62.31" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round" stroke-dasharray="6,4"/>
+<path d="M219.88 58.81 L212.88 65.81" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round"/>
+<path d="M213.58 58.81 L206.58 65.81" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round"/>
+<path d="M238.15 62.31 L188.31 62.31" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round" stroke-dasharray="6,4"/>
+<path d="M298.42 63.42 L291.42 56.42" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round"/>
+<path d="M298.42 57.12 L291.42 50.12" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round"/>
+<path d="M378.27 32.58 L385.27 25.58" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round"/>
+<path d="M384.57 32.58 L391.57 25.58" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round"/>
+<path d="M294.92 84.46 L294.92 29.08 L474.92 29.08 L474.92 59.54 L505.38 59.54" fill="none" stroke="#000000" stroke-width="1.12" stroke-linejoin="round"/>
+<path d="M505.38 59.54 L499.91 61.99 L499.91 57.09 z" fill="#000000" stroke="none"/>
+<path d="M412.41 34.93 L432.21 23.23 L432.21 34.93 L412.41 23.23 L412.41 34.93" fill="#E6FFE6" stroke="#000000" stroke-width="1.50" stroke-linejoin="round"/>
+<ellipse cx="357.23" cy="51.23" rx="15.30" ry="15.30" fill="#FFFFFF" stroke="#000000" stroke-width="1.00"/>
+<text x="357.23" y="54.03" font-size="8.12" text-anchor="middle" fill="#000000">PT</text>
+<path d="M357.23 36.00 L357.23 29.08" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round" stroke-dasharray="6,4"/>
+<path d="M505.38 42.92 L551.08 29.08 L551.08 90.00 L505.38 76.15 L505.38 42.92" fill="#FFFFFF" stroke="#000000" stroke-width="1.38" stroke-linejoin="round"/>
+<text x="495.69" y="109.85" font-size="9.38" text-anchor="middle" fill="#000000" font-weight="bold">HPT</text>
+<path d="M564.92 62.31 L814.15 62.31" fill="none" stroke="#1F5FBF" stroke-width="1.25" stroke-linejoin="round"/>
+<path d="M814.15 62.31 L808.68 64.75 L808.68 59.86 z" fill="#1F5FBF" stroke="none"/>
+<text x="872.31" y="65.54" font-size="9.38" text-anchor="middle" fill="#1F5FBF" font-weight="bold">POWER 1</text>
+<path d="M524.04 108.27 L531.04 115.27" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round"/>
+<path d="M524.04 114.57 L531.04 121.57" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round"/>
+<path d="M601.89 143.35 L608.89 136.35" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round"/>
+<path d="M608.19 143.35 L615.19 136.35" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round"/>
+<path d="M686.04 162.27 L693.04 169.27" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round"/>
+<path d="M686.04 168.57 L693.04 175.57" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round"/>
+<path d="M527.54 90.00 L527.54 139.85 L689.54 139.85 L689.54 198.00 L668.77 198.00" fill="none" stroke="#000000" stroke-width="1.12" stroke-linejoin="round"/>
+<path d="M668.77 198.00 L674.25 195.55 L674.25 200.45 z" fill="#000000" stroke="none"/>
+<path d="M754.20 143.35 L761.20 136.35" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round"/>
+<path d="M760.50 143.35 L767.50 136.35" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round"/>
+<path d="M689.54 139.85 L832.15 139.85" fill="none" stroke="#000000" stroke-width="1.12" stroke-linejoin="round"/>
+<ellipse cx="728.31" cy="98.31" rx="15.30" ry="15.30" fill="#FFFFFF" stroke="#000000" stroke-width="1.00"/>
+<text x="728.31" y="101.11" font-size="8.12" text-anchor="middle" fill="#000000">PT</text>
+<ellipse cx="807.23" cy="98.31" rx="15.30" ry="15.30" fill="#FFFFFF" stroke="#000000" stroke-width="1.00"/>
+<text x="807.23" y="101.11" font-size="8.12" text-anchor="middle" fill="#000000">TT</text>
+<ellipse cx="848.77" cy="139.85" rx="15.30" ry="15.30" fill="#FFFFFF" stroke="#000000" stroke-width="1.00"/>
+<text x="848.77" y="142.65" font-size="8.12" text-anchor="middle" fill="#000000">TC</text>
+<ellipse cx="886.15" cy="117.69" rx="15.30" ry="15.30" fill="#FFFFFF" stroke="#000000" stroke-width="1.00"/>
+<text x="886.15" y="120.50" font-size="8.12" text-anchor="middle" fill="#000000">PG</text>
+<path d="M728.31 113.54 L728.31 139.85" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round" stroke-dasharray="6,4"/>
+<path d="M807.23 113.54 L807.23 139.85" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round" stroke-dasharray="6,4"/>
+<path d="M743.54 98.31 L792.00 98.31" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round" stroke-dasharray="6,4"/>
+<path d="M839.34 112.31 L847.99 107.50" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round"/>
+<path d="M845.39 114.04 L854.05 109.23" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round"/>
+<path d="M822.46 103.85 L870.92 117.69" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round" stroke-dasharray="6,4"/>
+<path d="M616.15 156.46 L668.77 167.54 L668.77 204.92 L616.15 218.77 L616.15 156.46" fill="#FFFFFF" stroke="#000000" stroke-width="1.38" stroke-linejoin="round"/>
+<text x="606.46" y="240.00" font-size="9.38" text-anchor="middle" fill="#000000" font-weight="bold">IPT</text>
+<path d="M679.85 173.08 L828.00 173.08" fill="none" stroke="#1F5FBF" stroke-width="1.25" stroke-linejoin="round"/>
+<path d="M828.00 173.08 L822.52 175.52 L822.52 170.63 z" fill="#1F5FBF" stroke="none"/>
+<text x="886.15" y="176.31" font-size="9.38" text-anchor="middle" fill="#1F5FBF" font-weight="bold">POWER 2</text>
+<path d="M665.58 267.96 L672.58 260.96" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round"/>
+<path d="M671.88 267.96 L678.88 260.96" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round"/>
+<path d="M641.08 218.77 L641.08 264.46 L703.38 264.46" fill="none" stroke="#000000" stroke-width="1.12" stroke-linejoin="round"/>
+<path d="M703.38 264.46 L697.91 266.91 L697.91 262.01 z" fill="#000000" stroke="none"/>
+<path d="M703.38 246.46 L758.77 232.62 L758.77 294.92 L703.38 283.85 L703.38 246.46" fill="#FFFFFF" stroke="#000000" stroke-width="1.38" stroke-linejoin="round"/>
+<text x="700.62" y="316.16" font-size="9.38" text-anchor="middle" fill="#000000" font-weight="bold">LPT</text>
+<path d="M772.62 264.46 L848.77 264.46" fill="none" stroke="#1F5FBF" stroke-width="1.25" stroke-linejoin="round"/>
+<path d="M848.77 264.46 L843.29 266.91 L843.29 262.01 z" fill="#1F5FBF" stroke="none"/>
+<text x="906.92" y="267.70" font-size="9.38" text-anchor="middle" fill="#1F5FBF" font-weight="bold">POWER 3</text>
+<path d="M765.97 333.04 L772.97 326.04" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round"/>
+<path d="M772.27 333.04 L779.27 326.04" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round"/>
+<path d="M810.65 363.04 L817.65 370.04" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round"/>
+<path d="M810.65 369.34 L817.65 376.34" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round"/>
+<path d="M731.08 294.92 L731.08 329.54 L814.15 329.54 L814.15 409.85" fill="none" stroke="#000000" stroke-width="1.12" stroke-linejoin="round"/>
+<path d="M814.15 409.85 L811.71 404.37 L816.60 404.37 z" fill="#000000" stroke="none"/>
+<path d="M759.05 463.85 L869.26 463.85 A26.97 26.97 0 0 0 869.26 411.23 L759.05 411.23 A26.97 26.97 0 0 0 759.05 463.85" fill="#FFFFFF" stroke="#000000" stroke-width="1.38" stroke-linejoin="round"/>
+<path d="M807.85 411.23 L820.45 411.23 L820.45 404.93 L807.85 404.93 L807.85 411.23" fill="#FFFFFF" stroke="#000000" stroke-width="1.38" stroke-linejoin="round"/>
+<path d="M807.85 470.15 L820.45 470.15 L820.45 463.85 L807.85 463.85 L807.85 470.15" fill="#FFFFFF" stroke="#000000" stroke-width="1.38" stroke-linejoin="round"/>
+<path d="M890.31 443.84 L896.61 443.84 L896.61 431.24 L890.31 431.24 L890.31 443.84" fill="#FFFFFF" stroke="#000000" stroke-width="1.38" stroke-linejoin="round"/>
+<path d="M774.35 470.15 L786.95 470.15 L786.95 463.85 L774.35 463.85 L774.35 470.15" fill="#FFFFFF" stroke="#000000" stroke-width="1.38" stroke-linejoin="round"/>
+<text x="814.15" y="440.77" font-size="9.38" text-anchor="middle" fill="#000000" font-weight="bold">CONDENSER</text>
+<text x="973.38" y="378.76" font-size="8.75" text-anchor="middle" fill="#C00000" font-weight="bold">WATER FROM</text>
+<text x="973.38" y="388.82" font-size="8.75" text-anchor="middle" fill="#C00000" font-weight="bold">COOLING WATER</text>
+<path d="M947.50 434.04 L940.50 441.04" fill="none" stroke="#C00000" stroke-width="0.87" stroke-linejoin="round"/>
+<path d="M941.20 434.04 L934.20 441.04" fill="none" stroke="#C00000" stroke-width="0.87" stroke-linejoin="round"/>
+<path d="M987.23 437.54 L894.46 437.54" fill="none" stroke="#C00000" stroke-width="1.12" stroke-linejoin="round"/>
+<path d="M894.46 437.54 L899.94 435.09 L899.94 439.99 z" fill="#C00000" stroke="none"/>
+<path d="M910.87 443.39 L930.67 431.69 L930.67 443.39 L910.87 431.69 L910.87 443.39" fill="#E6FFE6" stroke="#000000" stroke-width="1.50" stroke-linejoin="round"/>
+<path d="M920.77 437.54 L920.77 428.74" fill="none" stroke="#000000" stroke-width="1.50" stroke-linejoin="round"/>
+<path d="M911.42 428.74 A9.42 9.42 0 0 1 930.12 428.74" fill="none" stroke="#000000" stroke-width="1.50" stroke-linejoin="round"/>
+<path d="M911.42 428.74 L930.12 428.74" fill="none" stroke="#000000" stroke-width="1.50" stroke-linejoin="round"/>
+<path d="M769.12 495.97 L776.12 502.97" fill="none" stroke="#C00000" stroke-width="0.87" stroke-linejoin="round"/>
+<path d="M769.12 502.27 L776.12 509.27" fill="none" stroke="#C00000" stroke-width="0.87" stroke-linejoin="round"/>
+<path d="M844.20 544.88 L851.20 537.88" fill="none" stroke="#C00000" stroke-width="0.87" stroke-linejoin="round"/>
+<path d="M850.50 544.88 L857.50 537.88" fill="none" stroke="#C00000" stroke-width="0.87" stroke-linejoin="round"/>
+<path d="M772.62 463.85 L772.62 541.38 L929.08 541.38" fill="none" stroke="#C00000" stroke-width="1.12" stroke-linejoin="round"/>
+<path d="M929.08 541.38 L923.60 543.83 L923.60 538.94 z" fill="#C00000" stroke="none"/>
+<ellipse cx="765.69" cy="488.77" rx="15.30" ry="15.30" fill="#FFFFFF" stroke="#000000" stroke-width="1.00"/>
+<text x="765.69" y="491.57" font-size="8.12" text-anchor="middle" fill="#000000">TC</text>
+<ellipse cx="765.69" cy="524.77" rx="15.30" ry="15.30" fill="#FFFFFF" stroke="#000000" stroke-width="1.00"/>
+<text x="765.69" y="527.57" font-size="8.12" text-anchor="middle" fill="#000000">TT</text>
+<ellipse cx="904.15" cy="524.77" rx="15.30" ry="15.30" fill="#FFFFFF" stroke="#000000" stroke-width="1.00"/>
+<text x="904.15" y="527.57" font-size="8.12" text-anchor="middle" fill="#000000">TT</text>
+<path d="M765.69 504.00 L765.69 509.54" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round" stroke-dasharray="6,4"/>
+<path d="M765.69 540.00 L765.69 541.38" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round" stroke-dasharray="6,4"/>
+<path d="M904.15 540.00 L904.15 541.38" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round" stroke-dasharray="6,4"/>
+<path d="M815.12 492.27 L822.12 485.27" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round"/>
+<path d="M821.42 492.27 L828.42 485.27" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round"/>
+<path d="M866.12 455.96 L859.12 448.96" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round"/>
+<path d="M866.12 449.66 L859.12 442.66" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round"/>
+<path d="M885.04 413.35 L892.04 406.35" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round"/>
+<path d="M891.34 413.35 L898.34 406.35" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round"/>
+<path d="M780.92 488.77 L862.62 488.77 L862.62 409.85 L920.77 409.85 L920.77 416.77" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round" stroke-dasharray="6,4"/>
+<path d="M810.65 551.35 L817.65 558.35" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round"/>
+<path d="M810.65 557.65 L817.65 564.65" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round"/>
+<path d="M814.15 463.85 L814.15 652.15" fill="none" stroke="#000000" stroke-width="1.12" stroke-linejoin="round"/>
+<path d="M814.15 652.15 L811.71 646.68 L816.60 646.68 z" fill="#000000" stroke="none"/>
+<path d="M758.35 655.06 L758.35 737.86 L869.95 737.86 L869.95 655.06" fill="none" stroke="#000000" stroke-width="1.38" stroke-linejoin="round"/>
+<text x="814.15" y="755.08" font-size="9.38" text-anchor="middle" fill="#000000" font-weight="bold">TANK</text>
+<ellipse cx="879.23" cy="657.69" rx="15.30" ry="15.30" fill="#FFFFFF" stroke="#000000" stroke-width="1.00"/>
+<text x="879.23" y="660.50" font-size="8.12" text-anchor="middle" fill="#000000">LW</text>
+<ellipse cx="915.23" cy="657.69" rx="15.30" ry="15.30" fill="#FFFFFF" stroke="#000000" stroke-width="1.00"/>
+<text x="915.23" y="660.50" font-size="8.12" text-anchor="middle" fill="#000000">LC</text>
+<path d="M894.46 657.69 L900.00 657.69" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round" stroke-dasharray="6,4"/>
+<path d="M879.23 672.92 L869.54 679.85" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round" stroke-dasharray="6,4"/>
+<path d="M928.42 780.65 L921.42 773.65" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round"/>
+<path d="M928.42 774.35 L921.42 767.35" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round"/>
+<path d="M903.88 706.81 L896.88 713.81" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round"/>
+<path d="M897.58 706.81 L890.58 713.81" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round"/>
+<path d="M924.92 837.69 L924.92 710.31 L869.54 710.31" fill="none" stroke="#000000" stroke-width="1.12" stroke-linejoin="round"/>
+<path d="M869.54 710.31 L875.02 707.86 L875.02 712.75 z" fill="#000000" stroke="none"/>
+<path d="M919.07 786.67 L930.77 766.87 L930.77 786.67 L919.07 766.87 L919.07 786.67" fill="#E6FFE6" stroke="#000000" stroke-width="1.50" stroke-linejoin="round"/>
+<path d="M924.92 776.77 L918.32 776.77" fill="none" stroke="#000000" stroke-width="1.50" stroke-linejoin="round"/>
+<path d="M918.32 784.47 A7.79 7.79 0 0 1 918.32 769.07" fill="none" stroke="#000000" stroke-width="1.50" stroke-linejoin="round"/>
+<path d="M918.32 784.47 L918.32 769.07" fill="none" stroke="#000000" stroke-width="1.50" stroke-linejoin="round"/>
+<path d="M911.73 713.35 L918.73 720.35" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round"/>
+<path d="M911.73 719.65 L918.73 726.65" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round"/>
+<path d="M915.23 672.92 L915.23 767.08" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round" stroke-dasharray="6,4"/>
+<text x="911.08" y="853.68" font-size="8.75" text-anchor="middle" fill="#000000" font-weight="bold">MAKE UP</text>
+<text x="911.08" y="863.74" font-size="8.75" text-anchor="middle" fill="#000000" font-weight="bold">WATER</text>
+<ellipse cx="814.15" cy="627.23" rx="4.50" ry="4.50" fill="#000000" stroke="#000000" stroke-width="0.62"/>
+<path d="M741.19 623.73 L734.19 630.73" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round"/>
+<path d="M734.89 623.73 L727.89 630.73" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round"/>
+<path d="M651.42 714.04 L658.42 721.04" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round"/>
+<path d="M651.42 720.34 L658.42 727.34" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round"/>
+<path d="M635.96 810.65 L628.96 817.65" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round"/>
+<path d="M629.66 810.65 L622.66 817.65" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round"/>
+<path d="M814.15 627.23 L654.92 627.23 L654.92 814.15 L603.69 814.15" fill="none" stroke="#000000" stroke-width="1.12" stroke-linejoin="round"/>
+<path d="M603.69 814.15 L609.17 811.71 L609.17 816.60 z" fill="#000000" stroke="none"/>
+<ellipse cx="578.77" cy="814.15" rx="23.40" ry="23.40" fill="#FFFFFF" stroke="#000000" stroke-width="1.38"/>
+<path d="M571.57 790.75 L585.97 790.75 L585.97 783.55 L571.57 783.55 L571.57 790.75" fill="#FFFFFF" stroke="#000000" stroke-width="1.38" stroke-linejoin="round"/>
+<path d="M558.97 837.55 L598.57 837.55" fill="none" stroke="#000000" stroke-width="1.38" stroke-linejoin="round"/>
+<text x="578.77" y="868.62" font-size="9.38" text-anchor="middle" fill="#000000" font-weight="bold">BCP</text>
+<path d="M582.27 755.03 L575.27 748.03" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round"/>
+<path d="M582.27 748.73 L575.27 741.73" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round"/>
+<path d="M443.50 706.81 L436.50 713.81" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round"/>
+<path d="M437.20 706.81 L430.20 713.81" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round"/>
+<path d="M578.77 786.46 L578.77 710.31 L294.92 710.31 L294.92 685.38" fill="none" stroke="#000000" stroke-width="1.12" stroke-linejoin="round"/>
+<path d="M294.92 685.38 L297.37 690.86 L292.48 690.86 z" fill="#000000" stroke="none"/>
+<text x="440.31" y="738.47" font-size="9.38" text-anchor="middle" fill="#000000" font-weight="bold">WATER</text>
+<ellipse cx="530.31" cy="668.77" rx="15.30" ry="15.30" fill="#FFFFFF" stroke="#000000" stroke-width="1.00"/>
+<text x="530.31" y="671.57" font-size="8.12" text-anchor="middle" fill="#000000">PT</text>
+<ellipse cx="488.77" cy="668.77" rx="15.30" ry="15.30" fill="#FFFFFF" stroke="#000000" stroke-width="1.00"/>
+<text x="488.77" y="671.57" font-size="8.12" text-anchor="middle" fill="#000000">FT</text>
+<ellipse cx="648.00" cy="862.62" rx="15.30" ry="15.30" fill="#FFFFFF" stroke="#000000" stroke-width="1.00"/>
+<text x="648.00" y="865.42" font-size="8.12" text-anchor="middle" fill="#000000">TC</text>
+<path d="M530.31 684.00 L530.31 710.31" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round" stroke-dasharray="6,4"/>
+<path d="M488.77 684.00 L488.77 710.31" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round" stroke-dasharray="6,4"/>
+<path d="M515.08 668.77 L504.00 668.77" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round" stroke-dasharray="6,4"/>
+<path d="M632.77 862.62 L605.08 834.92" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round" stroke-dasharray="6,4"/>
+<text x="225.69" y="611.08" font-size="9.38" text-anchor="middle" fill="#C00000" font-weight="bold">FLUE GAS</text>
+<path d="M173.08 621.69 L173.08 654.92 L218.77 654.92" fill="none" stroke="#C00000" stroke-width="1.12" stroke-linejoin="round"/>
+<path d="M218.77 654.92 L213.29 657.37 L213.29 652.48 z" fill="#C00000" stroke="none"/>
+<path d="M298.42 590.27 L291.42 583.27" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round"/>
+<path d="M298.42 583.97 L291.42 576.97" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round"/>
+<path d="M294.92 627.23 L294.92 540.00" fill="none" stroke="#000000" stroke-width="1.12" stroke-linejoin="round"/>
+<path d="M294.92 540.00 L297.37 545.48 L292.48 545.48 z" fill="#000000" stroke="none"/>
+<path d="M294.92 479.08 L294.92 437.54" fill="none" stroke="#000000" stroke-width="1.12" stroke-linejoin="round"/>
+<path d="M294.92 437.54 L297.37 443.02 L292.48 443.02 z" fill="#000000" stroke="none"/>
+<path d="M464.50 421.89 L471.50 428.89" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round"/>
+<path d="M464.50 428.19 L471.50 435.19" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round"/>
+<path d="M399.88 506.04 L392.88 513.04" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round"/>
+<path d="M393.58 506.04 L386.58 513.04" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round"/>
+<path d="M468.00 347.54 L468.00 509.54 L318.46 509.54" fill="none" stroke="#000000" stroke-width="1.12" stroke-linejoin="round"/>
+<path d="M318.46 509.54 L323.94 507.09 L323.94 511.99 z" fill="#000000" stroke="none"/>
+<path d="M388.42 355.57 L381.42 348.57" fill="none" stroke="#C00000" stroke-width="0.87" stroke-linejoin="round"/>
+<path d="M388.42 349.27 L381.42 342.27" fill="none" stroke="#C00000" stroke-width="0.87" stroke-linejoin="round"/>
+<path d="M371.08 409.85 L384.92 409.85 L384.92 288.00 L433.38 288.00" fill="none" stroke="#C00000" stroke-width="1.12" stroke-linejoin="round"/>
+<path d="M433.38 288.00 L427.91 290.45 L427.91 285.55 z" fill="#C00000" stroke="none"/>
+<path d="M379.07 346.36 L390.77 326.56 L390.77 346.36 L379.07 326.56 L379.07 346.36" fill="#E6FFE6" stroke="#000000" stroke-width="1.50" stroke-linejoin="round"/>
+<path d="M384.92 336.46 L378.32 336.46" fill="none" stroke="#000000" stroke-width="1.50" stroke-linejoin="round"/>
+<path d="M378.32 344.16 A7.79 7.79 0 0 1 378.32 328.76" fill="none" stroke="#000000" stroke-width="1.50" stroke-linejoin="round"/>
+<path d="M378.32 344.16 L378.32 328.76" fill="none" stroke="#000000" stroke-width="1.50" stroke-linejoin="round"/>
+<path d="M402.72 293.85 L422.52 282.15 L422.52 293.85 L402.72 282.15 L402.72 293.85" fill="#E6FFE6" stroke="#000000" stroke-width="1.50" stroke-linejoin="round"/>
+<ellipse cx="191.08" cy="311.54" rx="15.30" ry="15.30" fill="#FFFFFF" stroke="#000000" stroke-width="1.00"/>
+<text x="191.08" y="314.34" font-size="8.12" text-anchor="middle" fill="#000000">TIC</text>
+<ellipse cx="211.85" cy="260.31" rx="15.30" ry="15.30" fill="#FFFFFF" stroke="#000000" stroke-width="1.00"/>
+<text x="211.85" y="263.11" font-size="8.12" text-anchor="middle" fill="#000000">TT</text>
+<ellipse cx="264.46" cy="260.31" rx="15.30" ry="15.30" fill="#FFFFFF" stroke="#000000" stroke-width="1.00"/>
+<text x="264.46" y="263.11" font-size="8.12" text-anchor="middle" fill="#000000">TF</text>
+<path d="M227.08 260.31 L249.23 260.31" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round" stroke-dasharray="6,4"/>
+<path d="M260.96 322.20 L267.96 329.20" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round"/>
+<path d="M260.96 328.50 L267.96 335.50" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round"/>
+<path d="M264.46 275.54 L264.46 382.15" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round" stroke-dasharray="6,4"/>
+<path d="M211.85 275.54 L211.85 292.15 L191.08 296.31" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round" stroke-dasharray="6,4"/>
+<path d="M278.58 315.04 L285.58 308.04" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round"/>
+<path d="M284.88 315.04 L291.88 308.04" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round"/>
+<path d="M206.31 311.54 L364.15 311.54 L364.15 336.46 L373.85 336.46" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round" stroke-dasharray="6,4"/>
+<ellipse cx="294.92" cy="585.69" rx="4.50" ry="4.50" fill="#000000" stroke="#000000" stroke-width="0.62"/>
+<path d="M211.57 582.19 L204.57 589.19" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round"/>
+<path d="M205.27 582.19 L198.27 589.19" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round"/>
+<path d="M118.42 533.50 L111.42 526.50" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round"/>
+<path d="M118.42 527.20 L111.42 520.20" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round"/>
+<path d="M191.35 471.50 L198.35 464.50" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round"/>
+<path d="M197.65 471.50 L204.65 464.50" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round"/>
+<path d="M294.92 585.69 L114.92 585.69 L114.92 468.00 L281.08 468.00" fill="none" stroke="#000000" stroke-width="1.12" stroke-linejoin="round"/>
+<path d="M281.08 468.00 L275.60 470.45 L275.60 465.55 z" fill="#000000" stroke="none"/>
+<path d="M188.10 473.85 L207.90 462.15 L207.90 473.85 L188.10 462.15 L188.10 473.85" fill="#E6FFE6" stroke="#000000" stroke-width="1.50" stroke-linejoin="round"/>
+<path d="M198.00 468.00 L198.00 459.20" fill="none" stroke="#000000" stroke-width="1.50" stroke-linejoin="round"/>
+<path d="M188.65 459.20 A9.42 9.42 0 0 1 207.35 459.20" fill="none" stroke="#000000" stroke-width="1.50" stroke-linejoin="round"/>
+<path d="M188.65 459.20 L207.35 459.20" fill="none" stroke="#000000" stroke-width="1.50" stroke-linejoin="round"/>
+<ellipse cx="80.31" cy="544.15" rx="15.30" ry="15.30" fill="#FFFFFF" stroke="#000000" stroke-width="1.00"/>
+<text x="80.31" y="546.96" font-size="8.12" text-anchor="middle" fill="#000000">TT</text>
+<ellipse cx="80.31" cy="648.00" rx="15.30" ry="15.30" fill="#FFFFFF" stroke="#000000" stroke-width="1.00"/>
+<text x="80.31" y="650.80" font-size="8.12" text-anchor="middle" fill="#000000">TIC</text>
+<path d="M95.54 544.15 L114.92 544.15" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round" stroke-dasharray="6,4"/>
+<path d="M76.81 589.43 L83.81 596.43" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round"/>
+<path d="M76.81 595.73 L83.81 602.73" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round"/>
+<path d="M80.31 559.38 L80.31 632.77" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round" stroke-dasharray="6,4"/>
+<path d="M57.50 544.57 L50.50 537.57" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round"/>
+<path d="M57.50 538.27 L50.50 531.27" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round"/>
+<path d="M119.35 431.35 L126.35 424.35" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round"/>
+<path d="M125.65 431.35 L132.65 424.35" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round"/>
+<path d="M65.08 648.00 L54.00 648.00 L54.00 427.85 L198.00 427.85 L198.00 440.31" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round" stroke-dasharray="6,4"/>
+<path d="M471.50 202.57 L464.50 195.57" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round"/>
+<path d="M471.50 196.27 L464.50 189.27" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round"/>
+<path d="M443.50 159.88 L436.50 166.88" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round"/>
+<path d="M437.20 159.88 L430.20 166.88" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round"/>
+<path d="M468.00 228.46 L468.00 163.38 L405.69 163.38 L405.69 114.92 L375.23 114.92" fill="none" stroke="#000000" stroke-width="1.12" stroke-linejoin="round"/>
+<path d="M375.23 114.92 L380.71 112.48 L380.71 117.37 z" fill="#000000" stroke="none"/>
+<ellipse cx="430.62" cy="195.23" rx="15.30" ry="15.30" fill="#FFFFFF" stroke="#000000" stroke-width="1.00"/>
+<text x="430.62" y="198.03" font-size="8.12" text-anchor="middle" fill="#000000">TT</text>
+<ellipse cx="505.38" cy="195.23" rx="15.30" ry="15.30" fill="#FFFFFF" stroke="#000000" stroke-width="1.00"/>
+<text x="505.38" y="198.03" font-size="8.12" text-anchor="middle" fill="#000000">TF</text>
+<path d="M445.85 195.23 L468.00 195.23" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round" stroke-dasharray="6,4"/>
+<path d="M490.15 195.23 L468.00 195.23" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round" stroke-dasharray="6,4"/>
+<ellipse cx="537.23" cy="225.69" rx="15.30" ry="15.30" fill="#FFFFFF" stroke="#000000" stroke-width="1.00"/>
+<text x="537.23" y="228.50" font-size="8.12" text-anchor="middle" fill="#000000">LW</text>
+<ellipse cx="537.23" cy="350.31" rx="15.30" ry="15.30" fill="#FFFFFF" stroke="#000000" stroke-width="1.00"/>
+<text x="537.23" y="353.11" font-size="8.12" text-anchor="middle" fill="#000000">LC</text>
+<path d="M533.73 281.35 L540.73 288.35" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round"/>
+<path d="M533.73 287.65 L540.73 294.65" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round"/>
+<path d="M537.23 240.92 L537.23 335.08" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round" stroke-dasharray="6,4"/>
+<path d="M522.00 225.69 L498.46 239.54" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round" stroke-dasharray="6,4"/>
+<path d="M522.00 350.31 L498.46 339.23" fill="none" stroke="#000000" stroke-width="0.87" stroke-linejoin="round" stroke-dasharray="6,4"/>
+</svg>

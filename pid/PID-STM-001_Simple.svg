@@ -1,0 +1,204 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="992" height="701" viewBox="0 0 992 701" font-family="Arial, Liberation Sans, sans-serif">
+<rect width="100%" height="100%" fill="white"/>
+<path d="M24.00 677.40 L968.40 677.40 L968.40 24.00 L24.00 24.00 L24.00 677.40" fill="none" stroke="#000000" stroke-width="1.50" stroke-linejoin="round"/>
+<path d="M720.00 119.40 L966.00 119.40 L966.00 29.40 L720.00 29.40 L720.00 119.40" fill="#FFFFFF" stroke="#000000" stroke-width="1.17" stroke-linejoin="round"/>
+<path d="M720.00 56.40 L966.00 56.40" fill="none" stroke="#000000" stroke-width="0.50" stroke-linejoin="round"/>
+<text x="843.00" y="41.07" font-size="6.67" text-anchor="middle" fill="#000000" font-weight="bold">P&amp;ID SEDERHANA — SIKLUS UAP PLTU</text>
+<text x="843.00" y="48.73" font-size="6.67" text-anchor="middle" fill="#000000" font-weight="bold">DENGAN ECONOMIZER, STEAM DRUM &amp; SUPERHEATER</text>
+<text x="765.00" y="79.15" font-size="5.42" text-anchor="middle" fill="#000000" font-weight="bold">Dwg. No.</text>
+<text x="765.00" y="85.38" font-size="5.42" text-anchor="middle" fill="#000000" font-weight="bold">PID-STM-001</text>
+<text x="843.00" y="79.15" font-size="5.42" text-anchor="middle" fill="#000000">Rev. A</text>
+<text x="843.00" y="85.38" font-size="5.42" text-anchor="middle" fill="#000000">Issued for Review</text>
+<text x="921.00" y="79.15" font-size="5.42" text-anchor="middle" fill="#000000">A3 — NTS</text>
+<text x="921.00" y="85.38" font-size="5.42" text-anchor="middle" fill="#000000">Tag: ISA-5.1</text>
+<text x="843.00" y="112.12" font-size="5.00" text-anchor="middle" fill="#000000">Solid = proses (uap / air)     Dashed = sinyal instrumen     ⬡ = sistem luar / logika</text>
+<path d="M87.00 542.40 L282.00 542.40 L282.00 107.40 L87.00 107.40 L87.00 542.40" fill="none" stroke="#000000" stroke-width="0.83" stroke-linejoin="round" stroke-dasharray="6,4"/>
+<text x="186.00" y="121.70" font-size="6.67" text-anchor="middle" fill="#000000" font-weight="bold">BOILER</text>
+<path d="M114.00 536.40 L234.00 536.40 L234.00 482.40 L114.00 482.40 L114.00 536.40" fill="#FFFFFF" stroke="#000000" stroke-width="1.00" stroke-linejoin="round"/>
+<path d="M114.00 495.90 L123.00 495.90 L129.38 487.80 L142.12 504.00 L154.88 487.80 L167.62 504.00 L180.37 487.80 L193.12 504.00 L205.88 487.80 L218.62 504.00 L225.00 495.90 L234.00 495.90" fill="none" stroke="#000000" stroke-width="1.00" stroke-linejoin="round"/>
+<text x="174.00" y="523.29" font-size="5.83" text-anchor="middle" fill="#000000" font-weight="bold">ECONOMIZER</text>
+<path d="M114.00 434.40 L234.00 434.40 L234.00 386.40 L114.00 386.40 L114.00 434.40" fill="#FFFFFF" stroke="#000000" stroke-width="1.17" stroke-linejoin="round"/>
+<text x="174.00" y="409.15" font-size="5.42" text-anchor="middle" fill="#000000" font-weight="bold">EVAPORATOR</text>
+<text x="174.00" y="415.38" font-size="5.42" text-anchor="middle" fill="#000000" font-weight="bold">(WATER WALL)</text>
+<path d="M105.72 344.40 L242.28 344.40 A42.36 42.36 0 0 0 242.28 290.40 L105.72 290.40 A42.36 42.36 0 0 0 105.72 344.40" fill="#FFFFFF" stroke="#000000" stroke-width="1.17" stroke-linejoin="round"/>
+<text x="174.00" y="319.56" font-size="6.25" text-anchor="middle" fill="#000000" font-weight="bold">STEAM DRUM</text>
+<path d="M114.00 194.40 L234.00 194.40 L234.00 140.40 L114.00 140.40 L114.00 194.40" fill="#FFFFFF" stroke="#000000" stroke-width="1.00" stroke-linejoin="round"/>
+<path d="M114.00 153.90 L123.00 153.90 L129.38 145.80 L142.12 162.00 L154.88 145.80 L167.62 162.00 L180.37 145.80 L193.12 162.00 L205.88 145.80 L218.62 162.00 L225.00 153.90 L234.00 153.90" fill="none" stroke="#000000" stroke-width="1.00" stroke-linejoin="round"/>
+<text x="174.00" y="181.29" font-size="5.83" text-anchor="middle" fill="#000000" font-weight="bold">SUPERHEATER</text>
+<path d="M264.00 617.40 L264.00 509.40 L234.00 509.40" fill="none" stroke="#000000" stroke-width="1.83" stroke-linejoin="round"/>
+<path d="M234.00 509.40 L239.48 506.95 L239.48 511.85 z" fill="#000000" stroke="none"/>
+<path d="M114.00 509.40 L96.00 509.40 L96.00 317.40" fill="none" stroke="#000000" stroke-width="1.83" stroke-linejoin="round"/>
+<path d="M96.00 317.40 L98.45 322.88 L93.55 322.88 z" fill="#000000" stroke="none"/>
+<path d="M126.00 344.40 L126.00 386.40" fill="none" stroke="#000000" stroke-width="1.83" stroke-linejoin="round"/>
+<path d="M126.00 386.40 L123.55 380.92 L128.45 380.92 z" fill="#000000" stroke="none"/>
+<text x="105.00" y="364.35" font-size="4.58" text-anchor="middle" fill="#000000">DOWN-</text>
+<text x="105.00" y="369.62" font-size="4.58" text-anchor="middle" fill="#000000">COMER</text>
+<path d="M222.00 386.40 L222.00 344.40" fill="none" stroke="#000000" stroke-width="1.83" stroke-linejoin="round"/>
+<path d="M222.00 344.40 L224.45 349.88 L219.55 349.88 z" fill="#000000" stroke="none"/>
+<text x="243.00" y="366.98" font-size="4.58" text-anchor="middle" fill="#000000">RISER</text>
+<path d="M174.00 290.40 L174.00 245.40 L108.00 245.40 L108.00 167.40 L114.00 167.40" fill="none" stroke="#000000" stroke-width="1.83" stroke-linejoin="round"/>
+<path d="M114.00 167.40 L108.52 169.85 L108.52 164.95 z" fill="#000000" stroke="none"/>
+<text x="153.00" y="236.18" font-size="4.58" text-anchor="middle" fill="#000000">SAT. STEAM</text>
+<path d="M234.00 167.40 L516.00 167.40 L516.00 257.40 L642.00 257.40" fill="none" stroke="#000000" stroke-width="1.83" stroke-linejoin="round"/>
+<path d="M642.00 257.40 L636.52 259.85 L636.52 254.95 z" fill="#000000" stroke="none"/>
+<text x="474.00" y="157.27" font-size="5.42" text-anchor="middle" fill="#000000" font-weight="bold">MAIN STEAM</text>
+<ellipse cx="318.00" cy="317.40" rx="13.20" ry="13.20" fill="#FFFFFF" stroke="#000000" stroke-width="0.75"/>
+<text x="318.00" y="316.33" font-size="4.67" text-anchor="middle" fill="#000000" font-weight="bold">LT</text>
+<text x="318.00" y="321.69" font-size="4.67" text-anchor="middle" fill="#000000" font-weight="bold">01</text>
+<path d="M252.00 317.40 L304.80 317.40" fill="none" stroke="#000000" stroke-width="0.42" stroke-linejoin="round"/>
+<path d="M304.80 390.60 L331.20 390.60 L331.20 364.20 L304.80 364.20 L304.80 390.60" fill="#FFFFFF" stroke="#000000" stroke-width="0.75" stroke-linejoin="round"/>
+<ellipse cx="318.00" cy="377.40" rx="13.20" ry="13.20" fill="#FFFFFF" stroke="#000000" stroke-width="0.75"/>
+<path d="M307.80 377.40 L328.20 377.40" fill="none" stroke="#000000" stroke-width="0.75" stroke-linejoin="round"/>
+<text x="318.00" y="376.33" font-size="4.67" text-anchor="middle" fill="#000000" font-weight="bold">LIC</text>
+<text x="318.00" y="381.69" font-size="4.67" text-anchor="middle" fill="#000000" font-weight="bold">01</text>
+<path d="M318.00 330.60 L318.00 364.20" fill="none" stroke="#000000" stroke-width="0.62" stroke-linejoin="round" stroke-dasharray="6,4"/>
+<path d="M318.00 390.60 L318.00 554.40 L243.60 554.40 L243.60 559.80" fill="none" stroke="#000000" stroke-width="0.62" stroke-linejoin="round" stroke-dasharray="6,4"/>
+<path d="M243.60 559.80 L241.15 554.32 L246.05 554.32 z" fill="#000000" stroke="none"/>
+<path d="M259.20 578.40 L268.80 560.40 L268.80 578.40 L259.20 560.40 L259.20 578.40" fill="#FFFFFF" stroke="#000000" stroke-width="1.00" stroke-linejoin="round"/>
+<path d="M264.00 569.40 L258.00 569.40" fill="none" stroke="#000000" stroke-width="1.00" stroke-linejoin="round"/>
+<path d="M258.00 576.40 A7.08 7.08 0 0 1 258.00 562.40" fill="none" stroke="#000000" stroke-width="1.00" stroke-linejoin="round"/>
+<path d="M258.00 576.40 L258.00 562.40" fill="none" stroke="#000000" stroke-width="1.00" stroke-linejoin="round"/>
+<text x="275.40" y="568.25" font-size="5.00" text-anchor="start" fill="#000000" font-weight="bold">FCV-01</text>
+<text x="275.40" y="574.00" font-size="5.00" text-anchor="start" fill="#000000" font-weight="bold">FO</text>
+<path d="M331.20 317.40 L351.00 317.40" fill="none" stroke="#000000" stroke-width="0.62" stroke-linejoin="round" stroke-dasharray="6,4"/>
+<path d="M351.00 317.40 L345.52 319.85 L345.52 314.95 z" fill="#000000" stroke="none"/>
+<path d="M351.00 317.40 L361.80 328.20 L466.20 328.20 L477.00 317.40 L466.20 306.60 L361.80 306.60 L351.00 317.40" fill="none" stroke="#000000" stroke-width="0.83" stroke-linejoin="round"/>
+<text x="414.00" y="319.12" font-size="5.00" text-anchor="middle" fill="#000000" font-weight="bold">LSLL / LSHH → BOILER TRIP (MFT)</text>
+<ellipse cx="297.00" cy="521.40" rx="13.20" ry="13.20" fill="#FFFFFF" stroke="#000000" stroke-width="0.75"/>
+<text x="297.00" y="520.33" font-size="4.67" text-anchor="middle" fill="#000000" font-weight="bold">TT</text>
+<text x="297.00" y="525.69" font-size="4.67" text-anchor="middle" fill="#000000" font-weight="bold">02</text>
+<path d="M264.00 521.40 L283.80 521.40" fill="none" stroke="#000000" stroke-width="0.42" stroke-linejoin="round"/>
+<ellipse cx="318.00" cy="131.40" rx="13.20" ry="13.20" fill="#FFFFFF" stroke="#000000" stroke-width="0.75"/>
+<text x="318.00" y="130.33" font-size="4.67" text-anchor="middle" fill="#000000" font-weight="bold">TT</text>
+<text x="318.00" y="135.69" font-size="4.67" text-anchor="middle" fill="#000000" font-weight="bold">01</text>
+<path d="M318.00 167.40 L318.00 144.60" fill="none" stroke="#000000" stroke-width="0.42" stroke-linejoin="round"/>
+<path d="M304.80 96.60 L331.20 96.60 L331.20 70.20 L304.80 70.20 L304.80 96.60" fill="#FFFFFF" stroke="#000000" stroke-width="0.75" stroke-linejoin="round"/>
+<ellipse cx="318.00" cy="83.40" rx="13.20" ry="13.20" fill="#FFFFFF" stroke="#000000" stroke-width="0.75"/>
+<path d="M307.80 83.40 L328.20 83.40" fill="none" stroke="#000000" stroke-width="0.75" stroke-linejoin="round"/>
+<text x="318.00" y="82.33" font-size="4.67" text-anchor="middle" fill="#000000" font-weight="bold">TIC</text>
+<text x="318.00" y="87.69" font-size="4.67" text-anchor="middle" fill="#000000" font-weight="bold">01</text>
+<path d="M318.00 118.20 L318.00 96.60" fill="none" stroke="#000000" stroke-width="0.62" stroke-linejoin="round" stroke-dasharray="6,4"/>
+<path d="M304.80 83.40 L33.00 83.40 L33.00 401.40 L36.00 401.40" fill="none" stroke="#000000" stroke-width="0.62" stroke-linejoin="round" stroke-dasharray="6,4"/>
+<path d="M36.00 401.40 L30.52 403.85 L30.52 398.95 z" fill="#000000" stroke="none"/>
+<ellipse cx="366.00" cy="131.40" rx="13.20" ry="13.20" fill="#FFFFFF" stroke="#000000" stroke-width="0.75"/>
+<text x="366.00" y="130.33" font-size="4.67" text-anchor="middle" fill="#000000" font-weight="bold">PT</text>
+<text x="366.00" y="135.69" font-size="4.67" text-anchor="middle" fill="#000000" font-weight="bold">01</text>
+<path d="M366.00 167.40 L366.00 144.60" fill="none" stroke="#000000" stroke-width="0.42" stroke-linejoin="round"/>
+<ellipse cx="312.00" cy="617.40" rx="3.00" ry="3.00" fill="#000000" stroke="#000000" stroke-width="0.42"/>
+<path d="M312.00 617.40 L312.00 641.40 L54.00 641.40 L54.00 245.40 L108.00 245.40" fill="none" stroke="#000000" stroke-width="1.00" stroke-linejoin="round"/>
+<path d="M108.00 245.40 L102.52 247.85 L102.52 242.95 z" fill="#000000" stroke="none"/>
+<path d="M49.20 410.40 L58.80 392.40 L58.80 410.40 L49.20 392.40 L49.20 410.40" fill="#FFFFFF" stroke="#000000" stroke-width="1.00" stroke-linejoin="round"/>
+<path d="M54.00 401.40 L48.00 401.40" fill="none" stroke="#000000" stroke-width="1.00" stroke-linejoin="round"/>
+<path d="M48.00 408.40 A7.08 7.08 0 0 1 48.00 394.40" fill="none" stroke="#000000" stroke-width="1.00" stroke-linejoin="round"/>
+<path d="M48.00 408.40 L48.00 394.40" fill="none" stroke="#000000" stroke-width="1.00" stroke-linejoin="round"/>
+<text x="65.40" y="400.25" font-size="5.00" text-anchor="start" fill="#000000" font-weight="bold">TCV-01</text>
+<text x="65.40" y="406.00" font-size="5.00" text-anchor="start" fill="#000000" font-weight="bold">FC</text>
+<text x="67.80" y="651.98" font-size="4.58" text-anchor="start" fill="#000000">SPRAY WATER (ATTEMPERATOR)</text>
+<path d="M432.00 167.40 L432.00 149.40" fill="none" stroke="#000000" stroke-width="1.00" stroke-linejoin="round"/>
+<path d="M427.20 149.40 L436.80 131.40 L436.80 149.40 L427.20 131.40 L427.20 149.40" fill="#FFFFFF" stroke="#000000" stroke-width="1.00" stroke-linejoin="round"/>
+<text x="443.40" y="142.12" font-size="5.00" text-anchor="start" fill="#000000" font-weight="bold">PSV-01</text>
+<path d="M432.00 131.40 L432.00 119.40" fill="none" stroke="#000000" stroke-width="1.00" stroke-linejoin="round"/>
+<path d="M432.00 119.40 L434.45 124.88 L429.55 124.88 z" fill="#000000" stroke="none"/>
+<path d="M417.00 114.00 L417.00 52.80 A23.53 23.53 0 0 1 447.00 52.80 L447.00 114.00 A23.53 23.53 0 0 1 417.00 114.00" fill="#FFFFFF" stroke="#000000" stroke-width="1.17" stroke-linejoin="round"/>
+<text x="454.80" y="85.27" font-size="5.42" text-anchor="start" fill="#000000" font-weight="bold">SILENCER</text>
+<path d="M432.00 47.40 L432.00 32.40" fill="none" stroke="#000000" stroke-width="0.83" stroke-linejoin="round"/>
+<path d="M432.00 32.40 L434.45 37.88 L429.55 37.88 z" fill="#000000" stroke="none"/>
+<text x="439.80" y="36.98" font-size="4.58" text-anchor="start" fill="#000000">VENT</text>
+<path d="M542.40 262.80 L561.60 252.00 L561.60 262.80 L542.40 252.00 L542.40 262.80" fill="#FFFFFF" stroke="#000000" stroke-width="1.00" stroke-linejoin="round"/>
+<path d="M552.00 257.40 L552.00 248.87" fill="none" stroke="#000000" stroke-width="1.00" stroke-linejoin="round"/>
+<path d="M542.93 248.87 A9.14 9.14 0 0 1 561.07 248.87" fill="none" stroke="#000000" stroke-width="1.00" stroke-linejoin="round"/>
+<path d="M542.93 248.87 L561.07 248.87" fill="none" stroke="#000000" stroke-width="1.00" stroke-linejoin="round"/>
+<text x="552.00" y="273.05" font-size="5.00" text-anchor="middle" fill="#000000" font-weight="bold">MSV-01</text>
+<text x="552.00" y="278.80" font-size="5.00" text-anchor="middle" fill="#000000" font-weight="bold">STOP</text>
+<path d="M590.40 262.80 L609.60 252.00 L609.60 262.80 L590.40 252.00 L590.40 262.80" fill="#FFFFFF" stroke="#000000" stroke-width="1.00" stroke-linejoin="round"/>
+<path d="M600.00 257.40 L600.00 248.87" fill="none" stroke="#000000" stroke-width="1.00" stroke-linejoin="round"/>
+<path d="M590.93 248.87 A9.14 9.14 0 0 1 609.07 248.87" fill="none" stroke="#000000" stroke-width="1.00" stroke-linejoin="round"/>
+<path d="M590.93 248.87 L609.07 248.87" fill="none" stroke="#000000" stroke-width="1.00" stroke-linejoin="round"/>
+<text x="600.00" y="273.05" font-size="5.00" text-anchor="middle" fill="#000000" font-weight="bold">GV-01</text>
+<text x="600.00" y="278.80" font-size="5.00" text-anchor="middle" fill="#000000" font-weight="bold">CONTROL</text>
+<path d="M513.00 185.40 L523.80 196.20 L580.20 196.20 L591.00 185.40 L580.20 174.60 L523.80 174.60 L513.00 185.40" fill="none" stroke="#000000" stroke-width="0.83" stroke-linejoin="round"/>
+<text x="552.00" y="187.27" font-size="5.42" text-anchor="middle" fill="#000000" font-weight="bold">TURBINE TRIP</text>
+<path d="M603.00 185.40 L613.80 196.20 L658.20 196.20 L669.00 185.40 L658.20 174.60 L613.80 174.60 L603.00 185.40" fill="none" stroke="#000000" stroke-width="0.83" stroke-linejoin="round"/>
+<text x="636.00" y="187.27" font-size="5.42" text-anchor="middle" fill="#000000" font-weight="bold">GOVERNOR</text>
+<path d="M552.00 196.20 L552.00 231.00" fill="none" stroke="#000000" stroke-width="0.62" stroke-linejoin="round" stroke-dasharray="6,4"/>
+<path d="M552.00 231.00 L549.55 225.52 L554.45 225.52 z" fill="#000000" stroke="none"/>
+<path d="M636.00 196.20 L636.00 215.40 L600.00 215.40 L600.00 231.00" fill="none" stroke="#000000" stroke-width="0.62" stroke-linejoin="round" stroke-dasharray="6,4"/>
+<path d="M600.00 231.00 L597.55 225.52 L602.45 225.52 z" fill="#000000" stroke="none"/>
+<path d="M642.00 290.40 L714.00 311.40 L714.00 227.40 L642.00 248.40 L642.00 290.40" fill="#FFFFFF" stroke="#000000" stroke-width="1.17" stroke-linejoin="round"/>
+<text x="612.00" y="319.15" font-size="5.42" text-anchor="middle" fill="#000000" font-weight="bold">STEAM</text>
+<text x="612.00" y="325.38" font-size="5.42" text-anchor="middle" fill="#000000" font-weight="bold">TURBINE</text>
+<path d="M714.00 273.60 L768.00 273.60" fill="none" stroke="#000000" stroke-width="1.00" stroke-linejoin="round"/>
+<path d="M714.00 265.20 L768.00 265.20" fill="none" stroke="#000000" stroke-width="1.00" stroke-linejoin="round"/>
+<ellipse cx="798.00" cy="269.40" rx="30.00" ry="30.00" fill="#FFFFFF" stroke="#000000" stroke-width="1.17"/>
+<path d="M780.00 269.40 L782.25 266.19 L784.50 263.46 L786.75 261.64 L789.00 261.00 L791.25 261.64 L793.50 263.46 L795.75 266.19 L798.00 269.40 L800.25 272.61 L802.50 275.34 L804.75 277.16 L807.00 277.80 L809.25 277.16 L811.50 275.34 L813.75 272.61 L816.00 269.40" fill="none" stroke="#000000" stroke-width="1.17" stroke-linejoin="round"/>
+<text x="798.00" y="313.27" font-size="5.42" text-anchor="middle" fill="#000000" font-weight="bold">GENERATOR</text>
+<path d="M678.00 311.40 L678.00 425.40" fill="none" stroke="#000000" stroke-width="1.83" stroke-linejoin="round"/>
+<path d="M678.00 425.40 L675.55 419.92 L680.45 419.92 z" fill="#000000" stroke="none"/>
+<ellipse cx="711.00" cy="353.40" rx="13.20" ry="13.20" fill="#FFFFFF" stroke="#000000" stroke-width="0.75"/>
+<text x="711.00" y="352.33" font-size="4.67" text-anchor="middle" fill="#000000" font-weight="bold">PT</text>
+<text x="711.00" y="357.69" font-size="4.67" text-anchor="middle" fill="#000000" font-weight="bold">02</text>
+<path d="M678.00 353.40 L697.80 353.40" fill="none" stroke="#000000" stroke-width="0.42" stroke-linejoin="round"/>
+<ellipse cx="711.00" cy="389.40" rx="13.20" ry="13.20" fill="#FFFFFF" stroke="#000000" stroke-width="0.75"/>
+<text x="711.00" y="388.33" font-size="4.67" text-anchor="middle" fill="#000000" font-weight="bold">TT</text>
+<text x="711.00" y="393.69" font-size="4.67" text-anchor="middle" fill="#000000" font-weight="bold">03</text>
+<path d="M678.00 389.40 L697.80 389.40" fill="none" stroke="#000000" stroke-width="0.42" stroke-linejoin="round"/>
+<path d="M630.00 539.40 L726.00 539.40 L726.00 455.40 L693.00 425.40 L663.00 425.40 L630.00 455.40 L630.00 539.40" fill="#FFFFFF" stroke="#000000" stroke-width="1.17" stroke-linejoin="round"/>
+<text x="678.00" y="484.56" font-size="6.25" text-anchor="middle" fill="#000000" font-weight="bold">CONDENSER</text>
+<ellipse cx="606.00" cy="497.40" rx="13.20" ry="13.20" fill="#FFFFFF" stroke="#000000" stroke-width="0.75"/>
+<text x="606.00" y="496.33" font-size="4.67" text-anchor="middle" fill="#000000" font-weight="bold">LT</text>
+<text x="606.00" y="501.69" font-size="4.67" text-anchor="middle" fill="#000000" font-weight="bold">02</text>
+<path d="M630.00 497.40 L619.20 497.40" fill="none" stroke="#000000" stroke-width="0.42" stroke-linejoin="round"/>
+<path d="M834.00 521.40 L918.00 521.40 L909.00 449.40 L843.00 449.40 L834.00 521.40" fill="#FFFFFF" stroke="#000000" stroke-width="1.17" stroke-linejoin="round"/>
+<path d="M858.00 449.40 L894.00 449.40 L894.00 431.40 L858.00 431.40 L858.00 449.40" fill="#FFFFFF" stroke="#000000" stroke-width="1.17" stroke-linejoin="round"/>
+<path d="M858.00 449.40 L894.00 431.40" fill="none" stroke="#000000" stroke-width="1.17" stroke-linejoin="round"/>
+<path d="M858.00 431.40 L894.00 449.40" fill="none" stroke="#000000" stroke-width="1.17" stroke-linejoin="round"/>
+<text x="876.00" y="472.04" font-size="5.42" text-anchor="middle" fill="#000000" font-weight="bold"></text>
+<text x="876.00" y="478.27" font-size="5.42" text-anchor="middle" fill="#000000" font-weight="bold">COOLING</text>
+<text x="876.00" y="484.50" font-size="5.42" text-anchor="middle" fill="#000000" font-weight="bold">TOWER</text>
+<path d="M876.00 521.40 L876.00 635.40 L840.00 635.40" fill="none" stroke="#000000" stroke-width="1.83" stroke-linejoin="round"/>
+<ellipse cx="822.00" cy="635.40" rx="18.00" ry="18.00" fill="#FFFFFF" stroke="#000000" stroke-width="1.17"/>
+<path d="M812.10 643.50 L832.80 635.40 L812.10 627.30 L812.10 643.50" fill="none" stroke="#000000" stroke-width="1.17" stroke-linejoin="round"/>
+<text x="822.00" y="610.87" font-size="5.42" text-anchor="middle" fill="#000000" font-weight="bold">CW PUMP</text>
+<path d="M804.00 635.40 L774.00 635.40 L774.00 515.40 L726.00 515.40" fill="none" stroke="#000000" stroke-width="1.83" stroke-linejoin="round"/>
+<path d="M726.00 515.40 L731.48 512.95 L731.48 517.85 z" fill="#000000" stroke="none"/>
+<path d="M726.00 479.40 L804.00 479.40 L804.00 461.40 L834.00 461.40" fill="none" stroke="#000000" stroke-width="1.83" stroke-linejoin="round"/>
+<path d="M834.00 461.40 L828.52 463.85 L828.52 458.95 z" fill="#000000" stroke="none"/>
+<text x="765.00" y="470.18" font-size="4.58" text-anchor="middle" fill="#000000">CW</text>
+<path d="M678.00 539.40 L678.00 635.40 L594.00 635.40" fill="none" stroke="#000000" stroke-width="1.83" stroke-linejoin="round"/>
+<ellipse cx="576.00" cy="635.40" rx="18.00" ry="18.00" fill="#FFFFFF" stroke="#000000" stroke-width="1.17"/>
+<path d="M566.10 643.50 L586.80 635.40 L566.10 627.30 L566.10 643.50" fill="none" stroke="#000000" stroke-width="1.17" stroke-linejoin="round"/>
+<text x="576.00" y="602.35" font-size="5.42" text-anchor="middle" fill="#000000" font-weight="bold">CONDENSATE</text>
+<text x="576.00" y="608.58" font-size="5.42" text-anchor="middle" fill="#000000" font-weight="bold">PUMP</text>
+<path d="M558.00 635.40 L510.00 635.40 L510.00 521.40 L486.00 521.40" fill="none" stroke="#000000" stroke-width="1.83" stroke-linejoin="round"/>
+<path d="M486.00 521.40 L491.48 518.95 L491.48 523.85 z" fill="#000000" stroke="none"/>
+<path d="M450.00 574.92 L450.00 515.88 A28.24 28.24 0 0 1 486.00 515.88 L486.00 574.92 A28.24 28.24 0 0 1 450.00 574.92" fill="#FFFFFF" stroke="#000000" stroke-width="1.17" stroke-linejoin="round"/>
+<text x="443.40" y="565.27" font-size="5.42" text-anchor="end" fill="#000000" font-weight="bold">DEAERATOR</text>
+<ellipse cx="426.00" cy="533.40" rx="13.20" ry="13.20" fill="#FFFFFF" stroke="#000000" stroke-width="0.75"/>
+<text x="426.00" y="532.33" font-size="4.67" text-anchor="middle" fill="#000000" font-weight="bold">LT</text>
+<text x="426.00" y="537.69" font-size="4.67" text-anchor="middle" fill="#000000" font-weight="bold">03</text>
+<path d="M450.00 533.40 L439.20 533.40" fill="none" stroke="#000000" stroke-width="0.42" stroke-linejoin="round"/>
+<path d="M423.00 443.40 L433.80 454.20 L502.20 454.20 L513.00 443.40 L502.20 432.60 L433.80 432.60 L423.00 443.40" fill="none" stroke="#000000" stroke-width="0.83" stroke-linejoin="round"/>
+<text x="468.00" y="445.12" font-size="5.00" text-anchor="middle" fill="#000000" font-weight="bold">AUX / EXTRACTION STEAM</text>
+<path d="M468.00 454.20 L468.00 509.40" fill="none" stroke="#000000" stroke-width="1.00" stroke-linejoin="round"/>
+<path d="M468.00 509.40 L465.55 503.92 L470.45 503.92 z" fill="#000000" stroke="none"/>
+<path d="M468.00 581.40 L468.00 617.40 L420.00 617.40" fill="none" stroke="#000000" stroke-width="1.83" stroke-linejoin="round"/>
+<ellipse cx="402.00" cy="617.40" rx="18.00" ry="18.00" fill="#FFFFFF" stroke="#000000" stroke-width="1.17"/>
+<path d="M392.10 625.50 L412.80 617.40 L392.10 609.30 L392.10 625.50" fill="none" stroke="#000000" stroke-width="1.17" stroke-linejoin="round"/>
+<text x="402.00" y="584.35" font-size="5.42" text-anchor="middle" fill="#000000" font-weight="bold">BOILER FEED</text>
+<text x="402.00" y="590.58" font-size="5.42" text-anchor="middle" fill="#000000" font-weight="bold">PUMP</text>
+<path d="M384.00 617.40 L264.00 617.40" fill="none" stroke="#000000" stroke-width="1.83" stroke-linejoin="round"/>
+<path d="M343.20 627.00 L352.80 627.00 L352.80 607.80 L343.20 607.80 L343.20 627.00" fill="#FFFFFF" stroke="#000000" stroke-width="0.83" stroke-linejoin="round"/>
+<ellipse cx="348.00" cy="584.40" rx="13.20" ry="13.20" fill="#FFFFFF" stroke="#000000" stroke-width="0.75"/>
+<text x="348.00" y="583.33" font-size="4.67" text-anchor="middle" fill="#000000" font-weight="bold">FT</text>
+<text x="348.00" y="588.69" font-size="4.67" text-anchor="middle" fill="#000000" font-weight="bold">01</text>
+<path d="M348.00 607.80 L348.00 597.60" fill="none" stroke="#000000" stroke-width="0.42" stroke-linejoin="round"/>
+<text x="210.00" y="629.92" font-size="5.00" text-anchor="middle" fill="#000000" font-weight="bold">FEEDWATER  →  ECONOMIZER</text>
+<path d="M498.00 143.40 L708.00 143.40 L708.00 29.40 L498.00 29.40 L498.00 143.40" fill="#FFFFFF" stroke="#000000" stroke-width="0.67" stroke-linejoin="round"/>
+<text x="499.80" y="35.49" font-size="4.67" text-anchor="start" fill="#000000">URUTAN PROSES: Kondensat → Deaerator → BFP → Economizer (pemanas awal air) → Steam Drum</text>
+<text x="499.80" y="40.86" font-size="4.67" text-anchor="start" fill="#000000">→ Evaporator/Riser → Drum → Superheater → Main Steam → MSV/GV → Turbin → Generator; uap</text>
+<text x="499.80" y="46.23" font-size="4.67" text-anchor="start" fill="#000000">bekas → Kondensor (pendingin dari Cooling Tower) → kembali ke Deaerator.</text>
+<text x="499.80" y="51.59" font-size="4.67" text-anchor="start" fill="#000000">KONTROL: LIC-01 level drum → FCV-01 air pengisi;  TIC-01 suhu uap keluar superheater →</text>
+<text x="499.80" y="56.96" font-size="4.67" text-anchor="start" fill="#000000">TCV-01 spray attemperator;  GOVERNOR → GV-01 (beban/putaran).</text>
+<text x="499.80" y="62.33" font-size="4.67" text-anchor="start" fill="#000000">PROTEKSI: LSLL/LSHH drum → Boiler Trip (MFT);  TURBINE TRIP → MSV-01 menutup (fail</text>
+<text x="499.80" y="67.69" font-size="4.67" text-anchor="start" fill="#000000">close);  PSV-01 melepas uap lebih ke Silencer.</text>
+</svg>

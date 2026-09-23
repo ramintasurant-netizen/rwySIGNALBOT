@@ -1,0 +1,25 @@
+﻿Tag,Valve type,Size,Fail position,Service,Note
+LV-101,"Globe control valve, diaphragm","10""",FC,Deaerator level control (condensate inlet),
+PV-101,"Globe control valve, diaphragm","8""",FC,Deaerator pressure (pegging steam),
+PSV-101,Spring-loaded safety relief valve,"6""×8""",-,Deaerator overpressure protection,"Set 9.5 barg, ASME VIII"
+MOV-101A,"Gate valve, motor operated","16""",FL,Suction isolation train A,ZSO/ZSC limit switches
+CV-108A,"Swing check, non-slam (dashpot)","10""",-,BFP A discharge,
+MOV-108A,"Gate valve, motor operated","10""",FL,BFP A discharge isolation,Opens after pump speed ≥ min
+FV-109A,Angle multistage pressure-reducing control valve,"6""",FO,Min-flow recirculation BFP A,"Anti-cavitation trim, ΔP ≈ 185 bar"
+MOV-101B,"Gate valve, motor operated","16""",FL,Suction isolation train B,ZSO/ZSC limit switches
+CV-108B,"Swing check, non-slam (dashpot)","10""",-,BFP B discharge,
+MOV-108B,"Gate valve, motor operated","10""",FL,BFP B discharge isolation,Opens after pump speed ≥ min
+FV-109B,Angle multistage pressure-reducing control valve,"6""",FO,Min-flow recirculation BFP B,"Anti-cavitation trim, ΔP ≈ 185 bar"
+MOV-101C,"Gate valve, motor operated","16""",FL,Suction isolation train C,ZSO/ZSC limit switches
+CV-108C,"Swing check, non-slam (dashpot)","10""",-,BFP C discharge,
+MOV-108C,"Gate valve, motor operated","10""",FL,BFP C discharge isolation,Opens after pump speed ≥ min
+FV-109C,Angle multistage pressure-reducing control valve,"6""",FO,Min-flow recirculation BFP C,"Anti-cavitation trim, ΔP ≈ 185 bar"
+MOV-131,"Gate valve, motor operated","16""",FL,HP heater group inlet isolation,Fast-acting (< 10 s) on tube leak
+MOV-132,"Gate valve, motor operated","16""",FL,HP heater group outlet isolation,Fast-acting (< 10 s) on tube leak
+XV-106,Extraction steam quick-closing valve + NRV,"14""",FC,Extraction #6 to E-101,Closes on heater LSHH / turbine trip
+XV-107,Extraction steam quick-closing valve + NRV,"12""",FC,Extraction #7 to E-102,Closes on heater LSHH / turbine trip
+LV-114A,"Globe control valve, diaphragm","6""",FC,E-101 normal drain to V-101B (cascade),"LV-114B emergency drain 6"" FO → condenser (not shown)"
+LV-115A,"Globe control valve, diaphragm","4""",FC,E-102 normal drain to E-101 shell (cascade),"LV-115B emergency drain 4"" FO → condenser (not shown)"
+MOV-130,"Gate valve, motor operated, fast-acting","16""",FL (NC),HP heater group bypass,Opens < 10 s on I-3
+FCV-116,"Globe control valve, cage-guided, equal-%, pneumatic diaphragm + positioner","14""",FO,Main feedwater control (3-element),Cv sized 110 % MCR; hold-last on MFT
+FCV-119,"Globe control valve, anti-cavitation multistage, pneumatic","6""",FO,Start-up / low-load feedwater control (1-element),Bumpless transfer ↔ FCV-116 at 30 % steam flow

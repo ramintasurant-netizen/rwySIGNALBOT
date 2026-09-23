@@ -1,0 +1,52 @@
+﻿Tag (ISA-5.1),Instrument type,Service,Location / Line,Range / Setpoint,I/O,Alarm / Interlock / Note
+LT-101A/B/C,"Level transmitter (dP), 2oo3",Deaerator storage level,V-101B side nozzles,0–2500 mmWC,AI ×3,LAH/LAL/LALL alarm; LSLL trip via SIS
+LIC-101,Level indicating controller (DCS),DA level,DCS,0–100 %,AO → LV-101,Split-range to overflow valve LV-101B at LAH
+LSLL-101,Level switch low-low (SIS voting 2oo3),BFP protection,SIS,trip @ 15 %,DO,Interlock I-1
+PT-101,Pressure transmitter,Deaerator pressure,V-101A top,0–16 barg,AI,PAH 8.5 / PAL 5.5 barg
+PIC-101,Pressure indicating controller (DCS),DA pressure,DCS,0–16 barg,AO → PV-101,
+TT-101,"Temperature transmitter, RTD Pt100 + thermowell",FW temperature at DA outlet,"V-101B / 24""-FW-101",0–250 °C,AI,TAL 155 °C (deaeration check)
+PT-102A,Pressure transmitter,Booster suction A,"16""-FW-101A",0–16 barg,AI,"PSLL 4 barg → trip (I-1), 3 s delay"
+PDT-103A,Differential pressure transmitter,Suction strainer SR-103A ΔP,across strainer,0–1 bar,AI,PDAH 0.3 bar
+TT-104A,RTD bearing temperature (×4),P-100/P-101A bearings,bearing housings,0–150 °C,AI,TAH 80 / TSHH 90 °C trip (I-2)
+VT-105A,"Vibration transmitter (×2, radial)",P-101A bearings,bearing housings,0–25 mm/s,AI,VAH 7.1 / VSHH 11 mm/s trip (I-2)
+PT-106A,Lube oil pressure transmitter,P-101A lube oil,lube oil skid,0–6 barg,AI,PSLL 1.0 barg trip (I-2); PSH permissive
+PT-108A,Pressure transmitter,BFP A discharge,"10""-FW-108A",0–250 barg,AI,PAL 170 barg (pump health)
+FE/FT-109A,Orifice plate + dP transmitter,BFP A discharge flow,"10""-FW-108A",0–700 m³/h,AI,Min-flow control; FSLL 20 % trip if FV-109 not open (I-2)
+FIC-109A,Flow indicating controller (DCS),Min-flow recirculation,DCS,0–700 m³/h,AO → FV-109A,"Open <25 % BEP, close >35 % (hysteresis)"
+SC-110A,Speed controller (VSC hydraulic coupling),BFP A speed,local / DCS,0–100 %,AO,Setpoint from PDIC-110
+PT-102B,Pressure transmitter,Booster suction B,"16""-FW-101B",0–16 barg,AI,"PSLL 4 barg → trip (I-1), 3 s delay"
+PDT-103B,Differential pressure transmitter,Suction strainer SR-103B ΔP,across strainer,0–1 bar,AI,PDAH 0.3 bar
+TT-104B,RTD bearing temperature (×4),P-100/P-101B bearings,bearing housings,0–150 °C,AI,TAH 80 / TSHH 90 °C trip (I-2)
+VT-105B,"Vibration transmitter (×2, radial)",P-101B bearings,bearing housings,0–25 mm/s,AI,VAH 7.1 / VSHH 11 mm/s trip (I-2)
+PT-106B,Lube oil pressure transmitter,P-101B lube oil,lube oil skid,0–6 barg,AI,PSLL 1.0 barg trip (I-2); PSH permissive
+PT-108B,Pressure transmitter,BFP B discharge,"10""-FW-108B",0–250 barg,AI,PAL 170 barg (pump health)
+FE/FT-109B,Orifice plate + dP transmitter,BFP B discharge flow,"10""-FW-108B",0–700 m³/h,AI,Min-flow control; FSLL 20 % trip if FV-109 not open (I-2)
+FIC-109B,Flow indicating controller (DCS),Min-flow recirculation,DCS,0–700 m³/h,AO → FV-109B,"Open <25 % BEP, close >35 % (hysteresis)"
+SC-110B,Speed controller (VSC hydraulic coupling),BFP B speed,local / DCS,0–100 %,AO,Setpoint from PDIC-110
+PT-102C,Pressure transmitter,Booster suction C,"16""-FW-101C",0–16 barg,AI,"PSLL 4 barg → trip (I-1), 3 s delay"
+PDT-103C,Differential pressure transmitter,Suction strainer SR-103C ΔP,across strainer,0–1 bar,AI,PDAH 0.3 bar
+TT-104C,RTD bearing temperature (×4),P-100/P-101C bearings,bearing housings,0–150 °C,AI,TAH 80 / TSHH 90 °C trip (I-2)
+VT-105C,"Vibration transmitter (×2, radial)",P-101C bearings,bearing housings,0–25 mm/s,AI,VAH 7.1 / VSHH 11 mm/s trip (I-2)
+PT-106C,Lube oil pressure transmitter,P-101C lube oil,lube oil skid,0–6 barg,AI,PSLL 1.0 barg trip (I-2); PSH permissive
+PT-108C,Pressure transmitter,BFP C discharge,"10""-FW-108C",0–250 barg,AI,PAL 170 barg (pump health)
+FE/FT-109C,Orifice plate + dP transmitter,BFP C discharge flow,"10""-FW-108C",0–700 m³/h,AI,Min-flow control; FSLL 20 % trip if FV-109 not open (I-2)
+FIC-109C,Flow indicating controller (DCS),Min-flow recirculation,DCS,0–700 m³/h,AO → FV-109C,"Open <25 % BEP, close >35 % (hysteresis)"
+SC-110C,Speed controller (VSC hydraulic coupling),BFP C speed,local / DCS,0–100 %,AO,Setpoint from PDIC-110
+PT-110,Pressure transmitter,Discharge header pressure,"16""-FW-110",0–250 barg,AI,PAL 175 barg → auto-start standby (I-4)
+PDIC-110,ΔP indicating controller header–drum (DCS),BFP speed control,DCS,0–30 bar,AO → SC-110 A/B/C,SP ≈ 10 bar so FCV-116 works 40–80 % open; input PT-117 (drum)
+TT-111,RTD Pt100 + thermowell,FW inlet E-101,"16""-FW-110",0–300 °C,AI,TTD monitoring; TAL on TT-113 235 °C
+TT-112,RTD Pt100 + thermowell,FW between heaters,"16""-FW-111",0–300 °C,AI,TTD monitoring; TAL on TT-113 235 °C
+TT-113,RTD Pt100 + thermowell,FW outlet E-102 (final FW temp),"16""-FW-113",0–300 °C,AI,TTD monitoring; TAL on TT-113 235 °C
+LT-114 A/B/C,"Level transmitter dP, 2oo3 (A/B/C)",E-101 shell level,E-101 shell,0–800 mm,AI ×3,LIC-114 → LV-114A; LAH → LV-114B; LSHH → I-3
+LT-115 A/B/C,"Level transmitter dP, 2oo3 (A/B/C)",E-102 shell level,E-102 shell,0–800 mm,AI ×3,LIC-115 → LV-115A; LAH → LV-115B; LSHH → I-3
+FE/FT-116,"Flow nozzle + dP transmitter, P/T compensated (PT-116, TT-113)",Total feedwater flow,"16""-FW-113",0–1200 t/h,AI,3rd element of drum level control
+PT-116,Pressure transmitter,FW pressure at control station (compensation),"16""-FW-113",0–250 barg,AI,
+FIC-116,Flow indicating controller / 3-element drum level (DCS),Main FW control,DCS,0–1200 t/h,AO → FCV-116 / FCV-119,Cascade from LIC-117 + FF FT-118; auto 1-element < 30 %
+ZT-116 / ZT-119,Valve position transmitters,FCV-116 / FCV-119 stem position,valve actuators,0–100 %,AI,Deviation alarm 5 %
+PT-120,Pressure transmitter,Economizer inlet pressure,"16""-FW-116",0–250 barg,AI,PAL 175 barg
+TT-120,RTD Pt100 + thermowell,Economizer inlet temperature,"16""-FW-116",0–300 °C,AI,
+AT-121,"Analyser panel: pH, DO, cation conductivity, Na",FW chemistry at ECO inlet,"16""-FW-116 sample",pH 9.2–9.6; DO < 7 ppb,AI ×4,AAH DO 10 ppb
+LT-117 A/B/C,"Drum level dP transmitters 2oo3, P-compensated",Steam drum level,Steam drum,±300 mm,AI ×3,LSLL/LSHH → MFT (I-5)
+LIC-117,"Drum level controller (DCS), master of 3-element",Drum level,DCS,±300 mm,SP → FIC-116,
+FT-118,"Main steam flow (nozzle), P/T compensated",Feedforward,Main steam line,0–1100 t/h,AI,
+PT-117,Drum pressure transmitter,PDIC-110 reference,Steam drum,0–250 barg,AI,
