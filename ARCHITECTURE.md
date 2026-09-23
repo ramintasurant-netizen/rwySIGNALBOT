@@ -1107,3 +1107,24 @@ MDD 8,8 %): kerugian dan drawdown berkurang, tetapi trade yang lolos di sesi net
 jumlah trade OOS < 30 ⇒ **gate tetap tidak lulus**. Langkah riset berikutnya (di luar lingkup ini):
 `REGIME_BLOCK_NEUTRAL=true`, bobot per strategi (breakout −0,29R IS / −0,49R OOS konsisten negatif),
 universe lebih besar untuk jumlah trade — semuanya diuji di in-sample dulu.
+
+---
+
+## 29. Riset kalibrasi yang disiplin (2026-09-24 WIB)
+
+- `backtest/research.py` + `main.py research`: data diunduh **sekali** ke cache CSV (`var/research/cache`),
+  grid 8 varian bermotivasi (base, tanpa rezim, rezim menahan netral, tanpa breakout, tanpa
+  breakout+reversal, masa tahan 10, threshold 80, kombinasi) dievaluasi **hanya in-sample**; `--oos-for`
+  mengevaluasi satu varian pilihan **sekali** pada OOS. Setiap varian = konfigurasi engine berbeda
+  (`config_hash` berbeda). `SCORER_WEIGHTS` ditambahkan agar bobot per strategi dapat diatur di produksi.
+- Hasil in-sample (2025-01-02..2026-03-17, 12 saham): `no_breakout_reversal` PF 1,21 / +0,10R / MDD 5,3 %
+  (terbaik dengan trade cukup); `no_regime` PF 1,20 tetapi MDD lebih tinggi; `hold10` **merugikan** (PF 0,52,
+  MDD 18 %: memotong pemenang yang butuh waktu); `thr80` merugikan (PF 0,64: menyaring yang salah);
+  `block_neutral` mengurangi trade tanpa menambah edge.
+- **OOS satu kali** untuk `no_breakout_reversal` (2026-03-18..2026-09-22): 5 trade, −0,61R, PF 0,20 ⇒ **tidak
+  lulus**. Perbaikan in-sample tidak bertahan. Ini diterima sebagai temuan, bukan alasan untuk mencoba
+  varian lain pada OOS yang sama (itu akan menjadi in-sample terselubung).
+- Kesimpulan jujur: dengan universe 12 saham dan periode ~21 bulan, tidak ada konfigurasi yang layak
+  produksi. Langkah bermakna berikutnya bersifat data, bukan parameter: universe ≥ 40 saham likuid
+  (`config/universe_candidates.yaml`) dan periode lebih panjang, lalu prosedur yang sama diulang dengan OOS
+  yang **baru** (periode yang belum pernah dilihat).

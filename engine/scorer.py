@@ -50,6 +50,7 @@ class ScorerConfig:
     @classmethod
     def from_settings(cls, settings: Settings) -> ScorerConfig:
         return cls(
+            weights=settings.scorer_weight_map,
             threshold=settings.scorer_threshold,
             max_signals=settings.scorer_max_signals,
             degraded_penalty=settings.scorer_degraded_penalty,

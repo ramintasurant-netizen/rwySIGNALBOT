@@ -83,6 +83,32 @@ def parse_chat_targets(raw: str | None) -> tuple[ChatTarget, ...]:
     return targets
 
 
+def parse_weights(raw: str | None) -> dict[str, Decimal]:
+    """'breakout=0,reversal=0.5' → {'breakout': 0, 'reversal': 0.5}; bobot harus 0..5."""
+    out: dict[str, Decimal] = {}
+    if not raw or not raw.strip():
+        return out
+    for part in raw.split(","):
+        part = part.strip()
+        if not part:
+            continue
+        if "=" not in part:
+            raise ValueError(f"format bobot harus strategi=nilai, diterima {part!r}")
+        key, value = (x.strip() for x in part.split("=", 1))
+        if not re.fullmatch(r"[a-z_][a-z0-9_]*", key):
+            raise ValueError(f"nama strategi tidak valid: {key!r}")
+        try:
+            weight = Decimal(value)
+        except Exception as exc:  # noqa: BLE001
+            raise ValueError(f"bobot {key} bukan angka: {value!r}") from exc
+        if not (Decimal("0") <= weight <= Decimal("5")):
+            raise ValueError(f"bobot {key} harus 0..5")
+        if key in out:
+            raise ValueError(f"bobot {key} duplikat")
+        out[key] = weight
+    return out
+
+
 def _parse_int_list(raw: str | None, *, positive: bool) -> tuple[int, ...]:
     if not raw or not raw.strip():
         return ()
@@ -190,6 +216,8 @@ class Settings(BaseSettings):
     regime_slow: int = Field(default=200, ge=3, le=800)
     regime_policy_on_unknown: Literal["block", "allow"] = "block"
     regime_block_neutral: bool = False
+    # Bobot per strategi untuk scorer, mis. "breakout=0,reversal=0.5" (0 = strategi dinonaktifkan)
+    scorer_weights: str = ""
     scorer_threshold: int = Field(default=70, ge=0, le=100)
     scorer_max_signals: int = Field(default=5, ge=1, le=20)
     scorer_degraded_penalty: int = Field(default=10, ge=0, le=100)
@@ -199,6 +227,7 @@ class Settings(BaseSettings):
     _admin_user_ids: tuple[int, ...] = PrivateAttr(default=())
     _provider_order: tuple[str, ...] = PrivateAttr(default=())
     _warnings: tuple[str, ...] = PrivateAttr(default=())
+    _scorer_weights: dict[str, Decimal] = PrivateAttr(default_factory=dict)
 
     # ----- validator per-field -----
     @field_validator("app_timezone")
@@ -318,6 +347,7 @@ class Settings(BaseSettings):
 
         if self.regime_slow <= self.regime_fast:
             raise ValueError("REGIME_SLOW harus > REGIME_FAST")
+        self._scorer_weights = parse_weights(self.scorer_weights)
         self._warnings = tuple(warnings)
         return self
 
@@ -337,6 +367,10 @@ class Settings(BaseSettings):
     @property
     def provider_order(self) -> tuple[str, ...]:
         return self._provider_order
+
+    @property
+    def scorer_weight_map(self) -> dict[str, Decimal]:
+        return dict(self._scorer_weights)
 
     @property
     def config_warnings(self) -> tuple[str, ...]:

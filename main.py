@@ -9,6 +9,8 @@ Tahap 2: perintah diagnostik tanpa token —
   python main.py run                    bot Telegram (grup-only) + scheduler; tanpa token = scheduler dry-run saja
   python main.py screen --style bsjp|bpjs [--top 5] [--lookback 60]
                                         statistik historis gap overnight / intraday untuk kandidat (JARINGAN)
+  python main.py research --start ... --end ... [--fetch] [--oos-for VARIAN]
+                                        grid varian HANYA in-sample; OOS sekali untuk varian pilihan
   python main.py backtest --start ... --end ... [--csv-dir DIR] [--save-gate]
                                         backtest engine yang sama; laporan + CSV ke var/backtests (JARINGAN bila tanpa CSV)
 """
@@ -477,6 +479,118 @@ async def cmd_screen(settings: Settings, args: argparse.Namespace) -> int:
     return 0
 
 
+async def cmd_research(settings: Settings, args: argparse.Namespace) -> int:
+    from decimal import Decimal
+
+    from backtest.data import fetch_frames
+    from backtest.gate import GateThresholds, evaluate_gate, split_period
+    from backtest.research import (
+        DEFAULT_VARIANTS,
+        cache_dir,
+        format_table,
+        load_cached,
+        run_variants,
+        save_frame,
+    )
+    from backtest.runner import BacktestConfig
+
+    rules = load_market_rules(settings.config_dir / "market_rules.yaml")
+    watchlist = load_watchlist(settings.config_dir / "watchlist.yaml")
+    risk = RiskConfig.from_settings(settings)
+    regime_cfg = RegimeConfig.from_settings(settings)
+    start, end = date.fromisoformat(args.start), date.fromisoformat(args.end)
+    folder = cache_dir(settings.var_dir)
+    frames, index_frame = load_cached(folder)
+    if args.fetch or not frames:
+        symbols = [s.upper() for s in (args.symbols or watchlist.codes)]
+        aggregator = MarketDataAggregator(
+            build_providers(settings, rules), AggregatorConfig.from_settings(settings)
+        )
+        frames, skipped = await fetch_frames(
+            aggregator, symbols, start=start, end=end, min_bars=settings.daily_min_history_bars
+        )
+        if skipped:
+            logger.warning("simbol dilewati: {}", skipped)
+        idx = await aggregator.get_ohlcv(
+            regime_cfg.index_symbol,
+            Timeframe.D1,
+            datetime.combine(start, datetime.min.time(), tzinfo=UTC)
+            - timedelta(days=int(regime_cfg.warmup * 1.6) + 30),
+            datetime.combine(end, datetime.min.time(), tzinfo=UTC) + timedelta(days=1),
+            min_bars=regime_cfg.warmup,
+        )
+        index_frame = idx.frame if idx.frame is not None and idx.usable else None
+        for f in frames.values():
+            save_frame(f, folder)
+        if index_frame is not None:
+            save_frame(index_frame, folder)
+        logger.info(
+            "cache riset: {} saham + indeks={} di {}", len(frames), index_frame is not None, folder
+        )
+    if not frames:
+        print("Tidak ada data untuk riset.", file=sys.stderr)
+        return 1
+
+    thresholds = GateThresholds(oos_fraction=Decimal(str(args.oos_fraction)))
+    (is_start, is_end), (oos_start, oos_end) = split_period(start, end, thresholds.oos_fraction)
+    common = dict(
+        initial_capital=settings.sizing_capital_example,
+        slippage_ticks=args.slippage_ticks,
+        fee_buy_pct=settings.risk_fee_buy_pct,
+        fee_sell_pct=settings.risk_fee_sell_pct,
+        warmup_bars=settings.daily_min_history_bars,
+    )
+    variants = tuple(v for v in DEFAULT_VARIANTS if not args.variants or v.name in args.variants)
+    is_cfg = BacktestConfig(start=is_start, end=is_end, **common)
+    rows = run_variants(variants, frames, index_frame, rules=rules, risk=risk, cfg=is_cfg)
+    print(
+        f"IN-SAMPLE {is_start}..{is_end} ({len(frames)} saham; indeks {'ada' if index_frame else 'TIDAK ADA'})"
+    )
+    print(format_table(rows))
+    print("\nPer strategi (trade, expectancy R):")
+    for r in rows:
+        print(f"  {r.variant.name:22}{r.as_row()['by_strategy']}")
+    report: dict[str, object] = {
+        "in_sample": {
+            "period": [is_start.isoformat(), is_end.isoformat()],
+            "rows": [r.as_row() for r in rows],
+        },
+        "variants": [v.as_dict() for v in variants],
+        "universe": sorted(frames),
+    }
+    if args.oos_for:
+        chosen = next((v for v in DEFAULT_VARIANTS if v.name == args.oos_for), None)
+        if chosen is None:
+            print(f"varian {args.oos_for!r} tidak dikenal", file=sys.stderr)
+            return 2
+        oos_cfg = BacktestConfig(start=oos_start, end=oos_end, **common)
+        [oos_row] = run_variants(
+            (chosen,), frames, index_frame, rules=rules, risk=risk, cfg=oos_cfg
+        )
+        evaluation = evaluate_gate(oos_row.result, thresholds)
+        print(
+            f"\nOUT-OF-SAMPLE {oos_start}..{oos_end} — varian {chosen.name} (SATU kali evaluasi):"
+        )
+        print(format_table([oos_row]))
+        print(
+            "  gate:",
+            "LULUS" if evaluation.passed else "TIDAK LULUS",
+            "|",
+            "; ".join(evaluation.failures) or "semua pemeriksaan lolos",
+        )
+        report["out_of_sample"] = {
+            "variant": chosen.name,
+            "row": oos_row.as_row(),
+            "gate_passed": evaluation.passed,
+            "failures": evaluation.failures,
+        }
+    out_dir = settings.var_dir / "research"
+    out_path = out_dir / f"research_{start.isoformat()}_{end.isoformat()}.json"
+    out_path.write_text(_json(report), encoding="utf-8")
+    print(f"\nlaporan: {out_path}")
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="stock_signal_bot")
     parser.add_argument(
@@ -500,6 +614,15 @@ def build_parser() -> argparse.ArgumentParser:
     sc.add_argument("--top", type=int, default=5)
     sc.add_argument("--lookback", type=int, default=60)
     sc.add_argument("--symbols", nargs="*")
+    rs = sub.add_parser("research", help="grid varian in-sample; OOS sekali untuk varian pilihan")
+    rs.add_argument("--start", required=True)
+    rs.add_argument("--end", required=True)
+    rs.add_argument("--symbols", nargs="*")
+    rs.add_argument("--fetch", action="store_true", help="unduh ulang data ke cache riset")
+    rs.add_argument("--variants", nargs="*", help="subset nama varian")
+    rs.add_argument("--oos-for", help="nama varian yang dievaluasi SEKALI pada out-of-sample")
+    rs.add_argument("--slippage-ticks", type=int, default=1)
+    rs.add_argument("--oos-fraction", type=float, default=0.3)
     bt = sub.add_parser("backtest", help="backtest engine yang sama; gate out-of-sample")
     bt.add_argument("--start", required=True, help="YYYY-MM-DD")
     bt.add_argument("--end", required=True, help="YYYY-MM-DD")
@@ -550,6 +673,8 @@ def main(argv: list[str] | None = None) -> int:
         return asyncio.run(cmd_backtest(settings, args))
     if args.command == "screen":
         return asyncio.run(cmd_screen(settings, args))
+    if args.command == "research":
+        return asyncio.run(cmd_research(settings, args))
     return 2
 
 

@@ -83,7 +83,7 @@ Legenda status: ❌ belum · ⚠️ sebagian · ✅ selesai
 |---|---|---|
 | Threshold gate (trade minimum 30, expectancy > 0R, PF ≥ 1,3, MDD ≤ 15 %, OOS 30 %) | ⚠️ | diimplementasikan sebagai default CONTOH / BELUM DISEPAKATI; ubah lewat argumen CLI atau sepakati nilai final |
 | Sumber data historis & survivorship bias | ⚠️ | Yahoo (satu provider) atau CSV pengguna; universe = watchlist saat ini → survivorship bias dinyatakan dalam laporan |
-| Hasil gate saat ini | ❌ | 2026-09-23 (dengan `money_flow_proxy` + filter rezim IHSG): **TIDAK lulus** — IS 50 trade PF 1,05 (+0,04R), OOS 8 trade PF 0,54 (−0,37R, MDD 5,5 %); filter menahan setup pada 82/125 sesi bearish. Kalibrasi diperlukan; jangan menurunkan threshold agar lulus |
+| Hasil gate saat ini | ❌ | 2026-09-23: base **TIDAK lulus** (IS PF 1,05; OOS 8 trade PF 0,54). Riset in-sample terbaik `no_breakout_reversal` (IS PF 1,21) dievaluasi sekali di OOS: 5 trade, −0,61R, PF 0,20 → **tidak lulus**. Universe 12 saham terlalu kecil; butuh universe ≥40 & periode lebih panjang dengan OOS baru |
 | Simbol indeks rezim `^JKSE` (Yahoo) & perilaku bar hari berjalan | ⚠️ | terverifikasi tersedia 2 tahun; Yahoo memberi bar terakhir dengan Close NaN dan tanggal yang berbeda antara mode `period` vs `start/end` — ditangani (bar terakhir kosong ≠ lengkap) |
 | Slippage aktual | ❌ | default CONTOH 1 tick per sisi |
 

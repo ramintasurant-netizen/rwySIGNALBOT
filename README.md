@@ -290,7 +290,23 @@ TEASER_ONLY_WITH_SIGNALS=true      # tidak ada setup ⇒ tanpa teaser
 ```
 Teaser dikirim sebagai pesan pertama (tercatat dan dide-dup seperti bagian lain), diikuti laporan.
 
-### 15. Backtest dan gate produksi
+### 15. Riset kalibrasi yang disiplin (`main.py research`)
+```bash
+uv run python main.py research --start 2025-01-01 --end 2026-09-22 --fetch      # unduh sekali ke cache, grid in-sample
+uv run python main.py research --start 2025-01-01 --end 2026-09-22 --oos-for no_breakout_reversal
+```
+Grid varian kecil dan bermotivasi (bobot strategi, filter rezim, threshold, masa tahan) dievaluasi
+**hanya pada in-sample**; varian pilihan dievaluasi **sekali** pada out-of-sample lewat `--oos-for`.
+Bobot strategi untuk produksi diatur lewat `SCORER_WEIGHTS` (mis. `breakout=0,reversal=0`).
+
+> Hasil nyata 2026-09-23 (12 saham, Yahoo): in-sample terbaik `no_breakout_reversal` PF 1,21 (+0,10R,
+> MDD 5,3 %); `hold10` dan `thr80` justru merugikan. **OOS varian itu: 5 trade, −0,61R, PF 0,20 →
+> tidak lulus.** Perbaikan in-sample tidak bertahan di OOS — universe 12 saham terlalu kecil dan
+> periode OOS bearish. Kesimpulan jujur: belum ada konfigurasi yang layak produksi; langkah
+> berikutnya yang bermakna adalah universe lebih besar (≥40 saham) dan periode lebih panjang,
+> bukan menyetel parameter lebih lanjut pada data yang sama.
+
+### 16. Backtest dan gate produksi
 ```bash
 # data Yahoo (development) untuk watchlist, periode 2025-01-01..2026-09-22
 uv run python main.py backtest --start 2025-01-01 --end 2026-09-22
@@ -324,12 +340,12 @@ tidak akan menerbitkan sinyal.** Hasil backtest tidak menjamin keuntungan masa d
 > tetapi setup yang lolos di sesi netral masih negatif. Dilaporkan apa adanya; kalibrasi strategi
 > tetap diperlukan sebelum produksi.
 
-### 16. Database
+### 17. Database
 - Development: SQLite `var/dev.db` (skema dibuat otomatis).
 - Production: PostgreSQL, jalankan migrasi: `DATABASE_URL=postgresql+asyncpg://... uv run alembic upgrade head`.
 - Snapshot laporan tersimpan immutable di tabel `job_runs`.
 
-### 17. Docker Compose
+### 18. Docker Compose
 Prasyarat: Docker Engine + Compose v2, berkas `.env` sudah diisi (lihat §2–§5).
 ```bash
 # Development (SQLite di ./var, mode sesuai .env — default dry_run):
@@ -356,7 +372,7 @@ sehingga aturan/kalender/watchlist dapat diperbarui tanpa rebuild (restart conta
 > Build image belum dijalankan di lingkungan pengembangan ini (tanpa Docker); Dockerfile dan
 > Compose diperiksa statis dan dibangun + smoke-test oleh CI GitHub Actions (`ci/github-workflow-ci.yml` (pindahkan ke `.github/workflows/` untuk mengaktifkan; lihat `ci/README.md`)).
 
-### 18. Backup dan restore
+### 19. Backup dan restore
 - **SQLite**: hentikan bot (`docker compose stop bot`), salin `var/dev.db` (beserta `-wal`/`-shm`
   bila ada) ke lokasi aman, lalu jalankan lagi. Restore = kembalikan berkas saat bot berhenti.
 - **PostgreSQL**: `docker compose --profile production exec postgres pg_dump -U bot stock_signal_bot > backup.sql`;
@@ -364,7 +380,7 @@ sehingga aturan/kalender/watchlist dapat diperbarui tanpa rebuild (restart conta
 - Sertakan `var/exports/` (laporan HTML/WhatsApp) dan `var/backtests/` bila ingin menyimpan jejak audit.
 - `.env` **tidak** ikut backup otomatis; simpan di pengelola secret.
 
-### 19. Membuat arsip ZIP distribusi
+### 20. Membuat arsip ZIP distribusi
 ```bash
 uv run python scripts/package_project.py --check   # daftar berkas + pemindaian rahasia
 uv run python scripts/package_project.py           # -> dist/stock_signal_bot_<tgl>_<commit>.zip
@@ -375,7 +391,7 @@ Bila ada pola token/kunci di berkas non-test, pembuatan arsip dibatalkan. Memula
 ekstrak → `uv sync --all-groups` (atau `pip install -r requirements-dev.txt`) → `cp .env.example .env`
 → `uv run pytest` → ikuti bagian Telegram di atas.
 
-### 20. Troubleshooting umum
+### 21. Troubleshooting umum
 | Gejala | Penyebab umum | Tindakan |
 |---|---|---|
 | `Konfigurasi tidak valid: APP_MODE=live membutuhkan ...` | saklar live belum lengkap | isi `TELEGRAM_BOT_TOKEN`, `TELEGRAM_SIGNAL_CHAT_IDS`, `TELEGRAM_ENABLE_LIVE_SEND=true` |
@@ -401,7 +417,7 @@ notifications/ base, telegram
 bot/         formatter, commands, handlers, gates, reports, scheduler, alerts, runtime
 ai/          llm_client (openai/anthropic/openai_compatible), narrator (validasi + template)
 notifications/whatsapp_export.py  teks Saluran WhatsApp (manual)
-backtest/    runner (engine+lifecycle produksi), metrics, gate, data (Yahoo/CSV)
+backtest/    runner (engine+lifecycle produksi), metrics, gate, data (Yahoo/CSV), research (grid IS / OOS sekali)
 scripts/     test_telegram.py, reconcile_deliveries.py, package_project.py, healthcheck.py
 Dockerfile · docker-compose.yml · .dockerignore · ci/github-workflow-ci.yml
 tests/       test offline
